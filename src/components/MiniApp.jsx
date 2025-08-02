@@ -12,7 +12,7 @@ export default function Game() {
       default: "arcade",
       arcade: {
         gravity: { y: 300 },
-        debug: false,
+        debug: true,
       },
     },
     scene: {
@@ -22,11 +22,17 @@ export default function Game() {
     },
   };
 
-  let selectedCarKey = "car_green"; // or dynamically assigned
+  let selectedCarKey = "car_white"; // or dynamically assigned
 
   var player;
   let cursors;
+  var player_config;
   var game = new Phaser.Game(config);
+
+  // Find the asset group (folder) that contains the selectedCarKey
+  const group = assetsData.find((g) =>
+    g.files.some((file) => file.key === selectedCarKey)
+  );
 
   async function preload() {
     // Find the asset group (folder) that contains the selectedCarKey
@@ -40,24 +46,22 @@ export default function Game() {
     }
 
     // Find the specific file info inside that group
-    const selectedFile = group.files.find(
-      (file) => file.key === selectedCarKey
-    );
+    player_config = group.files.find((file) => file.key === selectedCarKey);
 
-    if (!selectedFile) {
+    if (!player_config) {
       console.error(`No asset file found for key: ${selectedCarKey}`);
       return;
     }
 
     // Load the sprite sheet or image for the selected car only
-    if (selectedFile.type === "image" && selectedFile.frameConfig) {
+    if (player_config.type === "image" && player_config.frameConfig) {
       this.load.spritesheet(
-        selectedFile.key,
-        `/${group.path}/${selectedFile.url}`,
-        selectedFile.frameConfig
+        player_config.key,
+        `/${group.path}/${player_config.url}`,
+        player_config.frameConfig
       );
-    } else if (selectedFile.type === "image") {
-      this.load.image(selectedFile.key, `/${group.path}/${selectedFile.url}`);
+    } else if (player_config.type === "image") {
+      this.load.image(player_config.key, `/${group.path}/${player_config.url}`);
     }
 
     // Load other assets you need
@@ -136,17 +140,24 @@ export default function Game() {
       window.innerHeight,
       selectedCarKey
     );
-    player.setScale(3.5);
+
+    // Set the scale first
+    const scale = 3.5;
+    player.setScale(scale);
+
+    const hitboxWidth = player.width * player_config["hitbox"].width;
+    const hitboxHeight = player.height * player_config["hitbox"].height;
+
+    const offsetX = (player.width - hitboxWidth) / 2;
+    const offsetY = (player.height - hitboxHeight) / 2;
+
+    player.body.setSize(hitboxWidth, hitboxHeight);
+    player.body.setOffset(offsetX, offsetY);
+
     player.setCollideWorldBounds(true);
 
-    // // Adjust the physics body to match the scaled size:
-
-    player.body.setOffset(
-      (player.width * player.scaleX - player.displayWidth) / 2,
-      (player.height * player.scaleY - player.displayHeight) / 2
-    );
-
-    const carKey = selectedCarKey; // like "car_blue_2"
+    // Adjust the physics body to match the scaled size:
+    const carKey = selectedCarKey;
 
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -260,11 +271,11 @@ export default function Game() {
   }
 
   function handleCollision(player, obstacle) {
-    console.log("Collision detected!");
-    // this.physics.pause();
-    player.setTint(0xff0000);
-    // player.anims.stop();
-    console.log("Game Over!");
+    // console.log("Collision detected!");
+    // // this.physics.pause();
+    // player.setTint(0xff0000);
+    // // player.anims.stop();
+    // console.log("Game Over!");
   }
 
   return <></>;

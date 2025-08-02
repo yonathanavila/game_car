@@ -61,6 +61,39 @@
         "frame": 5,
         "frameRate": 10,
         "repeat": 0,
-        "assetKey": "car_green"
+        "assetKey": "car_white"
+    },
+     {
+        "key": "car_white_left",
+        "frame": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ],
+        "frameRate": 10,
+        "repeat": 0,
+        "assetKey": "car_white"
+    },
+    {
+        "key": "car_white_right",
+        "frame": [
+            6,
+            7,
+            8,
+            9,
+            10
+        ],
+        "frameRate": 10,
+        "repeat": 0,
+        "assetKey": "car_white"
+    },
+    {
+        "key": "car_white_turn",
+        "frame": 5,
+        "frameRate": 10,
+        "repeat": 0,
+        "assetKey": "car_white"
     }
 ]

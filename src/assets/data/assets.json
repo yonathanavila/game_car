@@ -1,25 +1,46 @@
 [
-    {
-        "path": "images/car",
-        "files": [
-            {
-                "type": "image",
-                "key": "car_blue",
-                "url": "car_blue_2.png",
-                "frameConfig": {
-                    "frameWidth": 84.222222222,
-                    "frameHeight": 101
-                }
-            },
-             {
-                "type": "image",
-                "key": "car_green",
-                "url": "car_green.png",
-                "frameConfig": {
-                    "frameWidth": 100,
-                    "frameHeight": 100
-                }
-            }
-        ]
-    }
+  {
+    "path": "images/car",
+    "files": [
+      {
+        "type": "image",
+        "key": "car_blue",
+        "url": "car_blue.png",
+        "frameConfig": {
+          "frameWidth": 66,
+          "frameHeight": 67
+        },
+        "hitbox": {
+          "width": 0.5,
+          "height": 0.95
+        }
+      },
+      {
+        "type": "image",
+        "key": "car_green",
+        "url": "car_green.png",
+        "frameConfig": {
+          "frameWidth": 54,
+          "frameHeight": 51
+        },
+        "hitbox": {
+          "width": 0.8,
+          "height": 0.9
+        }
+      },
+       {
+        "type": "image",
+        "key": "car_white",
+        "url": "car_white.png",
+        "frameConfig": {
+          "frameWidth": 61,
+          "frameHeight": 61
+        },
+        "hitbox": {
+          "width": 0.6,
+          "height": 0.95
+        }
+      }
+    ]
+  }
 ]
