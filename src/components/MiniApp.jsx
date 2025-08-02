@@ -8,6 +8,7 @@ export default function Game() {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
+    pixelArt: true,
     physics: {
       default: "arcade",
       arcade: {
@@ -22,7 +23,7 @@ export default function Game() {
     },
   };
 
-  let selectedCarKey = "car_red"; // or dynamically assigned
+  let selectedCarKey = "car_green"; // or dynamically assigned
 
   var player;
   let cursors;
