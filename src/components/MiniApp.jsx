@@ -6,8 +6,6 @@ import animationsData from "../assets/data/animations.json";
 export default function Game() {
   var config = {
     type: Phaser.AUTO,
-    width: window.innerWidth,
-    height: window.innerHeight,
     pixelArt: true,
     physics: {
       default: "arcade",
@@ -16,6 +14,11 @@ export default function Game() {
         debug: true,
       },
     },
+      scale: {
+    parent: 'game-container',
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
     scene: {
       preload: preload,
       create: create,
@@ -279,5 +282,5 @@ export default function Game() {
     // console.log("Game Over!");
   }
 
-  return <></>;
+  return <div id="game-container"></div>;
 }
