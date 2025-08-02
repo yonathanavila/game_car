@@ -22,7 +22,7 @@ export default function Game() {
     },
   };
 
-  let selectedCarKey = "car_white"; // or dynamically assigned
+  let selectedCarKey = "car_red"; // or dynamically assigned
 
   var player;
   let cursors;

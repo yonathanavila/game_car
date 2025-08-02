@@ -28,13 +28,39 @@
           "height": 0.9
         }
       },
-       {
+      {
         "type": "image",
         "key": "car_white",
         "url": "car_white.png",
         "frameConfig": {
           "frameWidth": 61,
           "frameHeight": 61
+        },
+        "hitbox": {
+          "width": 0.6,
+          "height": 0.95
+        }
+      },
+      {
+        "type": "image",
+        "key": "car_taxi",
+        "url": "car_taxi.png",
+        "frameConfig": {
+          "frameWidth": 65,
+          "frameHeight": 67
+        },
+        "hitbox": {
+          "width": 0.6,
+          "height": 0.95
+        }
+      },
+      {
+        "type": "image",
+        "key": "car_red",
+        "url": "car_red.png",
+        "frameConfig": {
+          "frameWidth": 62,
+          "frameHeight": 64
         },
         "hitbox": {
           "width": 0.6,
