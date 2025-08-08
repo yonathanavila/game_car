@@ -7,6 +7,9 @@ export default function Game() {
   var config = {
     type: Phaser.AUTO,
     pixelArt: true,
+
+    width: window.innerWidth,
+    height: window.innerHeight,
     physics: {
       default: "arcade",
       arcade: {
@@ -14,11 +17,11 @@ export default function Game() {
         debug: true,
       },
     },
-      scale: {
-    parent: 'game-container',
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
+    scale: {
+      parent: "game-container",
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     scene: {
       preload: preload,
       create: create,
@@ -69,9 +72,7 @@ export default function Game() {
     }
 
     // Load other assets you need
-    this.load.image("limit", "images/limit.png");
     this.load.image("bache_2", "images/bache_2.webp");
-    this.load.image("bache", "images/bache.webp");
   }
 
   function create() {
@@ -128,7 +129,7 @@ export default function Game() {
     this.spliteYellowLineRight = this.physics.add.staticGroup();
     for (let i = 0; i < 26; i++) {
       const dash = this.add.rectangle(
-        window.innerWidth - 5,
+        window.innerWidth,
         i * 80,
         10,
         50,
@@ -146,7 +147,7 @@ export default function Game() {
     );
 
     // Set the scale first
-    const scale = 3.5;
+    const scale = window.innerWidth / 160; // Adjust the scale factor as needed
     player.setScale(scale);
 
     const hitboxWidth = player.width * player_config["hitbox"].width;
@@ -202,7 +203,7 @@ export default function Game() {
       player.setVelocityY(-330);
     }
 
-    // make infinite road
+    // Adjust the speed of the lines based on delta time
 
     const speed = 0.35 * delta;
 
@@ -238,19 +239,6 @@ export default function Game() {
     });
   }
 
-  function spliteWhiteLine(positionX, positionY, { width, height, color }) {
-    for (let i = 0; i < 10; i++) {
-      const dash = this.add.rectangle(
-        positionX,
-        positionY,
-        width,
-        height,
-        color
-      );
-      this.dashes.push(dash);
-    }
-  }
-
   function spawnObstacle() {
     const bacheFrame = this.textures.get("bache_2").getSourceImage();
     const obstacleWidth = bacheFrame.width;
@@ -263,12 +251,17 @@ export default function Game() {
     const y = Phaser.Math.Between(-600, -100);
 
     const obstacle = this.obstacles.create(x, y, "bache_2");
-    // obstacle.setScale(0.8);
-    obstacle.body.setSize(obstacle.displayWidth, obstacle.displayHeight);
-    obstacle.body.setOffset(
-      (obstacle.width * obstacle.scaleX - obstacle.displayWidth) / 2,
-      (obstacle.height * obstacle.scaleY - obstacle.displayHeight) / 2
-    );
+
+    // scale the obstacle to fit the screen width
+    obstacle.setScale(window.innerWidth / 650);
+
+    const hitboxWidth = obstacle.width * 0.6;
+    const hitboxHeight = obstacle.height * 0.8;
+
+    const offsetX = (obstacle.width - hitboxWidth) / 2;
+    const offsetY = (obstacle.height - hitboxHeight) / 2;
+    obstacle.body.setSize(hitboxWidth, hitboxHeight);
+    obstacle.body.setOffset(offsetX, offsetY);
     obstacle.body.setVelocityY(350);
     obstacle.body.setImmovable(true);
     obstacle.body.allowGravity = false;
