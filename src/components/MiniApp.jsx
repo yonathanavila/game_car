@@ -14,7 +14,7 @@ export default function Game() {
       default: "arcade",
       arcade: {
         gravity: { y: 300 },
-        debug: true,
+        debug: false,
       },
     },
     scale: {
@@ -70,12 +70,15 @@ export default function Game() {
     } else if (player_config.type === "image") {
       this.load.image(player_config.key, `/${group.path}/${player_config.url}`);
     }
+    console.log(this.textures.get(selectedCarKey).frameTotal);
 
     // Load other assets you need
     this.load.image("bache_2", "images/bache_2.webp");
   }
 
   function create() {
+    var speed = 250; // Speed for obstacles
+
     // Filter animations for selectedCarKey only
     const filteredAnims = animationsData.filter(
       (anim) => anim.assetKey === selectedCarKey
@@ -97,15 +100,20 @@ export default function Game() {
       });
     });
 
+    // ======================
+    // 1️⃣ Obstacles Group
+    // ======================
     this.obstacles = this.physics.add.group();
 
     // Spawn the first few obstacles
     for (let i = 0; i < 5; i++) {
-      spawnObstacle.call(this);
+      spawnObstacle.call(this, speed);
     }
 
-    // make infinite splite white lines
-    this.spliteWhiteLine = [];
+    // ======================
+    // 2️⃣ White center lines (Physics Group)
+    // ======================
+    this.spliteWhiteLineGroup = this.physics.add.group();
     for (let i = 0; i < 26; i++) {
       const dash = this.add.rectangle(
         this.scale.width / 2,
@@ -114,32 +122,45 @@ export default function Game() {
         40,
         0xffffff
       );
-      this.spliteWhiteLine.push(dash);
+      this.spliteWhiteLineGroup.add(dash);
+      dash.body.setVelocityY(speed);
+      dash.body.allowGravity = false;
+      dash.body.immovable = true;
     }
 
-    // make infinite splite yellow lines left
-    this.spliteYellowLineLeft = this.physics.add.staticGroup();
+    // ======================
+    // 3️⃣ Yellow left lines (Physics Group)
+    // ======================
+    this.spliteYellowLineLeftGroup = this.physics.add.group();
     for (let i = 0; i < 26; i++) {
       const dash = this.add.rectangle(5, i * 80, 10, 50, 0xffff00);
-
-      this.spliteYellowLineLeft.add(dash, true);
+      this.spliteYellowLineLeftGroup.add(dash);
+      dash.body.setVelocityY(speed);
+      dash.body.allowGravity = false;
+      dash.body.immovable = true;
     }
 
-    // make infinite splite yellow lines right
-    this.spliteYellowLineRight = this.physics.add.staticGroup();
+    // ======================
+    // 4️⃣ Yellow right lines (Physics Group)
+    // ======================
+    this.spliteYellowLineRightGroup = this.physics.add.group();
     for (let i = 0; i < 26; i++) {
       const dash = this.add.rectangle(
-        window.innerWidth,
+        window.innerWidth - 5,
         i * 80,
         10,
         50,
         0xffff00
       );
-
-      this.spliteYellowLineRight.add(dash, true);
+      this.spliteYellowLineRightGroup.add(dash);
+      dash.body.setVelocityY(speed);
+      dash.body.allowGravity = false;
+      dash.body.immovable = true;
     }
 
-    // Create player sprite with selectedCarKey
+    // ======================
+    // 5️⃣ Player
+    // ======================
     player = this.physics.add.sprite(
       window.innerWidth / 2,
       window.innerHeight,
@@ -149,25 +170,17 @@ export default function Game() {
     // Set the scale first
     const scale = window.innerWidth / 160; // Adjust the scale factor as needed
     player.setScale(scale);
+    player.setCollideWorldBounds(true);
 
+    // Player hitbox
     const hitboxWidth = player.width * player_config["hitbox"].width;
     const hitboxHeight = player.height * player_config["hitbox"].height;
-
     const offsetX = (player.width - hitboxWidth) / 2;
     const offsetY = (player.height - hitboxHeight) / 2;
-
     player.body.setSize(hitboxWidth, hitboxHeight);
     player.body.setOffset(offsetX, offsetY);
 
-    player.setCollideWorldBounds(true);
-
-    // Adjust the physics body to match the scaled size:
-    const carKey = selectedCarKey;
-
-    cursors = this.input.keyboard.createCursorKeys();
-
-    this.physics.add.collider(player, this.spliteWhiteLine);
-    // Add collision between player and obstacles
+    // Collisions with obstacles
     this.physics.add.overlap(
       player,
       this.obstacles,
@@ -175,17 +188,23 @@ export default function Game() {
       null,
       this
     );
+
+    cursors = this.input.keyboard.createCursorKeys();
   }
 
-  function update(time, delta) {
+  // ======================
+  // 6️⃣ Update Loop
+  // ======================
+  function update() {
+    // Player movement
     if (cursors.left.isDown) {
-      player.setVelocityX(-340);
+      player.setVelocityX(-260);
       const leftKey = `${selectedCarKey}_left`;
       if (player.anims.currentAnim?.key !== leftKey) {
         player.anims.play(leftKey, true);
       }
     } else if (cursors.right.isDown) {
-      player.setVelocityX(340);
+      player.setVelocityX(260);
 
       const rightKey = `${selectedCarKey}_right`;
       if (player.anims.currentAnim?.key !== rightKey) {
@@ -199,47 +218,44 @@ export default function Game() {
       }
     }
 
-    if (cursors.up.isDown && player.body.touching.down) {
+      if (cursors.up.isDown && player.body.touching.down) {
       player.setVelocityY(-330);
     }
 
-    // Adjust the speed of the lines based on delta time
-
-    const speed = 0.35 * delta;
-
-    this.spliteWhiteLine.forEach((whiteLine) => {
-      whiteLine.y += speed;
-
-      if (whiteLine.y > this.sys.game.config.height) {
-        whiteLine.y = 0;
-      }
-    });
-
-    this.spliteYellowLineLeft.getChildren().forEach((dash) => {
-      dash.y += speed;
-
+    // Recycle white lines
+    this.spliteWhiteLineGroup.getChildren().forEach((dash) => {
       if (dash.y > this.sys.game.config.height) {
         dash.y = 0;
       }
     });
 
-    this.spliteYellowLineRight.getChildren().forEach((dash) => {
-      dash.y += speed;
-
+    // Recycle yellow lines (left)
+    this.spliteYellowLineLeftGroup.getChildren().forEach((dash) => {
       if (dash.y > this.sys.game.config.height) {
         dash.y = 0;
       }
     });
 
+    // Recycle yellow lines (right)
+    this.spliteYellowLineRightGroup.getChildren().forEach((dash) => {
+      if (dash.y > this.sys.game.config.height) {
+        dash.y = 0;
+      }
+    });
+
+    // Recycle obstacles
     this.obstacles.getChildren().forEach((obstacle) => {
       if (obstacle.y > this.sys.game.config.height + 100) {
-        obstacle.y = Phaser.Math.Between(-600, -100);
+        obstacle.y = Phaser.Math.Between(-window.innerHeight, -100);
         obstacle.x = Phaser.Math.Between(100, window.innerWidth - 100);
       }
     });
   }
 
-  function spawnObstacle() {
+  // ======================
+  // 7️⃣ Spawn Obstacle Function
+  // ======================
+  function spawnObstacle(speed) {
     const bacheFrame = this.textures.get("bache_2").getSourceImage();
     const obstacleWidth = bacheFrame.width;
     const obstacleHeight = bacheFrame.height;
@@ -253,7 +269,7 @@ export default function Game() {
     const obstacle = this.obstacles.create(x, y, "bache_2");
 
     // scale the obstacle to fit the screen width
-    obstacle.setScale(window.innerWidth / 650);
+    obstacle.setScale(window.innerWidth / 850);
 
     const hitboxWidth = obstacle.width * 0.6;
     const hitboxHeight = obstacle.height * 0.8;
@@ -262,9 +278,11 @@ export default function Game() {
     const offsetY = (obstacle.height - hitboxHeight) / 2;
     obstacle.body.setSize(hitboxWidth, hitboxHeight);
     obstacle.body.setOffset(offsetX, offsetY);
-    obstacle.body.setVelocityY(350);
-    obstacle.body.setImmovable(true);
+
+    // Use physics velocity so it matches lines
+    obstacle.body.setVelocityY(speed);
     obstacle.body.allowGravity = false;
+    obstacle.body.immovable = true;
   }
 
   function handleCollision(player, obstacle) {
