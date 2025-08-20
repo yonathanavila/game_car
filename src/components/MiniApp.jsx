@@ -116,22 +116,14 @@ export default function Game() {
     // ======================
     // 2️⃣ White center lines (Physics Group)
     // ======================
-    this.spliteWhiteLineGroup = this.physics.add.group();
-    for (let i = 0; i < 26; i++) {
-      const dash = this.add.rectangle(
-        this.scale.width / 2,
-        i * 80,
-        10,
-        40,
-        0xffffff
-      );
-      this.spliteWhiteLineGroup.add(dash);
-      this.spliteWhiteLineGroup.setDepth(-1);
 
-      dash.body.setVelocityY(speed);
-      dash.body.allowGravity = false;
-      dash.body.immovable = true;
-    }
+    const dashHeight = 30;
+    const spacing = 65; // distancia entre inicios de líneas
+    const totalLines = Math.ceil(this.scale.height / spacing) + 1;
+
+    this.spliteWhiteLineGroup = generateLines.call(this, totalLines, spacing, dashHeight);
+
+    addPhisicsToLines.call(this, this.spliteWhiteLineGroup, speed);
 
     // ======================
     // 3️⃣ Yellow left lines (Physics Group)
@@ -302,6 +294,36 @@ export default function Game() {
     // player.setTint(0xff0000);
     // // player.anims.stop();
     // console.log("Game Over!");
+  }
+
+  function generateLines(totalLines, spacing, dashHeight) {
+    const group = this.add.group(); // <-- create a group
+
+    for (let i = 0; i < totalLines; i++) {
+      const dash = this.add.rectangle(
+        this.scale.width / 2,
+        i * spacing,
+        10,
+        dashHeight,
+        0xffffff
+      );
+
+      group.add(dash);
+      group.setDepth(-1);
+    }
+
+    return group;
+  }
+
+  function addPhisicsToLines(linesGroup, speed) {
+    linesGroup.getChildren().forEach((dash) => {
+      this.physics.add.existing(dash);
+      dash.body.setVelocityY(speed);
+      dash.body.allowGravity = false;
+      dash.body.immovable = true;
+    });
+
+    return linesGroup;
   }
 
   return <div id="game-container"></div>;
