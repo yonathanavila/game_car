@@ -77,7 +77,6 @@ export default function Game() {
     this.load.image("bache_3", "images/pothole/bache_3.webp");
     this.load.image("bache_4", "images/pothole/bache_4.webp");
     this.load.image("bache_5", "images/pothole/bache_5.webp");
-
   }
 
   function create() {
@@ -127,6 +126,8 @@ export default function Game() {
         0xffffff
       );
       this.spliteWhiteLineGroup.add(dash);
+      this.spliteWhiteLineGroup.setDepth(-1);
+
       dash.body.setVelocityY(speed);
       dash.body.allowGravity = false;
       dash.body.immovable = true;
@@ -269,7 +270,6 @@ export default function Game() {
 
     const obstacleWidth = bacheFrame.width;
     const obstacleHeight = bacheFrame.height;
-
 
     const x = Phaser.Math.Between(
       obstacleWidth / 2,
