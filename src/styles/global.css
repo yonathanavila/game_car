@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Minecraft";
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: 100 400;
+  font-display: swap;
+  src: url("/fonts/Minecraft.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pixelify Sans";
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/PixelifySans-VariableFont_wght.woff2") format("woff2");
+}

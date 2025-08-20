@@ -35,6 +35,10 @@ export default function Game() {
   let cursors;
   var player_config;
   var game = new Phaser.Game(config);
+  var clients = 0;
+  var damage = 0;
+  var scoreText;
+  var damageText;
 
   // Find the asset group (folder) that contains the selectedCarKey
   const group = assetsData.find((g) =>
@@ -73,8 +77,6 @@ export default function Game() {
     console.log(this.textures.get(selectedCarKey).frameTotal);
 
     // Load other assets you need
-    this.load.image("bache_2", "images/pothole/bache_2.webp");
-    this.load.image("bache_3", "images/pothole/bache_3.webp");
     this.load.image("bache_4", "images/pothole/bache_4.webp");
     this.load.image("bache_5", "images/pothole/bache_5.webp");
   }
@@ -121,9 +123,22 @@ export default function Game() {
     const spacing = 65; // distancia entre inicios de líneas
     const totalLines = Math.ceil(this.scale.height / spacing) + 1;
 
-    this.spliteWhiteLineGroup = generateLines.call(this, totalLines, spacing, dashHeight);
+    this.spliteWhiteLineGroup = this.physics.add.group();
+    for (let i = 0; i < totalLines; i++) {
+      const dash = this.add.rectangle(
+        this.scale.width / 2,
+        i * 80,
+        10,
+        dashHeight,
+        0xffffff
+      );
+      this.spliteWhiteLineGroup.add(dash);
+      dash.body.setVelocityY(speed);
+      dash.body.allowGravity = false;
+      dash.body.immovable = true;
+    }
 
-    addPhisicsToLines.call(this, this.spliteWhiteLineGroup, speed);
+    this.spliteWhiteLineGroup.setDepth(-1);
 
     // ======================
     // 3️⃣ Yellow left lines (Physics Group)
@@ -187,6 +202,20 @@ export default function Game() {
     );
 
     cursors = this.input.keyboard.createCursorKeys();
+
+    // The score text
+    scoreText = this.add.text(16, 16, "Clients: 0", {
+      fontFamily: "Minecraft",
+      fontSize: "32px",
+      fill: "#fff",
+    });
+
+    // The score text
+    damageText = this.add.text(16, 60, "Damage: 0", {
+      fontFamily: "Minecraft",
+      fontSize: "32px",
+      fill: "#fff",
+    });
   }
 
   // ======================
@@ -254,7 +283,7 @@ export default function Game() {
   // ======================
   function spawnObstacle(speed) {
     // Pick a random key from the available obstacle textures
-    const obstacleKeys = ["bache_2", "bache_3", "bache_4", "bache_5"];
+    const obstacleKeys = ["bache_4", "bache_5"];
 
     const randomKey = Phaser.Utils.Array.GetRandom(obstacleKeys);
 
@@ -289,41 +318,34 @@ export default function Game() {
   }
 
   function handleCollision(player, obstacle) {
-    // console.log("Collision detected!");
-    // // this.physics.pause();
-    // player.setTint(0xff0000);
-    // // player.anims.stop();
-    // console.log("Game Over!");
-  }
-
-  function generateLines(totalLines, spacing, dashHeight) {
-    const group = this.add.group(); // <-- create a group
-
-    for (let i = 0; i < totalLines; i++) {
-      const dash = this.add.rectangle(
-        this.scale.width / 2,
-        i * spacing,
-        10,
-        dashHeight,
-        0xffffff
-      );
-
-      group.add(dash);
-      group.setDepth(-1);
+    if (player.blinkEvent) {
+      player.blinkEvent.remove();
+      player.clearTint();
     }
 
-    return group;
-  }
+    let elapsed = 0;
+    damage += 1;
+    damageText.setText('Damage: ' + damage);
 
-  function addPhisicsToLines(linesGroup, speed) {
-    linesGroup.getChildren().forEach((dash) => {
-      this.physics.add.existing(dash);
-      dash.body.setVelocityY(speed);
-      dash.body.allowGravity = false;
-      dash.body.immovable = true;
+    player.blinkEvent = player.scene.time.addEvent({
+      delay: 200,
+      callback: () => {
+        if (player.tintTopLeft === 0xff0000) {
+          player.clearTint();
+        } else {
+          player.setTint(0xff0000);
+        }
+
+        elapsed += 200;
+
+        if (elapsed >= 2000) {
+          player.clearTint();
+          player.blinkEvent.remove();
+          player.blinkEvent = null;
+        }
+      },
+      loop: true,
     });
-
-    return linesGroup;
   }
 
   return <div id="game-container"></div>;
