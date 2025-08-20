@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 
-import assetsData from "../assets/data/assets.json";
-import animationsData from "../assets/data/animations.json";
+import assetsData from "@/assets/data/assets.json";
+import animationsData from "@/assets/data/animations.json";
 
 export default function Game() {
   var config = {
@@ -73,7 +73,11 @@ export default function Game() {
     console.log(this.textures.get(selectedCarKey).frameTotal);
 
     // Load other assets you need
-    this.load.image("bache_2", "images/bache_2.webp");
+    this.load.image("bache_2", "images/pothole/bache_2.webp");
+    this.load.image("bache_3", "images/pothole/bache_3.webp");
+    this.load.image("bache_4", "images/pothole/bache_4.webp");
+    this.load.image("bache_5", "images/pothole/bache_5.webp");
+
   }
 
   function create() {
@@ -218,7 +222,7 @@ export default function Game() {
       }
     }
 
-      if (cursors.up.isDown && player.body.touching.down) {
+    if (cursors.up.isDown && player.body.touching.down) {
       player.setVelocityY(-330);
     }
 
@@ -256,9 +260,16 @@ export default function Game() {
   // 7️⃣ Spawn Obstacle Function
   // ======================
   function spawnObstacle(speed) {
-    const bacheFrame = this.textures.get("bache_2").getSourceImage();
+    // Pick a random key from the available obstacle textures
+    const obstacleKeys = ["bache_2", "bache_3", "bache_4", "bache_5"];
+
+    const randomKey = Phaser.Utils.Array.GetRandom(obstacleKeys);
+
+    const bacheFrame = this.textures.get(randomKey).getSourceImage();
+
     const obstacleWidth = bacheFrame.width;
     const obstacleHeight = bacheFrame.height;
+
 
     const x = Phaser.Math.Between(
       obstacleWidth / 2,
@@ -266,7 +277,7 @@ export default function Game() {
     );
     const y = Phaser.Math.Between(-600, -100);
 
-    const obstacle = this.obstacles.create(x, y, "bache_2");
+    const obstacle = this.obstacles.create(x, y, randomKey);
 
     // scale the obstacle to fit the screen width
     obstacle.setScale(window.innerWidth / 850);
