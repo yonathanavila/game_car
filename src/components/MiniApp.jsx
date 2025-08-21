@@ -124,13 +124,13 @@ export default function Game() {
     });
 
     // ======================
-    // Obstacles Group
+    // Potholes Group
     // ======================
-    this.obstacles = this.physics.add.group();
+    this.potholes = this.physics.add.group();
 
     // Spawn the first few obstacles
     for (let i = 0; i < 5; i++) {
-      spawnObstacle.call(this, speed);
+      spawnPothole.call(this, speed);
     }
 
     // ======================
@@ -157,7 +157,7 @@ export default function Game() {
     // Collisions with obstacles
     this.physics.add.overlap(
       player,
-      this.obstacles,
+      this.potholes,
       handleCollision,
       null,
       this
@@ -247,7 +247,7 @@ export default function Game() {
     }
 
     // Recycle obstacles
-    this.obstacles.getChildren().forEach((obstacle) => {
+    this.potholes.getChildren().forEach((obstacle) => {
       if (obstacle.y > this.sys.game.config.height + 100) {
         obstacle.y = Phaser.Math.Between(-window.innerHeight, -100);
         obstacle.x = Phaser.Math.Between(100, window.innerWidth - 100);
@@ -256,41 +256,41 @@ export default function Game() {
   }
 
   // ======================
-  // Spawn Obstacle Function
+  // Spawn Potholes Function
   // ======================
-  function spawnObstacle(speed) {
+  function spawnPothole(speed) {
     // Pick a random key from the available obstacle textures
-    const obstacleKeys = ["bache_4", "bache_5"];
+    const potholeKeys = ["bache_4", "bache_5"];
 
-    const randomKey = Phaser.Utils.Array.GetRandom(obstacleKeys);
+    const randomKey = Phaser.Utils.Array.GetRandom(potholeKeys);
 
-    const bacheFrame = this.textures.get(randomKey).getSourceImage();
+    const potholeFrame = this.textures.get(randomKey).getSourceImage();
 
-    const obstacleWidth = bacheFrame.width;
+    const potholeWidth = potholeFrame.width;
 
     const x = Phaser.Math.Between(
-      obstacleWidth / 2,
-      window.innerWidth - obstacleWidth / 2
+      potholeWidth / 2,
+      window.innerWidth - potholeWidth / 2
     );
     const y = Phaser.Math.Between(-600, -100);
 
-    const obstacle = this.obstacles.create(x, y, randomKey);
+    const pothole = this.potholes.create(x, y, randomKey);
 
-    // scale the obstacle to fit the screen width
-    obstacle.setScale(0.452);
+    // scale the pothole to fit the screen width
+    pothole.setScale(0.452);
 
-    const hitboxWidth = obstacle.width * 0.6;
-    const hitboxHeight = obstacle.height * 0.8;
+    const hitboxWidth = pothole.width * 0.6;
+    const hitboxHeight = pothole.height * 0.8;
 
-    const offsetX = (obstacle.width - hitboxWidth) / 2;
-    const offsetY = (obstacle.height - hitboxHeight) / 2;
-    obstacle.body.setSize(hitboxWidth, hitboxHeight);
-    obstacle.body.setOffset(offsetX, offsetY);
+    const offsetX = (pothole.width - hitboxWidth) / 2;
+    const offsetY = (pothole.height - hitboxHeight) / 2;
+    pothole.body.setSize(hitboxWidth, hitboxHeight);
+    pothole.body.setOffset(offsetX, offsetY);
 
     // Use physics velocity so it matches lines
-    obstacle.body.setVelocityY(speed);
-    obstacle.body.allowGravity = false;
-    obstacle.body.immovable = true;
+    pothole.body.setVelocityY(speed);
+    pothole.body.allowGravity = false;
+    pothole.body.immovable = true;
   }
 
   function handleCollision(player, obstacle) {
