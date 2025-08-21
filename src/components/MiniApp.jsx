@@ -40,6 +40,7 @@ export default function Game() {
   var damage = 0;
   var scoreText;
   var damageText;
+  let taxiStop;
 
   // Find the asset group (folder) that contains the selectedCarKey
   const group = assetsData.find((g) =>
@@ -81,6 +82,7 @@ export default function Game() {
     this.load.image("bache_5", "images/pothole/bache_5.webp");
     this.load.image("npc_1", "images/npc/npc_1.webp");
     this.load.image("street", "images/street/street_us.png");
+    this.load.image("taxi_stop", "images/signal/taxi_stop.webp");
   }
 
   function create() {
@@ -94,12 +96,14 @@ export default function Game() {
     const screenHeight = this.scale.height;
 
     // Create vertical streets
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const tile = this.add
         .image(0, screenHeight - (i + 1) * streetHeight, "street")
         .setOrigin(0, 0)
         .setScale(1.24);
+        
       this.streetTiles.push(tile);
+      tile.setDepth(-2); 
     }
 
     // Filter animations for selectedCarKey only
@@ -177,8 +181,8 @@ export default function Game() {
     // add velocity in the axi Y
     npc.setVelocityY(speed);
 
-    // Collisions with NPC
-    this.physics.add.overlap(player, npc, handleNPCCollision, null, this);
+    // NPC pickup
+    this.physics.add.overlap(player, npc, handleNPCPickup, null, this);
 
     // ======================
     // Score and Damage Text
@@ -203,7 +207,7 @@ export default function Game() {
   // Update Loop
   // ======================
   function update() {
-    const scrollSpeed = 2;
+    const scrollSpeed = 1.74;
 
     this.streetTiles.forEach((tile) => {
       tile.y += scrollSpeed;
@@ -247,10 +251,10 @@ export default function Game() {
     }
 
     // Recycle obstacles
-    this.potholes.getChildren().forEach((obstacle) => {
-      if (obstacle.y > this.sys.game.config.height + 100) {
-        obstacle.y = Phaser.Math.Between(-window.innerHeight, -100);
-        obstacle.x = Phaser.Math.Between(100, window.innerWidth - 100);
+    this.potholes.getChildren().forEach((pothole) => {
+      if (pothole.y > this.sys.game.config.height + 100) {
+        pothole.y = Phaser.Math.Between(-window.innerHeight, -100);
+        pothole.x = Phaser.Math.Between(150, window.innerWidth - 100);
       }
     });
   }
@@ -324,13 +328,34 @@ export default function Game() {
     });
   }
 
-  function handleNPCCollision(player, npc) {
+  function handleNPCPickup() {
     if (npc.collided) return;
+
+    npc.disableBody(true, true);
     console.log("NPC Collision Detected");
     clients += 1;
     scoreText.setText("Clients: " + clients);
 
     npc.collided = true;
+
+    this.time.delayedCall(2000, () => {
+      // spawmn the taxi stop after 6seconds
+      taxiStop = this.add.sprite(
+        this.sys.game.config.width - 35,
+        100,
+        "taxi_stop"
+      );
+      taxiStop.setScale(0.53);
+      taxiStop.setDepth(-1);
+
+      // Move the taxi stop along Y-axis using a tween
+      this.tweens.add({
+        targets: taxiStop,
+        y: this.sys.game.config.height, // move 200 pixels down
+        duration: 3600, // in 3 seconds
+        ease: "Linear", // constant speed
+      });
+    });
   }
 
   return <div id="game-container"></div>;
