@@ -8,8 +8,8 @@ export default function Game() {
     type: Phaser.AUTO,
     pixelArt: true,
 
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: 430,
+    height: window.innerHeight + 100,
     physics: {
       default: "arcade",
       arcade: {
@@ -84,17 +84,19 @@ export default function Game() {
   }
 
   function create() {
-    var speed = 250; // Speed for obstacles
+    // Speed for obstacles
+    var speed = 250;
 
     // Create the street
     this.streetTiles = [];
 
     const streetHeight = this.textures.get("street").getSourceImage().height;
+    const screenHeight = this.scale.height;
 
-    // Create 3 vertical tiles
-    for (let i = 0; i < 10; i++) {
+    // Create vertical streets
+    for (let i = 0; i < 4; i++) {
       const tile = this.add
-        .image(0, i * -streetHeight, "street")
+        .image(0, screenHeight - (i + 1) * streetHeight, "street")
         .setOrigin(0, 0)
         .setScale(1.24);
       this.streetTiles.push(tile);
@@ -141,8 +143,7 @@ export default function Game() {
     );
 
     // Set the scale first
-    const scale = window.innerWidth / 160; // Adjust the scale factor as needed
-    player.setScale(scale);
+    player.setScale(2.5);
     player.setCollideWorldBounds(true);
 
     // Player hitbox
@@ -266,7 +267,6 @@ export default function Game() {
     const bacheFrame = this.textures.get(randomKey).getSourceImage();
 
     const obstacleWidth = bacheFrame.width;
-    const obstacleHeight = bacheFrame.height;
 
     const x = Phaser.Math.Between(
       obstacleWidth / 2,
@@ -277,7 +277,7 @@ export default function Game() {
     const obstacle = this.obstacles.create(x, y, randomKey);
 
     // scale the obstacle to fit the screen width
-    obstacle.setScale(window.innerWidth / 850);
+    obstacle.setScale(0.452);
 
     const hitboxWidth = obstacle.width * 0.6;
     const hitboxHeight = obstacle.height * 0.8;
