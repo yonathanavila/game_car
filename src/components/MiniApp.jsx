@@ -80,10 +80,25 @@ export default function Game() {
     this.load.image("bache_4", "images/pothole/bache_4.webp");
     this.load.image("bache_5", "images/pothole/bache_5.webp");
     this.load.image("npc_1", "images/npc/npc_1.webp");
+    this.load.image("street", "images/street/street_us.png");
   }
 
   function create() {
     var speed = 250; // Speed for obstacles
+
+    // Create the street
+    this.streetTiles = [];
+
+    const streetHeight = this.textures.get("street").getSourceImage().height;
+
+    // Create 3 vertical tiles
+    for (let i = 0; i < 10; i++) {
+      const tile = this.add
+        .image(0, i * -streetHeight, "street")
+        .setOrigin(0, 0)
+        .setScale(1.24);
+      this.streetTiles.push(tile);
+    }
 
     // Filter animations for selectedCarKey only
     const filteredAnims = animationsData.filter(
@@ -107,7 +122,7 @@ export default function Game() {
     });
 
     // ======================
-    // 1️⃣ Obstacles Group
+    // Obstacles Group
     // ======================
     this.obstacles = this.physics.add.group();
 
@@ -117,62 +132,7 @@ export default function Game() {
     }
 
     // ======================
-    // 2️⃣ White center lines (Physics Group)
-    // ======================
-
-    const dashHeight = 30;
-    const spacing = 65; // distancia entre inicios de líneas
-    const totalLines = Math.ceil(this.scale.height / spacing) + 1;
-
-    this.spliteWhiteLineGroup = this.physics.add.group();
-    for (let i = 0; i < totalLines; i++) {
-      const dash = this.add.rectangle(
-        this.scale.width / 2,
-        i * 80,
-        10,
-        dashHeight,
-        0xffffff
-      );
-      this.spliteWhiteLineGroup.add(dash);
-      dash.body.setVelocityY(speed);
-      dash.body.allowGravity = false;
-      dash.body.immovable = true;
-    }
-
-    this.spliteWhiteLineGroup.setDepth(-1);
-
-    // ======================
-    // 3️⃣ Yellow left lines (Physics Group)
-    // ======================
-    this.spliteYellowLineLeftGroup = this.physics.add.group();
-    for (let i = 0; i < 26; i++) {
-      const dash = this.add.rectangle(5, i * 80, 10, 50, 0xffff00);
-      this.spliteYellowLineLeftGroup.add(dash);
-      dash.body.setVelocityY(speed);
-      dash.body.allowGravity = false;
-      dash.body.immovable = true;
-    }
-
-    // ======================
-    // 4️⃣ Yellow right lines (Physics Group)
-    // ======================
-    this.spliteYellowLineRightGroup = this.physics.add.group();
-    for (let i = 0; i < 26; i++) {
-      const dash = this.add.rectangle(
-        window.innerWidth - 5,
-        i * 80,
-        10,
-        50,
-        0xffff00
-      );
-      this.spliteYellowLineRightGroup.add(dash);
-      dash.body.setVelocityY(speed);
-      dash.body.allowGravity = false;
-      dash.body.immovable = true;
-    }
-
-    // ======================
-    // 5️⃣ Player
+    // Player
     // ======================
     player = this.physics.add.sprite(
       window.innerWidth / 2,
@@ -205,14 +165,14 @@ export default function Game() {
     cursors = this.input.keyboard.createCursorKeys();
 
     // ======================
-    // 5️⃣ NPC
+    // NPC
     // ======================
     // add single sprite
-    npc = this.physics.add.sprite(window.innerWidth / 2, 100, "npc_1");
+    npc = this.physics.add.sprite(40, 100, "npc_1");
 
     // disallow gravity
     npc.body.allowGravity = false;
-    
+
     // add velocity in the axi Y
     npc.setVelocityY(speed);
 
@@ -220,7 +180,7 @@ export default function Game() {
     this.physics.add.overlap(player, npc, handleNPCCollision, null, this);
 
     // ======================
-    // 5️⃣ Score and Damage Text
+    // Score and Damage Text
     // ======================
 
     // The score text
@@ -239,9 +199,26 @@ export default function Game() {
   }
 
   // ======================
-  // 6️⃣ Update Loop
+  // Update Loop
   // ======================
   function update() {
+    const scrollSpeed = 2;
+
+    this.streetTiles.forEach((tile) => {
+      tile.y += scrollSpeed;
+    });
+
+    // Recycle tiles that move off screen
+    this.streetTiles.forEach((tile) => {
+      if (tile.y >= this.game.config.height) {
+        // Find the tile currently highest (smallest y)
+        const highestTile = this.streetTiles.reduce((prev, curr) =>
+          curr.y < prev.y ? curr : prev
+        );
+        tile.y = highestTile.y - tile.height;
+      }
+    });
+
     // Player movement
     if (cursors.left.isDown) {
       player.setVelocityX(-260);
@@ -268,27 +245,6 @@ export default function Game() {
       player.setVelocityY(-330);
     }
 
-    // Recycle white lines
-    this.spliteWhiteLineGroup.getChildren().forEach((dash) => {
-      if (dash.y > this.sys.game.config.height) {
-        dash.y = 0;
-      }
-    });
-
-    // Recycle yellow lines (left)
-    this.spliteYellowLineLeftGroup.getChildren().forEach((dash) => {
-      if (dash.y > this.sys.game.config.height) {
-        dash.y = 0;
-      }
-    });
-
-    // Recycle yellow lines (right)
-    this.spliteYellowLineRightGroup.getChildren().forEach((dash) => {
-      if (dash.y > this.sys.game.config.height) {
-        dash.y = 0;
-      }
-    });
-
     // Recycle obstacles
     this.obstacles.getChildren().forEach((obstacle) => {
       if (obstacle.y > this.sys.game.config.height + 100) {
@@ -299,7 +255,7 @@ export default function Game() {
   }
 
   // ======================
-  // 7️⃣ Spawn Obstacle Function
+  // Spawn Obstacle Function
   // ======================
   function spawnObstacle(speed) {
     // Pick a random key from the available obstacle textures
