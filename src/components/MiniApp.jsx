@@ -31,7 +31,8 @@ export default function Game() {
 
   let selectedCarKey = "car_green"; // or dynamically assigned
 
-  var player;
+  let player;
+  let npc;
   let cursors;
   var player_config;
   var game = new Phaser.Game(config);
@@ -74,11 +75,11 @@ export default function Game() {
     } else if (player_config.type === "image") {
       this.load.image(player_config.key, `/${group.path}/${player_config.url}`);
     }
-    console.log(this.textures.get(selectedCarKey).frameTotal);
 
     // Load other assets you need
     this.load.image("bache_4", "images/pothole/bache_4.webp");
     this.load.image("bache_5", "images/pothole/bache_5.webp");
+    this.load.image("npc_1", "images/npc/npc_1.webp");
   }
 
   function create() {
@@ -203,6 +204,25 @@ export default function Game() {
 
     cursors = this.input.keyboard.createCursorKeys();
 
+    // ======================
+    // 5️⃣ NPC
+    // ======================
+    // add single sprite
+    npc = this.physics.add.sprite(window.innerWidth / 2, 100, "npc_1");
+
+    // disallow gravity
+    npc.body.allowGravity = false;
+    
+    // add velocity in the axi Y
+    npc.setVelocityY(speed);
+
+    // Collisions with NPC
+    this.physics.add.overlap(player, npc, handleNPCCollision, null, this);
+
+    // ======================
+    // 5️⃣ Score and Damage Text
+    // ======================
+
     // The score text
     scoreText = this.add.text(16, 16, "Clients: 0", {
       fontFamily: "Minecraft",
@@ -325,7 +345,7 @@ export default function Game() {
 
     let elapsed = 0;
     damage += 1;
-    damageText.setText('Damage: ' + damage);
+    damageText.setText("Damage: " + damage);
 
     player.blinkEvent = player.scene.time.addEvent({
       delay: 200,
@@ -346,6 +366,15 @@ export default function Game() {
       },
       loop: true,
     });
+  }
+
+  function handleNPCCollision(player, npc) {
+    if (npc.collided) return;
+    console.log("NPC Collision Detected");
+    clients += 1;
+    scoreText.setText("Clients: " + clients);
+
+    npc.collided = true;
   }
 
   return <div id="game-container"></div>;
