@@ -101,9 +101,9 @@ export default function Game() {
         .image(0, screenHeight - (i + 1) * streetHeight, "street")
         .setOrigin(0, 0)
         .setScale(1.24);
-        
+
       this.streetTiles.push(tile);
-      tile.setDepth(-2); 
+      tile.setDepth(-2);
     }
 
     // Filter animations for selectedCarKey only
@@ -333,29 +333,38 @@ export default function Game() {
 
     npc.disableBody(true, true);
     console.log("NPC Collision Detected");
-    clients += 1;
-    scoreText.setText("Clients: " + clients);
 
     npc.collided = true;
 
     this.time.delayedCall(2000, () => {
       // spawmn the taxi stop after 6seconds
-      taxiStop = this.add.sprite(
-        this.sys.game.config.width - 35,
-        100,
+      taxiStop = this.physics.add.sprite(
+        this.sys.game.config.width - 32,
+        0,
         "taxi_stop"
       );
       taxiStop.setScale(0.53);
       taxiStop.setDepth(-1);
+      taxiStop.body.setAllowGravity(false);
+      taxiStop.body.setVelocityY(250);
 
-      // Move the taxi stop along Y-axis using a tween
-      this.tweens.add({
-        targets: taxiStop,
-        y: this.sys.game.config.height, // move 200 pixels down
-        duration: 3600, // in 3 seconds
-        ease: "Linear", // constant speed
-      });
+      // Taxi stop
+      this.physics.add.overlap(
+        player,
+        taxiStop,
+        handleTaxiStopCollision,
+        null,
+        this
+      );
     });
+  }
+
+  function handleTaxiStopCollision() {
+    console.log("Taxi Stop Collision Detected");
+    clients += 1;
+    scoreText.setText("Clients: " + clients);
+
+    taxiStop.disableBody(true, true);
   }
 
   return <div id="game-container"></div>;
