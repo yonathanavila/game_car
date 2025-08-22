@@ -324,8 +324,6 @@ export default function Game() {
     if (npc.collided) return;
 
     npc.destroy();
-    console.log("NPC Collision Detected");
-
     npc.collided = true;
 
     const delayedCall = Phaser.Math.Between(4000, 12000);
@@ -352,35 +350,30 @@ export default function Game() {
   }
 
   function handleTaxiStopCollision() {
-    console.log("Taxi Stop Collision Detected");
+    const delayedCall = Phaser.Math.Between(4000, 12000);
     clients += 1;
-    scoreText.setText("Clients: " + clients);
 
+    scoreText.setText("Clients: " + clients);
     taxiStop.disableBody(true, true);
+
+    this.time.delayedCall(delayedCall, () => {
+      let x = Phaser.Utils.Array.GetRandom(npcX);
+
+     spawnClient(this);
+    });
   }
 
   function spawnClient(context) {
     const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
-
     const npcFrame = getRandomFrame(context, npcKey);
-    console.log("Error here");
-
     let x = Phaser.Utils.Array.GetRandom(npcX);
+    
     npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
-
-    // disallow gravity
     npc.body.allowGravity = false;
-    // add velocity in the axi Y
     npc.setVelocityY(speed);
 
     // NPC pickup
-    context.physics.add.overlap(
-      player,
-      npc,
-      handleNPCPickup,
-      null,
-      context
-    );
+    context.physics.add.overlap(player, npc, handleNPCPickup, null, context);
   }
 
   function getRandomFrame(context, assets) {
