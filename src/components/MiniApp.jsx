@@ -8,7 +8,7 @@ export default function Game() {
     type: Phaser.AUTO,
     pixelArt: true,
 
-    width: 430,
+    width: 440,
     height: window.innerHeight + 100,
     physics: {
       default: "arcade",
@@ -41,6 +41,9 @@ export default function Game() {
   var scoreText;
   var damageText;
   let taxiStop;
+
+  // params
+  let npcX = [36, 400];
 
   // Find the asset group (folder) that contains the selectedCarKey
   const group = assetsData.find((g) =>
@@ -173,7 +176,8 @@ export default function Game() {
     // NPC
     // ======================
     // add single sprite
-    npc = this.physics.add.sprite(40, 100, "npc_1");
+    let x = Phaser.Utils.Array.GetRandom(npcX);
+    npc = this.physics.add.sprite(x, 0, "npc_1");
 
     // disallow gravity
     npc.body.allowGravity = false;
@@ -336,13 +340,13 @@ export default function Game() {
 
     npc.collided = true;
 
-    this.time.delayedCall(2000, () => {
+    const delayedCall = Phaser.Math.Between(4000, 12000);
+
+    this.time.delayedCall(delayedCall, () => {
+      let x = Phaser.Utils.Array.GetRandom(npcX);
+
       // spawmn the taxi stop after 6seconds
-      taxiStop = this.physics.add.sprite(
-        this.sys.game.config.width - 32,
-        0,
-        "taxi_stop"
-      );
+      taxiStop = this.physics.add.sprite(x, 0, "taxi_stop");
       taxiStop.setScale(0.53);
       taxiStop.setDepth(-1);
       taxiStop.body.setAllowGravity(false);
@@ -365,6 +369,15 @@ export default function Game() {
     scoreText.setText("Clients: " + clients);
 
     taxiStop.disableBody(true, true);
+  }
+
+  function spawnNewClient() {
+    // Pick a random key from the available obstacle textures
+    const potholeKeys = ["bache_4", "bache_5"];
+
+    const randomKey = Phaser.Utils.Array.GetRandom(potholeKeys);
+
+    const potholeFrame = this.textures.get(randomKey).getSourceImage();
   }
 
   return <div id="game-container"></div>;
