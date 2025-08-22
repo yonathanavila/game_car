@@ -44,6 +44,7 @@ export default function Game() {
 
   // params
   let npcX = [36, 400];
+  let speed = 250;
 
   // Find the asset group (folder) that contains the selectedCarKey
   const group = assetsData.find((g) =>
@@ -84,13 +85,16 @@ export default function Game() {
     this.load.image("bache_4", "images/pothole/bache_4.webp");
     this.load.image("bache_5", "images/pothole/bache_5.webp");
     this.load.image("npc_1", "images/npc/npc_1.webp");
+    this.load.image("npc_2", "images/npc/npc_2.webp");
+    this.load.image("npc_3", "images/npc/npc_3.webp");
+    this.load.image("npc_4", "images/npc/npc_4.webp");
+
     this.load.image("street", "images/street/street_us.png");
     this.load.image("taxi_stop", "images/signal/taxi_stop.webp");
   }
 
   function create() {
     // Speed for obstacles
-    var speed = 250;
 
     // Create the street
     this.streetTiles = [];
@@ -175,18 +179,7 @@ export default function Game() {
     // ======================
     // NPC
     // ======================
-    // add single sprite
-    let x = Phaser.Utils.Array.GetRandom(npcX);
-    npc = this.physics.add.sprite(x, 0, "npc_1");
-
-    // disallow gravity
-    npc.body.allowGravity = false;
-
-    // add velocity in the axi Y
-    npc.setVelocityY(speed);
-
-    // NPC pickup
-    this.physics.add.overlap(player, npc, handleNPCPickup, null, this);
+    spawnClient(this);
 
     // ======================
     // Score and Damage Text
@@ -268,13 +261,8 @@ export default function Game() {
   // ======================
   function spawnPothole(speed) {
     // Pick a random key from the available obstacle textures
-    const potholeKeys = ["bache_4", "bache_5"];
-
-    const randomKey = Phaser.Utils.Array.GetRandom(potholeKeys);
-
-    const potholeFrame = this.textures.get(randomKey).getSourceImage();
-
-    const potholeWidth = potholeFrame.width;
+    const potholeFrame = getRandomFrame(this, ["bache_4", "bache_5"]);
+    const potholeWidth = potholeFrame["width"];
 
     const x = Phaser.Math.Between(
       potholeWidth / 2,
@@ -282,7 +270,7 @@ export default function Game() {
     );
     const y = Phaser.Math.Between(-600, -100);
 
-    const pothole = this.potholes.create(x, y, randomKey);
+    const pothole = this.potholes.create(x, y, potholeFrame["randomKey"]);
 
     // scale the pothole to fit the screen width
     pothole.setScale(0.452);
@@ -335,7 +323,7 @@ export default function Game() {
   function handleNPCPickup() {
     if (npc.collided) return;
 
-    npc.disableBody(true, true);
+    npc.destroy();
     console.log("NPC Collision Detected");
 
     npc.collided = true;
@@ -371,13 +359,38 @@ export default function Game() {
     taxiStop.disableBody(true, true);
   }
 
-  function spawnNewClient() {
-    // Pick a random key from the available obstacle textures
-    const potholeKeys = ["bache_4", "bache_5"];
+  function spawnClient(context) {
+    const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
 
-    const randomKey = Phaser.Utils.Array.GetRandom(potholeKeys);
+    const npcFrame = getRandomFrame(context, npcKey);
+    console.log("Error here");
 
-    const potholeFrame = this.textures.get(randomKey).getSourceImage();
+    let x = Phaser.Utils.Array.GetRandom(npcX);
+    npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
+
+    // disallow gravity
+    npc.body.allowGravity = false;
+    // add velocity in the axi Y
+    npc.setVelocityY(speed);
+
+    // NPC pickup
+    context.physics.add.overlap(
+      player,
+      npc,
+      handleNPCPickup,
+      null,
+      context
+    );
+  }
+
+  function getRandomFrame(context, assets) {
+    const randomKey = Phaser.Utils.Array.GetRandom(assets);
+    const width = context.textures.get(randomKey).getSourceImage().width;
+
+    return {
+      width,
+      randomKey,
+    };
   }
 
   return <div id="game-container"></div>;
