@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
 import assetsData from "@/assets/data/assets.json";
 import animationsData from "@/assets/data/animations.json";
@@ -27,6 +28,15 @@ export default function Game() {
       create: create,
       update: update,
     },
+    plugins: {
+      scene: [
+        {
+          key: "rexVirtualJoystick",
+          plugin: VirtualJoystickPlugin,
+          mapping: "rexVirtualJoystick",
+        },
+      ],
+    },
   };
 
   let selectedCarKey = "car_green"; // or dynamically assigned
@@ -34,6 +44,8 @@ export default function Game() {
   let player;
   let npc;
   let cursors;
+  let joystick;
+  let isDesktop;
   var player_config;
   var game = new Phaser.Game(config);
   var clients = 0;
@@ -94,7 +106,30 @@ export default function Game() {
   }
 
   function create() {
-    // Speed for obstacles
+    // Detect platform
+    isDesktop = this.sys.game.device.os.desktop;
+
+    if (isDesktop) {
+      // Desktop: enable keyboard
+      cursors = this.input.keyboard.createCursorKeys();
+    } else {
+      // Mobile: enable joystick
+      joystick = this.rexVirtualJoystick.add(this, {
+        x: this.sys.game.config.width / 2,
+        y: this.sys.game.config.height - 100,
+        radius: 50,
+        base: this.add.circle(0, 0, 50, 0x888888),
+        thumb: this.add.circle(0, 0, 25, 0xcccccc),
+      });
+
+      joystick.base.setAlpha(0.4); // 50% transparent base
+      joystick.thumb.setAlpha(0.6); // 70% transparent thumb
+      joystick.base.setDepth(1);
+      joystick.thumb.setDepth(1);
+
+      // Optional: show velocity vector for debugging
+      this.joystickForceText = this.add.text(300, 50, "");
+    }
 
     // Create the street
     this.streetTiles = [];
@@ -174,8 +209,6 @@ export default function Game() {
       this
     );
 
-    cursors = this.input.keyboard.createCursorKeys();
-
     // ======================
     // NPC
     // ======================
@@ -204,6 +237,60 @@ export default function Game() {
   // Update Loop
   // ======================
   function update() {
+    if (isDesktop) {
+      // Desktop movement with keyboard
+      if (cursors.left.isDown) {
+        player.setVelocityX(-260);
+        const leftKey = `${selectedCarKey}_left`;
+        if (player.anims.currentAnim?.key !== leftKey) {
+          player.anims.play(leftKey, true);
+        }
+      } else if (cursors.right.isDown) {
+        player.setVelocityX(260);
+        const rightKey = `${selectedCarKey}_right`;
+        if (player.anims.currentAnim?.key !== rightKey) {
+          player.anims.play(rightKey, true);
+        }
+      } else {
+        player.setVelocityX(0);
+        const turnKey = `${selectedCarKey}_turn`;
+        if (player.anims.currentAnim?.key !== turnKey) {
+          player.anims.play(turnKey);
+        }
+      }
+
+      if (cursors.up.isDown && player.body.touching.down) {
+        player.setVelocityY(-330);
+      }
+    } else {
+      // Mobile movement with joystick
+      let forceX = joystick.forceX;
+      let forceY = joystick.forceY;
+
+      if (forceX < -0.1) {
+        player.setVelocityX(-260);
+        const leftKey = `${selectedCarKey}_left`;
+        if (player.anims.currentAnim?.key !== leftKey) {
+          player.anims.play(leftKey, true);
+        }
+      } else if (forceX > 0.1) {
+        player.setVelocityX(260);
+        const rightKey = `${selectedCarKey}_right`;
+        if (player.anims.currentAnim?.key !== rightKey) {
+          player.anims.play(rightKey, true);
+        }
+      } else {
+        player.setVelocityX(0);
+        const turnKey = `${selectedCarKey}_turn`;
+        if (player.anims.currentAnim?.key !== turnKey) {
+          player.anims.play(turnKey);
+        }
+      }
+
+      if (forceY < -0.5 && player.body.touching.down) {
+        player.setVelocityY(-330);
+      }
+    }
     const scrollSpeed = 1.74;
 
     this.streetTiles.forEach((tile) => {
@@ -220,32 +307,6 @@ export default function Game() {
         tile.y = highestTile.y - tile.height;
       }
     });
-
-    // Player movement
-    if (cursors.left.isDown) {
-      player.setVelocityX(-260);
-      const leftKey = `${selectedCarKey}_left`;
-      if (player.anims.currentAnim?.key !== leftKey) {
-        player.anims.play(leftKey, true);
-      }
-    } else if (cursors.right.isDown) {
-      player.setVelocityX(260);
-
-      const rightKey = `${selectedCarKey}_right`;
-      if (player.anims.currentAnim?.key !== rightKey) {
-        player.anims.play(rightKey, true);
-      }
-    } else {
-      player.setVelocityX(0);
-      const turnKey = `${selectedCarKey}_turn`;
-      if (player.anims.currentAnim?.key !== turnKey) {
-        player.anims.play(turnKey);
-      }
-    }
-
-    if (cursors.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
-    }
 
     // Recycle obstacles
     this.potholes.getChildren().forEach((pothole) => {
@@ -359,7 +420,7 @@ export default function Game() {
     this.time.delayedCall(delayedCall, () => {
       let x = Phaser.Utils.Array.GetRandom(npcX);
 
-     spawnClient(this);
+      spawnClient(this);
     });
   }
 
@@ -367,7 +428,7 @@ export default function Game() {
     const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
     const npcFrame = getRandomFrame(context, npcKey);
     let x = Phaser.Utils.Array.GetRandom(npcX);
-    
+
     npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
     npc.body.allowGravity = false;
     npc.setVelocityY(speed);
