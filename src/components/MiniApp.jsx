@@ -9,7 +9,7 @@ export default function Game() {
     type: Phaser.AUTO,
     pixelArt: true,
 
-    width: 440,
+    width: 434,
     height: window.innerHeight + 100,
     physics: {
       default: "arcade",
@@ -56,7 +56,9 @@ export default function Game() {
 
   // params
   let npcX = [36, 400];
-  let speed = 250;
+  const speed = 200;
+  const sidewalkWidth = 100;
+
 
   // Find the asset group (folder) that contains the selectedCarKey
   const group = assetsData.find((g) =>
@@ -143,9 +145,8 @@ export default function Game() {
         .image(0, screenHeight - (i + 1) * streetHeight, "street")
         .setOrigin(0, 0)
         .setScale(1.24);
-
       this.streetTiles.push(tile);
-      tile.setDepth(-2);
+      tile.setDepth(-3);
     }
 
     // Filter animations for selectedCarKey only
@@ -175,7 +176,7 @@ export default function Game() {
     this.potholes = this.physics.add.group();
 
     // Spawn the first few obstacles
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       spawnPothole.call(this, speed);
     }
 
@@ -236,7 +237,7 @@ export default function Game() {
   // ======================
   // Update Loop
   // ======================
-  function update() {
+  function update(time, delta) {
     if (isDesktop) {
       // Desktop movement with keyboard
       if (cursors.left.isDown) {
@@ -291,15 +292,18 @@ export default function Game() {
         player.setVelocityY(-330);
       }
     }
-    const scrollSpeed = 1.74;
+
+    // Convert delta to seconds
+    const dt = delta / 1000;
 
     this.streetTiles.forEach((tile) => {
-      tile.y += scrollSpeed;
+      tile.y += speed * dt;
     });
 
     // Recycle tiles that move off screen
     this.streetTiles.forEach((tile) => {
       if (tile.y >= this.game.config.height) {
+
         // Find the tile currently highest (smallest y)
         const highestTile = this.streetTiles.reduce((prev, curr) =>
           curr.y < prev.y ? curr : prev
@@ -310,9 +314,31 @@ export default function Game() {
 
     // Recycle obstacles
     this.potholes.getChildren().forEach((pothole) => {
-      if (pothole.y > this.sys.game.config.height + 100) {
+      if (pothole.y > this.sys.game.config.height + 50) {
+
+        // Pick a new random pothole frame
+        const potholeFrame = Phaser.Utils.Array.GetRandom(["bache_4", "bache_5"]);
+
+        // Change the texture
+        pothole.setTexture(potholeFrame);
+
+        // adjust hitbox if needed
+        const hitboxWidth = pothole.width * 0.6;  // adjust based on scale
+        const hitboxHeight = pothole.height * 0.8;
+        const offsetX = (pothole.width - hitboxWidth) / 2;
+        const offsetY = (pothole.height - hitboxHeight) / 2;
+        pothole.body.setSize(hitboxWidth, hitboxHeight);
+        pothole.body.setOffset(offsetX, offsetY);
+
         pothole.y = Phaser.Math.Between(-window.innerHeight, -100);
-        pothole.x = Phaser.Math.Between(150, window.innerWidth - 100);
+
+        const axiX = Phaser.Math.Between(
+          0 + sidewalkWidth, 434 - sidewalkWidth
+        );
+
+        pothole.x = axiX
+        pothole.body.setVelocityY(speed);
+
       }
     });
   }
@@ -326,14 +352,14 @@ export default function Game() {
     const potholeWidth = potholeFrame["width"];
 
     const x = Phaser.Math.Between(
-      potholeWidth / 2,
-      window.innerWidth - potholeWidth / 2
+      sidewalkWidth,
+      434 - sidewalkWidth
     );
     const y = Phaser.Math.Between(-600, -100);
 
     const pothole = this.potholes.create(x, y, potholeFrame["randomKey"]);
 
-    // scale the pothole to fit the screen width
+    // scale the pothole
     pothole.setScale(0.452);
 
     const hitboxWidth = pothole.width * 0.6;
@@ -387,7 +413,7 @@ export default function Game() {
     npc.destroy();
     npc.collided = true;
 
-    const delayedCall = Phaser.Math.Between(4000, 12000);
+    const delayedCall = Phaser.Math.Between(3000, 12000);
 
     this.time.delayedCall(delayedCall, () => {
       let x = Phaser.Utils.Array.GetRandom(npcX);
@@ -397,7 +423,7 @@ export default function Game() {
       taxiStop.setScale(0.53);
       taxiStop.setDepth(-1);
       taxiStop.body.setAllowGravity(false);
-      taxiStop.body.setVelocityY(250);
+      taxiStop.body.setVelocityY(speed);
 
       // Taxi stop
       this.physics.add.overlap(
@@ -411,7 +437,7 @@ export default function Game() {
   }
 
   function handleTaxiStopCollision() {
-    const delayedCall = Phaser.Math.Between(4000, 12000);
+    const delayedCall = Phaser.Math.Between(3000, 12000);
     clients += 1;
 
     scoreText.setText("Clients: " + clients);
