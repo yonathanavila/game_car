@@ -322,7 +322,7 @@ export default function Game() {
         // Change the texture
         pothole.setTexture(potholeFrame);
 
-        // adjust hitbox if needed
+        // Adjust hitbox if needed
         const hitboxWidth = pothole.width * 0.6;  // adjust based on scale
         const hitboxHeight = pothole.height * 0.8;
         const offsetX = (pothole.width - hitboxWidth) / 2;
@@ -337,8 +337,9 @@ export default function Game() {
         );
 
         pothole.x = axiX
-        pothole.body.setVelocityY(speed);
 
+        // this function applys the pothole change texture (i dont know why, becouse only set the speed)
+        pothole.body.setVelocityY(speed); 
       }
     });
   }
