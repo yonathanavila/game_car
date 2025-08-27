@@ -1,7 +1,7 @@
 import assetsData from "@/assets/data/assets.json";
 import animationsData from "@/assets/data/animations.json";
 
-class GameScene extends Phaser.Scene {
+export default class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: "GameScene" });
 
@@ -12,11 +12,8 @@ class GameScene extends Phaser.Scene {
         this.joystick;
         this.isDesktop;
         this.player_config;
-        this.game = new Phaser.Game(config);
         this.clients = 0;
         this.damage = 0;
-        this.scoreText;
-        this.damageText;
         this.taxiStop;
 
         // params
@@ -56,19 +53,12 @@ class GameScene extends Phaser.Scene {
             this.load.image(this.player_config.key, `/${group.path}/${this.player_config.url}`);
         }
 
-        // Load other assets you need
-        this.load.image("bache_4", "images/pothole/bache_4.webp");
-        this.load.image("bache_5", "images/pothole/bache_5.webp");
-        this.load.image("npc_1", "images/npc/npc_1.webp");
-        this.load.image("npc_2", "images/npc/npc_2.webp");
-        this.load.image("npc_3", "images/npc/npc_3.webp");
-        this.load.image("npc_4", "images/npc/npc_4.webp");
-
-        this.load.image("street", "images/street/street_us.png");
-        this.load.image("taxi_stop", "images/signal/taxi_stop.webp");
     }
 
     create() {
+        this.registry.set("clients", 0);
+        this.registry.set("damage", 0);
+
         // Detect platform
         this.isDesktop = this.sys.game.device.os.desktop;
 
@@ -138,7 +128,7 @@ class GameScene extends Phaser.Scene {
 
         // Spawn the first few obstacles
         for (let i = 0; i < 4; i++) {
-            spawnPothole.call(this, this.speed);
+            this.spawnPothole.call(this, this.speed);
         }
 
         // ======================
@@ -166,7 +156,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(
             this.player,
             this.potholes,
-            handleCollision,
+            this.handleCollision,
             null,
             this
         );
@@ -174,25 +164,8 @@ class GameScene extends Phaser.Scene {
         // ======================
         // NPC
         // ======================
-        spawnClient(this);
+        this.spawnClient(this);
 
-        // ======================
-        // Score and Damage Text
-        // ======================
-
-        // The score text
-        this.scoreText = this.add.text(16, 16, "Clients: 0", {
-            fontFamily: "Minecraft",
-            fontSize: "32px",
-            fill: "#fff",
-        });
-
-        // The score text
-        this.damageText = this.add.text(16, 60, "Damage: 0", {
-            fontFamily: "Minecraft",
-            fontSize: "32px",
-            fill: "#fff",
-        });
     }
 
     update(time, delta) {
@@ -260,7 +233,7 @@ class GameScene extends Phaser.Scene {
 
         // Recycle tiles that move off screen
         this.streetTiles.forEach((tile) => {
-            if (tile.y >= this.game.config.height) {
+            if (tile.y >= this.sys.game.config.height) {
 
                 // Find the tile currently highest (smallest y)
                 const highestTile = this.streetTiles.reduce((prev, curr) =>
@@ -321,8 +294,7 @@ class GameScene extends Phaser.Scene {
     // ======================
     spawnPothole(speed) {
         // Pick a random key from the available obstacle textures
-        const potholeFrame = getRandomFrame(this, ["bache_4", "bache_5"]);
-        const potholeWidth = potholeFrame["width"];
+        const potholeFrame = this.getRandomFrame(this, ["bache_4", "bache_5"]);
 
         const x = Phaser.Math.Between(
             this.sidewalkWidth,
@@ -349,7 +321,7 @@ class GameScene extends Phaser.Scene {
         pothole.body.immovable = true;
     }
 
-    handleCollision(player, obstacle) {
+    handleCollision(player) {
         if (player.blinkEvent) {
             player.blinkEvent.remove();
             player.clearTint();
@@ -357,7 +329,7 @@ class GameScene extends Phaser.Scene {
 
         let elapsed = 0;
         this.damage += 1;
-        this.damageText.setText("Damage: " + this.damage);
+        this.registry.set("damage", this.damage);
 
         player.blinkEvent = player.scene.time.addEvent({
             delay: 200,
@@ -381,28 +353,28 @@ class GameScene extends Phaser.Scene {
     }
 
     handleNPCPickup() {
-        if (npc.collided) return;
+        if (this.npc.collided) return;
 
-        npc.destroy();
-        npc.collided = true;
+        this.npc.destroy();
+        this.npc.collided = true;
 
         const delayedCall = Phaser.Math.Between(3000, 12000);
 
         this.time.delayedCall(delayedCall, () => {
-            let x = Phaser.Utils.Array.GetRandom(npcX);
+            let x = Phaser.Utils.Array.GetRandom(this.npcX);
 
             // spawmn the taxi stop after 6seconds
             this.taxiStop = this.physics.add.sprite(x, 0, "taxi_stop");
             this.taxiStop.setScale(0.53);
             this.taxiStop.setDepth(-1);
             this.taxiStop.body.setAllowGravity(false);
-            this.taxiStop.body.setVelocityY(speed);
+            this.taxiStop.body.setVelocityY(this.speed);
 
             // Taxi stop
             this.physics.add.overlap(
-                player,
+                this.player,
                 this.taxiStop,
-                handleTaxiStopCollision,
+                this.handleTaxiStopCollision,
                 null,
                 this
             );
@@ -411,30 +383,29 @@ class GameScene extends Phaser.Scene {
 
     handleTaxiStopCollision() {
         const delayedCall = Phaser.Math.Between(3000, 12000);
-        clients += 1;
+        this.clients += 1;
 
-        this.scoreText.setText("Clients: " + clients);
+        this.registry.set("clients", this.clients);
         this.taxiStop.disableBody(true, true);
 
         this.time.delayedCall(delayedCall, () => {
-            let x = Phaser.Utils.Array.GetRandom(npcX);
 
-            spawnClient(this);
+            this.spawnClient(this);
         });
     }
 
     spawnClient(context) {
         const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
-        const npcFrame = getRandomFrame(context, npcKey);
-        let x = Phaser.Utils.Array.GetRandom(npcX);
+        const npcFrame = this.getRandomFrame(context, npcKey);
+        let x = Phaser.Utils.Array.GetRandom(this.npcX);
 
-        this.npc = context.physics.add.sprite(x, 0, this.npcFrame["randomKey"]);
+        this.npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
         this.npc.body.allowGravity = false;
         this.npc.setVelocityY(this.speed);
         this.npc.setDepth(-1);
 
         // NPC pickup
-        context.physics.add.overlap(this.player, this.npc, handleNPCPickup, null, context);
+        context.physics.add.overlap(this.player, this.npc, this.handleNPCPickup, null, context);
     }
 
     getRandomFrame(context, assets) {

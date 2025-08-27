@@ -1,6 +1,9 @@
 import Phaser from "phaser";
 import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
+import MenuScene from "@/components/phaser/scenes/MenuScene";
+import GameScene from "@/components/phaser/scenes/GameScene";
+import BootScene from "@/components/phaser/scenes/BootScene";
 
 export default class Game extends Phaser.Game {
     constructor() {
@@ -8,7 +11,6 @@ export default class Game extends Phaser.Game {
         var config = {
             type: Phaser.AUTO,
             pixelArt: true,
-
             width: 434,
             height: window.innerHeight + 100,
             physics: {
@@ -23,11 +25,7 @@ export default class Game extends Phaser.Game {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
             },
-            scene: {
-                preload: preload,
-                create: create,
-                update: update,
-            },
+            scene: [BootScene, MenuScene, GameScene],
             plugins: {
                 scene: [
                     {
@@ -38,7 +36,7 @@ export default class Game extends Phaser.Game {
                 ],
             },
         };
-        
+
         super(config);
     }
 }
