@@ -339,9 +339,22 @@ export default function Game() {
         pothole.x = axiX
 
         // this function applys the pothole change texture (i dont know why, becouse only set the speed)
-        pothole.body.setVelocityY(speed); 
+        pothole.body.setVelocityY(speed);
       }
     });
+
+    if (taxiStop && taxiStop.active && taxiStop.y > this.sys.game.config.height + 50) {
+
+      const delayedCall = Phaser.Math.Between(3000, 12000);
+
+      // Taxi stop has gone off screen without being picked up
+      taxiStop.destroy();
+
+      this.time.delayedCall(delayedCall, () => {
+        // Spawn a new client since the taxi missed it
+        spawnClient(this);
+      });
+    }
   }
 
   // ======================
@@ -459,6 +472,7 @@ export default function Game() {
     npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
     npc.body.allowGravity = false;
     npc.setVelocityY(speed);
+    npc.setDepth(-1);
 
     // NPC pickup
     context.physics.add.overlap(player, npc, handleNPCPickup, null, context);
