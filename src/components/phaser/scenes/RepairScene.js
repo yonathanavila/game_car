@@ -17,8 +17,6 @@ export default class RepairScene extends Phaser.Scene {
         this.load.image("tool_2", "/images/tools/MechanicTools_2.webp");
         this.load.image("tool_3", "/images/tools/MechanicTools_3.webp");
         this.load.image("tool_4", "/images/tools/MechanicTools_4.webp");
-
-
     }
 
     create() {
@@ -57,21 +55,31 @@ export default class RepairScene extends Phaser.Scene {
         const lowerBallJoint = this.add.text(
             55,
             200,
-            "Fix lower ball joints", this.baseTextStyle)
+            "Fix lower ball joints . . . . . . . . . . . . . . . . . . . . . . . . . . . $1400", {
+            ...this.baseTextStyle, wordWrap: {
+                width: this.scale.width - 100, // max width of text
+                useAdvancedWrap: true          // better word breaking
+            },
+        })
             .setOrigin(0, 0)
             .setInteractive();
 
         const ShockAbsorber = this.add.text(
             55,
-            255,
-            "Fix shocks absorbers", this.baseTextStyle)
+            275,
+            "Fix shocks absorbers . . . . . . . . . . . . . . . . . . . . . . . . $5000", {
+            ...this.baseTextStyle, wordWrap: {
+                width: this.scale.width - 100, // max width of text
+                useAdvancedWrap: true          // better word breaking
+            },
+        })
             .setOrigin(0, 0)
             .setInteractive();
 
         const Bushings = this.add.text(
             55,
-            300,
-            "Fix lower control arms bushings", {
+            350,
+            "Fix lower control arms bushings . . . . . . . . . . . . $1200", {
             ...this.baseTextStyle,
             wordWrap: {
                 width: this.scale.width - 100, // max width of text
@@ -82,8 +90,8 @@ export default class RepairScene extends Phaser.Scene {
 
         const AligmentBalance = this.add.text(
             55,
-            365,
-            "Fix aligment & balance", {
+            445,
+            "Fix aligment & balance . . . . . . . . . . . . . . . . . . . . . . . . $600", {
             ...this.baseTextStyle,
             wordWrap: {
                 width: this.scale.width - 100, // max width of text
@@ -94,8 +102,8 @@ export default class RepairScene extends Phaser.Scene {
 
         const BrakeCheckService = this.add.text(
             55,
-            400,
-            "Brake check service", {
+            520,
+            "Brake check service . . . . . . . . . . . . . . . . . . . . . . . . . $800", {
             ...this.baseTextStyle,
             wordWrap: {
                 width: this.scale.width - 100, // max width of text
@@ -106,8 +114,8 @@ export default class RepairScene extends Phaser.Scene {
 
         const Tires = this.add.text(
             55,
-            455,
-            "Buy tires", {
+            585,
+            "Buy tires . . . . . . . . . . $5200", {
             ...this.baseTextStyle,
             wordWrap: {
                 width: this.scale.width - 100, // max width of text
@@ -118,8 +126,8 @@ export default class RepairScene extends Phaser.Scene {
 
         const CheckAirPressure = this.add.text(
             55,
-            505,
-            "Check tire air pressure", {
+            625,
+            "Check tire air pressure . . . . . . . . . . . . . . . . . . . . . . . $100", {
             ...this.baseTextStyle,
             wordWrap: {
                 width: this.scale.width - 100, // max width of text
@@ -131,8 +139,8 @@ export default class RepairScene extends Phaser.Scene {
 
         const WashCar = this.add.text(
             55,
-            555,
-            "Wash car", {
+            695,
+            "Wash car . . . . . . . . . . . $200", {
             ...this.baseTextStyle,
             wordWrap: {
                 width: this.scale.width - 100, // max width of text
@@ -140,5 +148,15 @@ export default class RepairScene extends Phaser.Scene {
             },
         }).setOrigin(0, 0)
             .setInteractive();
+
+
+        // Add title text
+        this.add.text(300, this.scale.height - 30, "Balance: $0", {
+            fontFamily: "Minecraft",
+            fontSize: "28px",
+            color: "#ffffff",
+            fontStyle: "bold"
+        }).setOrigin(0.5);
+
     }
 }
