@@ -277,6 +277,8 @@ export default class GameScene extends Phaser.Scene {
             }
         });
 
+        // If the taxi pass away of the stop
+
         if (this.taxiStop && this.taxiStop.active && this.taxiStop.y > this.sys.game.config.height + 50) {
 
             const delayedCall = Phaser.Math.Between(3000, 12000);
@@ -289,6 +291,21 @@ export default class GameScene extends Phaser.Scene {
                 this.spawnClient(this);
             });
         }
+
+        // If the taxi pass away of the client
+        if (this.npc && this.npc.active && this.npc.y > this.sys.game.config.height + 50) {
+
+            const delayedCall = Phaser.Math.Between(3000, 12000);
+
+            // Taxi stop has gone off screen without being picked up
+            this.npc.destroy();
+
+            this.time.delayedCall(delayedCall, () => {
+                // Spawn a new client since the taxi missed it
+                this.spawnClient(this);
+            });
+        }
+
     }
 
 
