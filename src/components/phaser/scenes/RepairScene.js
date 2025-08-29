@@ -8,6 +8,78 @@ export default class RepairScene extends Phaser.Scene {
             color: '#ffffff',
             align: 'left'
         };
+        this.balance = 1000000;
+        this.damage = 1000000;
+        this.lastRepairKm = 40000;
+        this.menuItems = [];
+
+        this.damageInfo = [{
+            name: "lowerBallJoint",
+            repairCost: 1400,
+            damageHealth: 5000,
+            kmDamage: [60000, 100000],
+            comfort: [6, 7],
+            security: [9, 10],
+        },
+        {
+            name: "shockAbsorber",
+            repairCost: 5000,
+            damageHealth: 4000,
+            kmDamage: [30000, 50000],
+            comfort: [8, 10],
+            security: [7, 8],
+        },
+        {
+            name: "bushings",
+            repairCost: 1200,
+            damageHealth: 2000,
+            kmDamage: [40000, 70000],
+            comfort: [7, 8],
+            security: [7, 8],
+        },
+        {
+            name: "aligmentBalance",
+            repairCost: 600,
+            damageHealth: 1200,
+            kmDamage: [15000, 20000],
+            comfort: [7, 8],
+            security: [9, 10],
+        },
+        {
+            name: "brakeCheck",
+            repairCost: 800,
+            damageHealth: 4500,
+            kmDamage: [30000, 50000],
+            comfort: [5, 6],
+            security: [10, 11],
+        },
+        {
+            name: "tires",
+            repairCost: 800,
+            damageHealth: 2500,
+            kmDamage: [50000, 70000],
+            comfort: [6, 7],
+            security: [9, 10],
+        },
+        {
+            name: "airPressure",
+            repairCost: 100,
+            damageHealth: 500,
+            kmDamage: [5000, 8000],
+            comfort: [4, 5],
+            security: [8, 9],
+        },
+        {
+            name: "washCar",
+            repairCost: 200,
+            damageHealth: 0,
+            kmDamage: [20000, 70000],
+            comfort: [3, 4],
+            security: [3, 4],
+        }];
+
+
+
     }
 
     preload() {
@@ -61,17 +133,32 @@ export default class RepairScene extends Phaser.Scene {
             fontStyle: "bold"
         }).setOrigin(0.5);
 
-        const lowerBallJoint = this.add.text(
-            55,
-            200,
-            "Fix lower ball joints . . . . . . . . . . . . . . . . . . . . . . . . . . . $1400", {
-            ...this.baseTextStyle, wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        })
-            .setOrigin(0, 0)
-            .setInteractive();
+        if (this.lowerBallJointInfo.kmDamage >= this.lastRepairKm) {
+            const lowerBallJoint = this.add.text(
+                55,
+                200,
+                "Fix lower ball joints . . . . . . . . . . . . . . . . . . . . . . . . . . . $1400", {
+                ...this.baseTextStyle, wordWrap: {
+                    width: this.scale.width - 100, // max width of text
+                    useAdvancedWrap: true          // better word breaking
+                },
+            })
+                .setOrigin(0, 0)
+                .setInteractive();
+
+            // lowerBallJoint.on("pointerdown", () => {
+            //     this.balance -= this.lowerBallJointInfo.repairCost;
+            //     this.damage -= this.lowerBallJointInfo.damageHelth;
+            // });
+
+            this.menuItems.push({
+                text: "Fix lower ball joints . . . . . . . . . . . . . . . . . . . . . . . . . . . $1400",
+                cost: this.lowerBallJointInfo.repairCost,
+                damage: this.lowerBallJointInfo.damageHelth,
+            });
+
+        }
+
 
         const ShockAbsorber = this.add.text(
             55,
@@ -160,12 +247,47 @@ export default class RepairScene extends Phaser.Scene {
 
 
         // Add title text
-        this.add.text(300, this.scale.height - 30, "Balance: $0", {
+        this.add.text(300, this.scale.height - 30, "Balance: $" + this.balance, {
             fontFamily: "Minecraft",
-            fontSize: "28px",
+            fontSize: "25px",
             color: "#ffffff",
             fontStyle: "bold"
         }).setOrigin(0.5);
+
+
+        // Contenedor principal en X=55, Y=200
+        const menuContainer = this.add.container(55, 200);
+
+        // Espaciado vertical
+        let offsetY = 0;
+
+        this.menuItems.forEach((item) => {
+            const option = this.add.text(
+                0,
+                offsetY,
+                item.text.AligmentBalance,
+                {
+                    ...this.baseTextStyle,
+                    wordWrap: {
+                        width: this.scale.width - 100,
+                        useAdvancedWrap: true,
+                    },
+                }
+            ).setOrigin(0, 0)
+                .setInteractive();
+
+            option.on("pointerdown", () => {
+                this.balance -= item.cost;
+                this.damage -= item.damage;
+            });
+
+            // Agregar al contenedor
+            menuContainer.add(option);
+
+            // Aumentar Y para la siguiente línea
+            offsetY += option.height + 10; // margen de 10px entre textos
+
+        })
 
     }
 }
