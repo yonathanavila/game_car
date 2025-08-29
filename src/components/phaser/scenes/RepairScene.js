@@ -17,6 +17,8 @@ export default class RepairScene extends Phaser.Scene {
         this.load.image("tool_2", "/images/tools/MechanicTools_2.webp");
         this.load.image("tool_3", "/images/tools/MechanicTools_3.webp");
         this.load.image("tool_4", "/images/tools/MechanicTools_4.webp");
+        this.load.image("close", "/images/close.webp");
+
     }
 
     create() {
@@ -25,6 +27,13 @@ export default class RepairScene extends Phaser.Scene {
         bg.displayHeight = this.sys.game.config.height;
         // Make background fill screen width while keeping aspect ratio
         bg.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+
+        // close
+        const close = this.add.image(this.sys.game.config.width - 125, 50, "close").setOrigin(0, 1);
+        close.displayWidth = 100;
+        close.displayHeight = 100;
+        close.rotation = Phaser.Math.DegToRad(45);
+
 
         // tools
         const tool_1 = this.add.image(70, this.sys.game.config.height - 90, "tool_1").setOrigin(0, 0);
