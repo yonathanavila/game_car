@@ -59,6 +59,9 @@ export default class GameScene extends Phaser.Scene {
         this.registry.set("clients", 0);
         this.registry.set("damage", 0);
 
+        // Start the UI scene on top of the GameScene
+        this.scene.launch("UIScene");
+
         // Detect platform
         this.isDesktop = this.sys.game.device.os.desktop;
 
@@ -283,7 +286,7 @@ export default class GameScene extends Phaser.Scene {
 
             this.time.delayedCall(delayedCall, () => {
                 // Spawn a new client since the taxi missed it
-                spawnClient(this);
+                this.spawnClient(this);
             });
         }
     }
