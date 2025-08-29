@@ -9,7 +9,7 @@ export default function MiniApp() {
 
   return (
     <div className="App">
-      <div id="game-container"></div>;
+      <div id="game-container"></div>
     </div>
   );
 }

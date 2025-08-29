@@ -5,6 +5,7 @@ import UIScene from "@/components/phaser/scenes/UIScene";
 import MenuScene from "@/components/phaser/scenes/MenuScene";
 import GameScene from "@/components/phaser/scenes/GameScene";
 import BootScene from "@/components/phaser/scenes/BootScene";
+import RepairScene from "@/components/phaser/scenes/RepairScene";
 
 export default class Game extends Phaser.Game {
     constructor() {
@@ -26,7 +27,7 @@ export default class Game extends Phaser.Game {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
             },
-            scene: [BootScene, MenuScene, GameScene, UIScene],
+            scene: [BootScene, MenuScene, GameScene, UIScene, RepairScene],
             plugins: {
                 scene: [
                     {

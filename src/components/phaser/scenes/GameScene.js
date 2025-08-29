@@ -304,6 +304,8 @@ export default class GameScene extends Phaser.Scene {
                 // Spawn a new client since the taxi missed it
                 this.spawnClient(this);
             });
+
+            this.scene.start("RepairScene");
         }
 
     }
