@@ -277,15 +277,12 @@ export default class GameScene extends Phaser.Scene {
             const carButton = this.add.sprite(this.sys.game.config.width - 60, 100, 'button_tool', 0)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
-                    console.log('Car clicked!');
-                    // optional: set frame for pressed effect
                     carButton.setFrame(1);
+                    this.scene.start("RepairScene");
                 })
                 .on('pointerup', () => {
-                    // back to hover frame if still hovered
                     carButton.setFrame(2);
                 });
-            // this.scene.start("RepairScene");
 
             carButton.displayHeight = 50;
             carButton.displayWidth = 100;

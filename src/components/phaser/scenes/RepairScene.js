@@ -1,5 +1,5 @@
 import { damageInfo } from "@/const";
-import { calculateCurrentLife, calculateKmDamage } from "@/services/Global";
+import { calculateCurrentLife } from "@/services/Global";
 
 export default class RepairScene extends Phaser.Scene {
     constructor() {
@@ -25,6 +25,7 @@ export default class RepairScene extends Phaser.Scene {
         this.load.image("tool_1", "/images/tools/MechanicTools_1.webp");
         this.load.image("tool_2", "/images/tools/MechanicTools_2.webp");
         this.load.image("tool_3", "/images/tools/MechanicTools_3.webp");
+        this.load.image("tool_4", "/images/tools/MechanicTools_4.webp");
         this.load.image("close", "/images/close.webp");
 
     }
@@ -37,10 +38,16 @@ export default class RepairScene extends Phaser.Scene {
         bg.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
         // close
-        const close = this.add.image(this.sys.game.config.width - 125, 50, "close").setOrigin(0, 1);
-        close.displayWidth = 100;
-        close.displayHeight = 100;
-        close.rotation = Phaser.Math.DegToRad(45);
+        const closeButton = this.add.image(this.sys.game.config.width - 125, 50, "close")
+            .setInteractive({ useHandCursor: true })
+            .setOrigin(0, 1)
+            .on("pointerdown", () => {
+                this.scene.start("GameScene");
+            });
+
+        closeButton.displayWidth = 100;
+        closeButton.displayHeight = 100;
+        closeButton.rotation = Phaser.Math.DegToRad(45);
 
 
         // tools
@@ -57,7 +64,7 @@ export default class RepairScene extends Phaser.Scene {
         tool_3.displayHeight = 150;
         tool_3.displayWidth = 30;
 
-        const tool_4 = this.add.image(35, this.sys.game.config.height - 129, "tool_4").setOrigin(0, 0);
+        const tool_4 = this.add.image(35, this.sys.game.config.height - 100, "tool_4").setOrigin(0, 0);
         tool_4.displayHeight = 35;
         tool_4.displayWidth = 35;
 
