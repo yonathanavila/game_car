@@ -305,7 +305,6 @@ export default class GameScene extends Phaser.Scene {
                 this.spawnClient(this);
             });
 
-            this.scene.start("RepairScene");
         }
 
     }
