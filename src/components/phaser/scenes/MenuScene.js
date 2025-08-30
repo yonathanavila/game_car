@@ -35,7 +35,7 @@ export default class MenuScene extends Phaser.Scene {
 
         loginButton.on("pointerdown", async () => {
 
-            await startGame();
+            // await startGame();
             // this.scene.start("GameScene");
         });
 
@@ -54,25 +54,25 @@ export default class MenuScene extends Phaser.Scene {
     }
 }
 
-async function startGame() {
-    try {
+// async function startGame() {
+//     try {
 
-        console.log('enter')
-        const response = await fetch("/api/get-user?68b255b8d7df03c60accfd46");
-        const user = await response.json();
+//         console.log('enter')
+//         const response = await fetch("/api/get-user?68b255b8d7df03c60accfd46");
+//         const user = await response.json();
 
-        const config = {
-            type: Phaser.AUTO,
-            width: 800,
-            height: 600,
-            scene: new MyGame(),
-        };
+//         const config = {
+//             type: Phaser.AUTO,
+//             width: 800,
+//             height: 600,
+//             scene: new MyGame(),
+//         };
 
-        const game = new Phaser.Game(config);
+//         const game = new Phaser.Game(config);
 
-        // Pass user data to the scene
-        game.scene.scenes[0].user = user;
-    } catch (err) {
-        console.error("Failed to fetch user:", err);
-    }
-}
+//         // Pass user data to the scene
+//         game.scene.scenes[0].user = user;
+//     } catch (err) {
+//         console.error("Failed to fetch user:", err);
+//     }
+// }
