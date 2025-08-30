@@ -14,7 +14,7 @@ export default class Game extends Phaser.Game {
             type: Phaser.AUTO,
             pixelArt: true,
             width: 434,
-            height: window.innerHeight,
+            height: 700,
             physics: {
                 default: "arcade",
                 arcade: {
