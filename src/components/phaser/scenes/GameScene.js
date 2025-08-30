@@ -1,7 +1,7 @@
 import { damageInfo } from "@/const";
 import assetsData from "@/assets/data/assets.json";
+import { calculateCurrentLife } from "@/services/Global";
 import animationsData from "@/assets/data/animations.json";
-import { calculateCurrentLife, calculateKmDamage } from "@/services/Global";
 
 
 export default class GameScene extends Phaser.Scene {
@@ -67,14 +67,14 @@ export default class GameScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
                 console.log('Car clicked!');
-                // optional: set frame for pressed effect
                 pauseButton.setFrame(1);
+                this.scene.pause();
+                this.scene.launch("PauseScene");
             })
             .on('pointerup', () => {
                 // back to hover frame if still hovered
                 pauseButton.setFrame(2);
             });
-        // this.scene.start("RepairScene");
 
         pauseButton.displayHeight = 50;
         pauseButton.displayWidth = 100;
