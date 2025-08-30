@@ -7,8 +7,8 @@ const miniapp = {
     title: "🚩 Start",
     action: {
       type: "launch_miniapp",
-      url: "https://yoink.party/framesV2",
-      name: "Yoink!",
+      url: "https://game-car-beta.vercel.app/",
+      name: "Taxi Driver",
       splashImageUrl: "https://yoink.party/logo.png",
       splashBackgroundColor: "#f5f0ec",
     },
@@ -22,15 +22,9 @@ const miniapp = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <!-- head content -->
-    <meta
-      name="fc:miniapp"
-      content='{"version":"1","imageUrl":"https://yoink.party/framesV2/opengraph-image","button":{"title":"🚩 Start","action":{"type":"launch_miniapp","name":"Yoink!","url":"https://yoink.party/framesV2","splashImageUrl":"https://yoink.party/logo.png","splashBackgroundColor":"#f5f0ec"}}}'
-    />
+    <meta name="fc:miniapp" content={JSON.stringify(miniapp)} />
     <!-- For backward compatibility -->
-    <meta
-      name="fc:frame"
-      content='{"version":"1","imageUrl":"https://yoink.party/framesV2/opengraph-image","button":{"title":"🚩 Start","action":{"type":"launch_frame","name":"Yoink!","url":"https://yoink.party/framesV2","splashImageUrl":"https://yoink.party/logo.png","splashBackgroundColor":"#f5f0ec"}}}'
-    />
+    <meta name="fc:frame" content={JSON.stringify(miniapp)} />
 
     <link
       rel="preload"
