@@ -10,12 +10,12 @@ export default class RepairScene extends Phaser.Scene {
         };
         this.balance = 1000000;
         this.damage = 1000000;
-        this.lastRepairKm = 40000;
+        this.lastRepairKm = 0;
         this.menuItems = [];
 
         this.damageInfo = [{
             name: "lowerBallJoint",
-            repairCost: 1400,
+            cost: 1400,
             damageHealth: 5000,
             kmDamage: [60000, 100000],
             comfort: [6, 7],
@@ -23,7 +23,7 @@ export default class RepairScene extends Phaser.Scene {
         },
         {
             name: "shockAbsorber",
-            repairCost: 5000,
+            cost: 5000,
             damageHealth: 4000,
             kmDamage: [30000, 50000],
             comfort: [8, 10],
@@ -31,7 +31,7 @@ export default class RepairScene extends Phaser.Scene {
         },
         {
             name: "bushings",
-            repairCost: 1200,
+            cost: 1200,
             damageHealth: 2000,
             kmDamage: [40000, 70000],
             comfort: [7, 8],
@@ -39,7 +39,7 @@ export default class RepairScene extends Phaser.Scene {
         },
         {
             name: "aligmentBalance",
-            repairCost: 600,
+            cost: 600,
             damageHealth: 1200,
             kmDamage: [15000, 20000],
             comfort: [7, 8],
@@ -47,7 +47,7 @@ export default class RepairScene extends Phaser.Scene {
         },
         {
             name: "brakeCheck",
-            repairCost: 800,
+            cost: 800,
             damageHealth: 4500,
             kmDamage: [30000, 50000],
             comfort: [5, 6],
@@ -55,7 +55,7 @@ export default class RepairScene extends Phaser.Scene {
         },
         {
             name: "tires",
-            repairCost: 800,
+            cost: 800,
             damageHealth: 2500,
             kmDamage: [50000, 70000],
             comfort: [6, 7],
@@ -63,7 +63,7 @@ export default class RepairScene extends Phaser.Scene {
         },
         {
             name: "airPressure",
-            repairCost: 100,
+            cost: 100,
             damageHealth: 500,
             kmDamage: [5000, 8000],
             comfort: [4, 5],
@@ -71,10 +71,10 @@ export default class RepairScene extends Phaser.Scene {
         },
         {
             name: "washCar",
-            repairCost: 200,
+            cost: 200,
             damageHealth: 0,
             kmDamage: [20000, 70000],
-            comfort: [3, 4],
+            comfort: [3, 10],
             security: [3, 4],
         }];
 
@@ -133,18 +133,9 @@ export default class RepairScene extends Phaser.Scene {
             fontStyle: "bold"
         }).setOrigin(0.5);
 
-        if (this.lowerBallJointInfo.kmDamage >= this.lastRepairKm) {
-            const lowerBallJoint = this.add.text(
-                55,
-                200,
-                "Fix lower ball joints . . . . . . . . . . . . . . . . . . . . . . . . . . . $1400", {
-                ...this.baseTextStyle, wordWrap: {
-                    width: this.scale.width - 100, // max width of text
-                    useAdvancedWrap: true          // better word breaking
-                },
-            })
-                .setOrigin(0, 0)
-                .setInteractive();
+        const lowerBallJointInfo = this.damageInfo.find((value) => value.name == "lowerBallJoint");
+
+        if (lowerBallJointInfo.kmDamage[0] >= this.lastRepairKm) {
 
             // lowerBallJoint.on("pointerdown", () => {
             //     this.balance -= this.lowerBallJointInfo.repairCost;
@@ -153,98 +144,80 @@ export default class RepairScene extends Phaser.Scene {
 
             this.menuItems.push({
                 text: "Fix lower ball joints . . . . . . . . . . . . . . . . . . . . . . . . . . . $1400",
-                cost: this.lowerBallJointInfo.repairCost,
-                damage: this.lowerBallJointInfo.damageHelth,
+                cost: lowerBallJointInfo.cost,
+                damage: lowerBallJointInfo.damageHealth,
             });
-
         }
 
+        const shockAbsorber = this.damageInfo.find((value) => value.name == "shockAbsorber");
 
-        const ShockAbsorber = this.add.text(
-            55,
-            275,
-            "Fix shocks absorbers . . . . . . . . . . . . . . . . . . . . . . . . $5000", {
-            ...this.baseTextStyle, wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        })
-            .setOrigin(0, 0)
-            .setInteractive();
+        if (shockAbsorber.kmDamage[0] >= this.lastRepairKm) {
+            this.menuItems.push({
+                text: "Fix shocks absorbers . . . . . . . . . . . . . . . . . . . . . . . . $5000",
+                cost: shockAbsorber.cost,
+                damage: shockAbsorber.damageHealth,
+            });
+        }
 
-        const Bushings = this.add.text(
-            55,
-            350,
-            "Fix lower control arms bushings . . . . . . . . . . . . $1200", {
-            ...this.baseTextStyle,
-            wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        }).setOrigin(0, 0)
-            .setInteractive();
+        const bushings = this.damageInfo.find((value) => value.name == "bushings");
 
-        const AligmentBalance = this.add.text(
-            55,
-            445,
-            "Fix aligment & balance . . . . . . . . . . . . . . . . . . . . . . . . $600", {
-            ...this.baseTextStyle,
-            wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        }).setOrigin(0, 0)
-            .setInteractive();
+        if (bushings.kmDamage[0] >= this.lastRepairKm) {
+            this.menuItems.push({
+                text: "Fix lower control arms bushings . . . . . . . . . . . . $1200",
+                cost: bushings.cost,
+                damage: bushings.damageHealth,
+            });
+        }
 
-        const BrakeCheckService = this.add.text(
-            55,
-            520,
-            "Brake check service . . . . . . . . . . . . . . . . . . . . . . . . . $800", {
-            ...this.baseTextStyle,
-            wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        }).setOrigin(0, 0)
-            .setInteractive();
+        const aligmentBalance = this.damageInfo.find((value) => value.name == "aligmentBalance");
 
-        const Tires = this.add.text(
-            55,
-            585,
-            "Buy tires . . . . . . . . . . $5200", {
-            ...this.baseTextStyle,
-            wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        }).setOrigin(0, 0)
-            .setInteractive();
+        if (aligmentBalance.kmDamage[0] >= this.lastRepairKm) {
+            this.menuItems.push({
+                text: "Fix aligment & balance . . . . . . . . . . . . . . . . . . . . . . . . $600",
+                cost: aligmentBalance.cost,
+                damage: aligmentBalance.damageHealth,
+            });
+        }
 
-        const CheckAirPressure = this.add.text(
-            55,
-            625,
-            "Check tire air pressure . . . . . . . . . . . . . . . . . . . . . . . $100", {
-            ...this.baseTextStyle,
-            wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        }).setOrigin(0, 0)
-            .setInteractive();
+        const brakeCheckService = this.damageInfo.find((value) => value.name == "brakeCheck");
 
+        if (brakeCheckService.kmDamage[0] >= this.lastRepairKm) {
+            this.menuItems.push({
+                text: "Brake check service . . . . . . . . . . . . . . . . . . . . . . . . . $800",
+                cost: brakeCheckService.cost,
+                damage: brakeCheckService.damageHealth,
+            });
+        }
 
-        const WashCar = this.add.text(
-            55,
-            695,
-            "Wash car . . . . . . . . . . . $200", {
-            ...this.baseTextStyle,
-            wordWrap: {
-                width: this.scale.width - 100, // max width of text
-                useAdvancedWrap: true          // better word breaking
-            },
-        }).setOrigin(0, 0)
-            .setInteractive();
+        const tires = this.damageInfo.find((value) => value.name == "tires");
 
+        if (tires.kmDamage[0] >= this.lastRepairKm) {
+            this.menuItems.push({
+                text: "Buy tires . . . . . . . . . . $5200",
+                cost: tires.cost,
+                damage: tires.damageHealth,
+            });
+        }
+
+        const checkAirPressure = this.damageInfo.find((value) => value.name == "airPressure");
+
+        if (checkAirPressure.kmDamage[0] >= this.lastRepairKm) {
+            this.menuItems.push({
+                text: "Check tire air pressure . . . . . . . . . . . . . . . . . . . . . . . $100",
+                cost: tires.cost,
+                damage: tires.damageHealth,
+            });
+        }
+
+        const washCar = this.damageInfo.find((value) => value.name == "washCar");
+
+        if (washCar.kmDamage[0] >= this.lastRepairKm) {
+            this.menuItems.push({
+                text: "Wash car . . . . . . . . . . . $200",
+                cost: washCar.cost,
+                damage: washCar.damageHealth,
+            });
+        }
 
         // Add title text
         this.add.text(300, this.scale.height - 30, "Balance: $" + this.balance, {
@@ -254,18 +227,20 @@ export default class RepairScene extends Phaser.Scene {
             fontStyle: "bold"
         }).setOrigin(0.5);
 
-
         // Contenedor principal en X=55, Y=200
         const menuContainer = this.add.container(55, 200);
 
         // Espaciado vertical
         let offsetY = 0;
+        let totalCost = 0;
 
-        this.menuItems.forEach((item) => {
+        this.menuItems.forEach((item, index) => {
+            totalCost += item.cost;
+
             const option = this.add.text(
                 0,
                 offsetY,
-                item.text.AligmentBalance,
+                item.text,
                 {
                     ...this.baseTextStyle,
                     wordWrap: {
@@ -286,6 +261,27 @@ export default class RepairScene extends Phaser.Scene {
 
             // Aumentar Y para la siguiente línea
             offsetY += option.height + 10; // margen de 10px entre textos
+
+            if (index === this.menuItems.length - 1) {
+                const totalCostText = this.add.text(
+                    0,
+                    offsetY,
+                    "Total Cost . . . . . . . . $" + totalCost,
+                    {
+                        ...this.baseTextStyle,
+                        wordWrap: {
+                            width: this.scale.width - 100,
+                            useAdvancedWrap: true,
+                        },
+                    }
+                ).setOrigin(0, 0)
+                    .setInteractive();
+                // Agregar al contenedor
+                menuContainer.add(totalCostText)
+
+                // Aumentar Y para la siguiente línea
+                offsetY += totalCostText.height + 10; // margen de 10px entre textos
+            }
 
         })
 
