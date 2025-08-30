@@ -1,5 +1,19 @@
 ---
 import "@/styles/global.css";
+const miniapp = {
+  version: "1",
+  imageUrl: "https://yoink.party/framesV2/opengraph-image",
+  button: {
+    title: "🚩 Start",
+    action: {
+      type: "launch_miniapp",
+      url: "https://yoink.party/framesV2",
+      name: "Yoink!",
+      splashImageUrl: "https://yoink.party/logo.png",
+      splashBackgroundColor: "#f5f0ec",
+    },
+  },
+};
 ---
 
 <!doctype html>
@@ -7,6 +21,17 @@ import "@/styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <!-- head content -->
+    <meta
+      name="fc:miniapp"
+      content='{"version":"1","imageUrl":"https://yoink.party/framesV2/opengraph-image","button":{"title":"🚩 Start","action":{"type":"launch_miniapp","name":"Yoink!","url":"https://yoink.party/framesV2","splashImageUrl":"https://yoink.party/logo.png","splashBackgroundColor":"#f5f0ec"}}}'
+    />
+    <!-- For backward compatibility -->
+    <meta
+      name="fc:frame"
+      content='{"version":"1","imageUrl":"https://yoink.party/framesV2/opengraph-image","button":{"title":"🚩 Start","action":{"type":"launch_frame","name":"Yoink!","url":"https://yoink.party/framesV2","splashImageUrl":"https://yoink.party/logo.png","splashBackgroundColor":"#f5f0ec"}}}'
+    />
+
     <link
       rel="preload"
       href="/fonts/Minecraft.woff2"
@@ -30,7 +55,6 @@ import "@/styles/global.css";
     <!-- car assets are created created by @MinZiin_  https://minzinn.itch.io/ -->
     <slot />
   </body>
-  
 </html>
 
 <style>
