@@ -10,7 +10,7 @@ export default class RepairScene extends Phaser.Scene {
         };
         this.balance = 1000000;
         this.damage = 1000000;
-        this.lastRepairKm = 0;
+        this.lastRepairKm = 30000;
         this.menuItems = [];
 
         this.damageInfo = [{

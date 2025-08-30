@@ -12,6 +12,7 @@
     "@astrojs/preact": "4.1.0",
     "@tailwindcss/vite": "4.1.11",
     "astro": "5.12.0",
+    "mongodb": "^6.19.0",
     "phaser": "3.90.0",
     "phaser3-rex-plugins": "^1.80.16",
     "preact": "10.26.9",
