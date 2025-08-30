@@ -6,16 +6,15 @@ export default class UIScene extends Phaser.Scene {
     }
 
     create() {
-        // Example texts
         this.score = 0;
         this.clients = 0;
 
-        this.clientsText = this.add.text(16, 60, "Clients: 0", {
+        this.scoreText = this.add.text(16, 16, "Damage: 0", {
             fontFamily: "Minecraft",
             fontSize: "32px",
             fill: "#fff",
         });
-        this.scoreText = this.add.text(16, 16, "Damage: 0", {
+        this.clientsText = this.add.text(16, 60, "Clients: 0", {
             fontFamily: "Minecraft",
             fontSize: "32px",
             fill: "#fff",
@@ -24,7 +23,6 @@ export default class UIScene extends Phaser.Scene {
         this.scoreText.setScrollFactor(0).setDepth(1);
         this.clientsText.setScrollFactor(0).setDepth(2);
 
-        // Example listener from GameScene
         this.registry.events.on("changedata", (parent, key, data) => {
             if (key === "clients") {
                 this.clientsText.setText("Clients: " + data);
@@ -32,6 +30,7 @@ export default class UIScene extends Phaser.Scene {
             if (key === "damage") {
                 this.scoreText.setText("Damage: " + data);
             }
+
         });
     }
 }

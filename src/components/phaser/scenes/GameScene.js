@@ -1,5 +1,8 @@
+import { damageInfo } from "@/const";
 import assetsData from "@/assets/data/assets.json";
 import animationsData from "@/assets/data/animations.json";
+import { calculateCurrentLife, calculateKmDamage } from "@/services/Global";
+
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -15,11 +18,13 @@ export default class GameScene extends Phaser.Scene {
         this.clients = 0;
         this.damage = 0;
         this.taxiStop;
+        this.damageInfo = damageInfo;
 
         // params
         this.npcX = [36, 400];
         this.speed = 200;
         this.sidewalkWidth = 100;
+        this.carKm = 0;
     }
 
     preload() {
@@ -169,6 +174,10 @@ export default class GameScene extends Phaser.Scene {
         // ======================
         this.spawnClient(this);
 
+
+        this.currentLife = calculateCurrentLife(this);
+        console.log("This current life: ", this.currentLife);
+
     }
 
     update(time, delta) {
@@ -229,6 +238,20 @@ export default class GameScene extends Phaser.Scene {
 
         // Convert delta to seconds
         const dt = delta / 1000;
+
+        const speedKmPerSec = 20;
+        this.carKm += speedKmPerSec * dt;
+
+        this.registry.set("carKm", this.carKm);
+
+        // === NEW: Recalculate life ===
+        this.currentLife = calculateCurrentLife(this);
+
+        // Store in registry (so UIScene or RepairScene can read it)
+        this.registry.set("carLife", this.currentLife);
+
+        console.log("Current life:", this.currentLife);
+
 
         this.streetTiles.forEach((tile) => {
             tile.y += this.speed * dt;
@@ -307,6 +330,8 @@ export default class GameScene extends Phaser.Scene {
 
         }
 
+        console.log("Current life: ", this.c)
+
     }
 
 
@@ -349,6 +374,10 @@ export default class GameScene extends Phaser.Scene {
         }
 
         let elapsed = 0;
+        // Apply instant pothole damage
+        this.carLife -= 200; // <-- tweak based on how harsh you want potholes
+        if (this.carLife < 0) this.carLife = 0;
+
         this.damage += 1;
         this.registry.set("damage", this.damage);
 
@@ -438,4 +467,5 @@ export default class GameScene extends Phaser.Scene {
             randomKey,
         };
     }
+
 }

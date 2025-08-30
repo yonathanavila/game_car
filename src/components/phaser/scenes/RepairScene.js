@@ -1,3 +1,6 @@
+import { damageInfo } from "@/const";
+import { calculateCurrentLife, calculateKmDamage } from "@/services/Global";
+
 export default class RepairScene extends Phaser.Scene {
     constructor() {
         super({ key: "RepairScene" });
@@ -12,74 +15,8 @@ export default class RepairScene extends Phaser.Scene {
         this.damage = 1000000;
         this.lastRepairKm = 30000;
         this.menuItems = [];
-
-        this.damageInfo = [{
-            name: "lowerBallJoint",
-            cost: 1400,
-            damageHealth: 5000,
-            kmDamage: [60000, 100000],
-            comfort: [6, 7],
-            security: [9, 10],
-        },
-        {
-            name: "shockAbsorber",
-            cost: 5000,
-            damageHealth: 4000,
-            kmDamage: [30000, 50000],
-            comfort: [8, 10],
-            security: [7, 8],
-        },
-        {
-            name: "bushings",
-            cost: 1200,
-            damageHealth: 2000,
-            kmDamage: [40000, 70000],
-            comfort: [7, 8],
-            security: [7, 8],
-        },
-        {
-            name: "aligmentBalance",
-            cost: 600,
-            damageHealth: 1200,
-            kmDamage: [15000, 20000],
-            comfort: [7, 8],
-            security: [9, 10],
-        },
-        {
-            name: "brakeCheck",
-            cost: 800,
-            damageHealth: 4500,
-            kmDamage: [30000, 50000],
-            comfort: [5, 6],
-            security: [10, 11],
-        },
-        {
-            name: "tires",
-            cost: 800,
-            damageHealth: 2500,
-            kmDamage: [50000, 70000],
-            comfort: [6, 7],
-            security: [9, 10],
-        },
-        {
-            name: "airPressure",
-            cost: 100,
-            damageHealth: 500,
-            kmDamage: [5000, 8000],
-            comfort: [4, 5],
-            security: [8, 9],
-        },
-        {
-            name: "washCar",
-            cost: 200,
-            damageHealth: 0,
-            kmDamage: [20000, 70000],
-            comfort: [3, 10],
-            security: [3, 4],
-        }];
-
-
-
+        // this.carKm = this.registry.get("carKm") || 0;
+        this.damageInfo = damageInfo;
     }
 
     preload() {
@@ -88,7 +25,6 @@ export default class RepairScene extends Phaser.Scene {
         this.load.image("tool_1", "/images/tools/MechanicTools_1.webp");
         this.load.image("tool_2", "/images/tools/MechanicTools_2.webp");
         this.load.image("tool_3", "/images/tools/MechanicTools_3.webp");
-        this.load.image("tool_4", "/images/tools/MechanicTools_4.webp");
         this.load.image("close", "/images/close.webp");
 
     }
@@ -285,5 +221,8 @@ export default class RepairScene extends Phaser.Scene {
 
         })
 
+        this.currentLife = calculateCurrentLife(this);
+
     }
+
 }
