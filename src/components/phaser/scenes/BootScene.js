@@ -16,6 +16,14 @@ export default class BootScene extends Phaser.Scene {
 
         this.load.image("street", "images/street/street_us.png");
         this.load.image("taxi_stop", "images/signal/taxi_stop.webp");
+        this.load.spritesheet("button_tool", "images/button/button_tool.webp", {
+            frameWidth: 768,
+            frameHeight: 405
+        });
+        this.load.spritesheet("button_pause", "images/button/button_pause.webp", {
+            frameWidth: 770,
+            frameHeight: 409
+        });
     }
 
     create() {

@@ -8,6 +8,7 @@ export default class UIScene extends Phaser.Scene {
     create() {
         this.score = 0;
         this.clients = 0;
+        this.carLife = 0;
 
         this.scoreText = this.add.text(16, 16, "Damage: 0", {
             fontFamily: "Minecraft",
@@ -15,6 +16,11 @@ export default class UIScene extends Phaser.Scene {
             fill: "#fff",
         });
         this.clientsText = this.add.text(16, 60, "Clients: 0", {
+            fontFamily: "Minecraft",
+            fontSize: "32px",
+            fill: "#fff",
+        });
+        this.carLifeText = this.add.text(16, 104, "Life: 0", {
             fontFamily: "Minecraft",
             fontSize: "32px",
             fill: "#fff",
@@ -31,6 +37,9 @@ export default class UIScene extends Phaser.Scene {
                 this.scoreText.setText("Damage: " + data);
             }
 
+            if (key === "carLife") {
+                this.carLifeText.setText("Life: " + data);
+            }
         });
     }
 }

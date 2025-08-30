@@ -25,6 +25,8 @@ export default class GameScene extends Phaser.Scene {
         this.speed = 200;
         this.sidewalkWidth = 100;
         this.carKm = 0;
+        this.totalLife = 19700;
+        this.carImageShown = false;
     }
 
     preload() {
@@ -61,6 +63,22 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
+        const pauseButton = this.add.sprite(this.sys.game.config.width - 60, 30, 'button_pause', 0)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                console.log('Car clicked!');
+                // optional: set frame for pressed effect
+                pauseButton.setFrame(1);
+            })
+            .on('pointerup', () => {
+                // back to hover frame if still hovered
+                pauseButton.setFrame(2);
+            });
+        // this.scene.start("RepairScene");
+
+        pauseButton.displayHeight = 50;
+        pauseButton.displayWidth = 100;
+
         this.registry.set("clients", 0);
         this.registry.set("damage", 0);
 
@@ -244,14 +262,34 @@ export default class GameScene extends Phaser.Scene {
 
         this.registry.set("carKm", this.carKm);
 
-        // === NEW: Recalculate life ===
-        this.currentLife = calculateCurrentLife(this);
+        // // === NEW: Recalculate life ===
+        // this.currentLife = calculateCurrentLife(this);
 
-        // Store in registry (so UIScene or RepairScene can read it)
-        this.registry.set("carLife", this.currentLife);
+        // // Store in registry (so UIScene or RepairScene can read it)
+        // this.registry.set("carLife", this.currentLife);
 
-        console.log("Current life:", this.currentLife);
+        // let lifePercent = (this.currentLife / this.totalLife) * 100;
 
+        // 70% of life check or make a service
+        if (this.carImageShown == false) {
+            this.carImageShown = true; // prevent running again
+            // Create interactive image in create()
+            const carButton = this.add.sprite(this.sys.game.config.width - 60, 100, 'button_tool', 0)
+                .setInteractive({ useHandCursor: true })
+                .on('pointerdown', () => {
+                    console.log('Car clicked!');
+                    // optional: set frame for pressed effect
+                    carButton.setFrame(1);
+                })
+                .on('pointerup', () => {
+                    // back to hover frame if still hovered
+                    carButton.setFrame(2);
+                });
+            // this.scene.start("RepairScene");
+
+            carButton.displayHeight = 50;
+            carButton.displayWidth = 100;
+        }
 
         this.streetTiles.forEach((tile) => {
             tile.y += this.speed * dt;
