@@ -347,6 +347,28 @@ export default class GameScene extends Phaser.Scene {
       this.onSidewalk = false;
       // console.log("✅ Player returned to the road");
     }
+
+    // check for NPCs that go off-screen (missed)
+    this.npcGroup.getChildren().forEach((npc) => {
+      if (npc.y > this.sys.game.config.height) {
+        npc.destroy();
+
+        // respawn a new NPC after delay
+        const delay = Phaser.Math.Between(3000, 12000);
+        this.time.delayedCall(delay, () => this.spawnClient());
+      }
+    });
+
+    // check for Taxi Stop that go off-screen (missed)
+    this.taxiStopGroup.getChildren().forEach((taxiStop) => {
+      if (taxiStop.y > this.sys.game.config.height) {
+        taxiStop.destroy();
+
+        // respawn a new Taxi Stop after delay
+        const delay = Phaser.Math.Between(3000, 12000);
+        this.time.delayedCall(delay, () => this.spawnClient());
+      }
+    });
   }
 
   // ======================
