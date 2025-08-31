@@ -26,5 +26,23 @@ export default class PauseScene extends Phaser.Scene {
             this.scene.stop();
             this.scene.resume("GameScene");
         })
+
+        const titleScreen = this.add.text(this.scale.width / 2,
+            70,
+            "Pause",
+            {
+                fontFamily: "Minecraft",
+                fontSize: "48px",
+                fill: "#fff",
+            }).setOrigin(0.5);
+
+        const load = this.add.text(this.scale.width / 2,
+            120,
+            "Load Game",
+            {
+                fontFamily: "Minecraft",
+                fontSize: "48px",
+                fill: "#fff",
+            }).setOrigin(0.5);
     }
 }

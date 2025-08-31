@@ -3,504 +3,514 @@ import assetsData from "@/assets/data/assets.json";
 import { calculateCurrentLife } from "@/services/Global";
 import animationsData from "@/assets/data/animations.json";
 
-
 export default class GameScene extends Phaser.Scene {
-    constructor() {
-        super({ key: "GameScene" });
+  constructor() {
+    super({ key: "GameScene" });
 
-        this.selectedCarKey = "car_green";
-        this.player;
-        this.npc;
-        this.cursors;
-        this.joystick;
-        this.isDesktop;
-        this.player_config;
-        this.clients = 0;
-        this.damage = 0;
-        this.taxiStop;
-        this.damageInfo = damageInfo;
+    this.selectedCarKey = "car_green";
+    this.player;
+    this.npc;
+    this.cursors;
+    this.joystick;
+    this.isDesktop;
+    this.player_config;
+    this.clients = 0;
+    this.damage = 0;
+    this.taxiStop;
+    this.damageInfo = damageInfo;
 
-        // params
-        this.npcX = [36, 400];
-        this.speed = 200;
-        this.sidewalkWidth = 100;
-        this.carKm = 0;
-        this.totalLife = 19700;
-        this.carImageShown = false;
+    // params
+    this.npcX = [36, 400];
+    this.speed = 200;
+    this.sidewalkWidth = 100;
+    this.carKm = 0;
+    this.totalLife = 19700;
+    this.carImageShown = false;
+  }
+
+  preload() {
+    // Find the asset group (folder) that contains the selectedCarKey
+    const group = assetsData.find((g) =>
+      g.files.some((file) => file.key === this.selectedCarKey)
+    );
+
+    if (!group) {
+      console.error(`No asset group found for key: ${this.selectedCarKey}`);
+      return;
     }
 
-    preload() {
+    // Find the specific file info inside that group
+    this.player_config = group.files.find(
+      (file) => file.key === this.selectedCarKey
+    );
 
-        // Find the asset group (folder) that contains the selectedCarKey
-        const group = assetsData.find((g) =>
-            g.files.some((file) => file.key === this.selectedCarKey)
-        );
-
-        if (!group) {
-            console.error(`No asset group found for key: ${this.selectedCarKey}`);
-            return;
-        }
-
-        // Find the specific file info inside that group
-        this.player_config = group.files.find((file) => file.key === this.selectedCarKey);
-
-        if (!this.player_config) {
-            console.error(`No asset file found for key: ${this.selectedCarKey}`);
-            return;
-        }
-
-        // Load the sprite sheet or image for the selected car only
-        if (this.player_config.type === "image" && this.player_config.frameConfig) {
-            this.load.spritesheet(
-                this.player_config.key,
-                `/${group.path}/${this.player_config.url}`,
-                this.player_config.frameConfig
-            );
-        } else if (this.player_config.type === "image") {
-            this.load.image(this.player_config.key, `/${group.path}/${this.player_config.url}`);
-        }
-
+    if (!this.player_config) {
+      console.error(`No asset file found for key: ${this.selectedCarKey}`);
+      return;
     }
 
-    create() {
-        const pauseButton = this.add.sprite(this.sys.game.config.width - 60, 30, 'button_pause', 0)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
-                console.log('Car clicked!');
-                pauseButton.setFrame(1);
-                this.scene.pause();
-                this.scene.launch("PauseScene");
-            })
-            .on('pointerup', () => {
-                // back to hover frame if still hovered
-                pauseButton.setFrame(2);
-            });
+    // Load the sprite sheet or image for the selected car only
+    if (this.player_config.type === "image" && this.player_config.frameConfig) {
+      this.load.spritesheet(
+        this.player_config.key,
+        `/${group.path}/${this.player_config.url}`,
+        this.player_config.frameConfig
+      );
+    } else if (this.player_config.type === "image") {
+      this.load.image(
+        this.player_config.key,
+        `/${group.path}/${this.player_config.url}`
+      );
+    }
+  }
 
-        pauseButton.displayHeight = 50;
-        pauseButton.displayWidth = 100;
+  create() {
+    const pauseButton = this.add
+      .sprite(this.sys.game.config.width - 60, 30, "button_pause", 0)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", () => {
+        console.log("Car clicked!");
+        pauseButton.setFrame(1);
+        this.scene.pause();
+        this.scene.launch("PauseScene");
+      })
+      .on("pointerup", () => {
+        // back to hover frame if still hovered
+        pauseButton.setFrame(2);
+      });
+    pauseButton.setDepth(2);
 
-        this.registry.set("clients", 0);
-        this.registry.set("damage", 0);
+    pauseButton.displayHeight = 50;
+    pauseButton.displayWidth = 100;
 
-        // Start the UI scene on top of the GameScene
-        this.scene.launch("UIScene");
+    this.registry.set("clients", 0);
+    this.registry.set("damage", 0);
 
-        // Detect platform
-        this.isDesktop = this.sys.game.device.os.desktop;
+    // Start the UI scene on top of the GameScene
+    this.scene.launch("UIScene");
 
-        if (this.isDesktop) {
-            // Desktop: enable keyboard
-            this.cursors = this.input.keyboard.createCursorKeys();
-        } else {
-            // Mobile: enable joystick
-            this.joystick = this.rexVirtualJoystick.add(this, {
-                x: this.sys.game.config.width / 2,
-                y: this.sys.game.config.height - 100,
-                radius: 50,
-                base: this.add.circle(0, 0, 50, 0x888888),
-                thumb: this.add.circle(0, 0, 25, 0xcccccc),
-            });
+    // Detect platform
+    this.isDesktop = this.sys.game.device.os.desktop;
 
-            this.joystick.base.setAlpha(0.4); // 50% transparent base
-            this.joystick.thumb.setAlpha(0.6); // 70% transparent thumb
-            this.joystick.base.setDepth(1);
-            this.joystick.thumb.setDepth(1);
+    if (this.isDesktop) {
+      // Desktop: enable keyboard
+      this.cursors = this.input.keyboard.createCursorKeys();
+    } else {
+      // Mobile: enable joystick
+      this.joystick = this.rexVirtualJoystick.add(this, {
+        x: this.sys.game.config.width / 2,
+        y: this.sys.game.config.height - 100,
+        radius: 50,
+        base: this.add.circle(0, 0, 50, 0x888888),
+        thumb: this.add.circle(0, 0, 25, 0xcccccc),
+      });
 
-            // Optional: show velocity vector for debugging
-            this.joystickForceText = this.add.text(300, 50, "");
-        }
+      this.joystick.base.setAlpha(0.4); // 50% transparent base
+      this.joystick.thumb.setAlpha(0.6); // 70% transparent thumb
+      this.joystick.base.setDepth(1);
+      this.joystick.thumb.setDepth(1);
 
-        // Create the street
-        this.streetTiles = [];
-
-        const streetHeight = this.textures.get("street").getSourceImage().height;
-        const screenHeight = this.scale.height;
-
-        // Create vertical streets
-        for (let i = 0; i < 5; i++) {
-            const tile = this.add
-                .image(0, screenHeight - (i + 1) * streetHeight, "street")
-                .setOrigin(0, 0)
-                .setScale(1.24);
-            this.streetTiles.push(tile);
-            tile.setDepth(-3);
-        }
-
-        // Filter animations for selectedCarKey only
-        const filteredAnims = animationsData.filter(
-            (anim) => anim.assetKey === this.selectedCarKey
-        );
-
-        // Create animations for selected car
-        filteredAnims.forEach((anim) => {
-            const frames = Array.isArray(anim.frames || anim.frame)
-                ? anim.frames || anim.frame
-                : [anim.frames || anim.frame];
-
-            this.anims.create({
-                key: anim.key,
-                frames: this.anims.generateFrameNumbers(this.selectedCarKey, {
-                    frames,
-                }),
-                frameRate: anim.frameRate,
-                repeat: anim.repeat ?? -1,
-            });
-        });
-
-        // ======================
-        // Potholes Group
-        // ======================
-        this.potholes = this.physics.add.group();
-
-        // Spawn the first few obstacles
-        for (let i = 0; i < 4; i++) {
-            this.spawnPothole.call(this, this.speed);
-        }
-
-        // ======================
-        // Player
-        // ======================
-        this.player = this.physics.add.sprite(
-            window.innerWidth / 2,
-            window.innerHeight,
-            this.selectedCarKey
-        );
-
-        // Set the scale first
-        this.player.setScale(2.5);
-        this.player.setCollideWorldBounds(true);
-
-        // Player hitbox
-        const hitboxWidth = this.player.width * this.player_config["hitbox"].width;
-        const hitboxHeight = this.player.height * this.player_config["hitbox"].height;
-        const offsetX = (this.player.width - hitboxWidth) / 2;
-        const offsetY = (this.player.height - hitboxHeight) / 2;
-        this.player.body.setSize(hitboxWidth, hitboxHeight);
-        this.player.body.setOffset(offsetX, offsetY);
-
-        // Collisions with obstacles
-        this.physics.add.overlap(
-            this.player,
-            this.potholes,
-            this.handleCollision,
-            null,
-            this
-        );
-
-        // ======================
-        // NPC
-        // ======================
-        this.spawnClient(this);
-
-
-        this.currentLife = calculateCurrentLife(this);
-        console.log("This current life: ", this.currentLife);
-
+      // Optional: show velocity vector for debugging
+      this.joystickForceText = this.add.text(300, 50, "");
     }
 
-    update(time, delta) {
-        if (this.isDesktop) {
-            // Desktop movement with keyboard
-            if (this.cursors.left.isDown) {
-                this.player.setVelocityX(-260);
-                const leftKey = `${this.selectedCarKey}_left`;
-                if (this.player.anims.currentAnim?.key !== leftKey) {
-                    this.player.anims.play(leftKey, true);
-                }
-            } else if (this.cursors.right.isDown) {
-                this.player.setVelocityX(260);
-                const rightKey = `${this.selectedCarKey}_right`;
-                if (this.player.anims.currentAnim?.key !== rightKey) {
-                    this.player.anims.play(rightKey, true);
-                }
-            } else {
-                this.player.setVelocityX(0);
-                const turnKey = `${this.selectedCarKey}_turn`;
-                if (this.player.anims.currentAnim?.key !== turnKey) {
-                    this.player.anims.play(turnKey);
-                }
-            }
+    // Create the street
+    this.streetTiles = [];
 
-            if (this.cursors.up.isDown && this.player.body.touching.down) {
-                this.player.setVelocityY(-330);
-            }
-        } else {
-            // Mobile movement with joystick
-            let forceX = this.joystick.forceX;
-            let forceY = this.joystick.forceY;
+    const streetHeight = this.textures.get("street").getSourceImage().height;
+    const screenHeight = this.scale.height;
 
-            if (forceX < -0.1) {
-                this.player.setVelocityX(-260);
-                const leftKey = `${this.selectedCarKey}_left`;
-                if (this.player.anims.currentAnim?.key !== leftKey) {
-                    this.player.anims.play(leftKey, true);
-                }
-            } else if (forceX > 0.1) {
-                this.player.setVelocityX(260);
-                const rightKey = `${this.selectedCarKey}_right`;
-                if (this.player.anims.currentAnim?.key !== rightKey) {
-                    this.player.anims.play(rightKey, true);
-                }
-            } else {
-                this.player.setVelocityX(0);
-                const turnKey = `${this.selectedCarKey}_turn`;
-                if (this.player.anims.currentAnim?.key !== turnKey) {
-                    this.player.anims.play(turnKey);
-                }
-            }
-
-            if (forceY < -0.5 && this.player.body.touching.down) {
-                this.player.setVelocityY(-330);
-            }
-        }
-
-        // Convert delta to seconds
-        const dt = delta / 1000;
-
-        const speedKmPerSec = 20;
-        this.carKm += speedKmPerSec * dt;
-
-        this.registry.set("carKm", this.carKm);
-
-        // // === NEW: Recalculate life ===
-        // this.currentLife = calculateCurrentLife(this);
-
-        // // Store in registry (so UIScene or RepairScene can read it)
-        // this.registry.set("carLife", this.currentLife);
-
-        // let lifePercent = (this.currentLife / this.totalLife) * 100;
-
-        // 70% of life check or make a service
-        if (this.carImageShown == false) {
-            this.carImageShown = true; // prevent running again
-            // Create interactive image in create()
-            const carButton = this.add.sprite(this.sys.game.config.width - 60, 100, 'button_tool', 0)
-                .setInteractive({ useHandCursor: true })
-                .on('pointerdown', () => {
-                    carButton.setFrame(1);
-                    this.scene.start("RepairScene");
-                })
-                .on('pointerup', () => {
-                    carButton.setFrame(2);
-                });
-
-            carButton.displayHeight = 50;
-            carButton.displayWidth = 100;
-        }
-
-        this.streetTiles.forEach((tile) => {
-            tile.y += this.speed * dt;
-        });
-
-        // Recycle tiles that move off screen
-        this.streetTiles.forEach((tile) => {
-            if (tile.y >= this.sys.game.config.height) {
-
-                // Find the tile currently highest (smallest y)
-                const highestTile = this.streetTiles.reduce((prev, curr) =>
-                    curr.y < prev.y ? curr : prev
-                );
-                tile.y = highestTile.y - tile.height;
-            }
-        });
-
-        // Recycle obstacles
-        this.potholes.getChildren().forEach((pothole) => {
-            if (pothole.y > this.sys.game.config.height + 50) {
-
-                // Pick a new random pothole frame
-                const potholeFrame = Phaser.Utils.Array.GetRandom(["bache_4", "bache_5"]);
-
-                // Change the texture
-                pothole.setTexture(potholeFrame);
-
-                // Adjust hitbox if needed
-                const hitboxWidth = pothole.width * 0.6;  // adjust based on scale
-                const hitboxHeight = pothole.height * 0.8;
-                const offsetX = (pothole.width - hitboxWidth) / 2;
-                const offsetY = (pothole.height - hitboxHeight) / 2;
-                pothole.body.setSize(hitboxWidth, hitboxHeight);
-                pothole.body.setOffset(offsetX, offsetY);
-
-                pothole.y = Phaser.Math.Between(-window.innerHeight, -100);
-
-                const axiX = Phaser.Math.Between(
-                    0 + this.sidewalkWidth, 434 - this.sidewalkWidth
-                );
-
-                pothole.x = axiX
-
-                // this function applys the pothole change texture (i dont know why, becouse only set the this.speed)
-                pothole.body.setVelocityY(this.speed);
-            }
-        });
-
-        // If the taxi pass away of the stop
-
-        if (this.taxiStop && this.taxiStop.active && this.taxiStop.y > this.sys.game.config.height + 50) {
-
-            const delayedCall = Phaser.Math.Between(3000, 12000);
-
-            // Taxi stop has gone off screen without being picked up
-            this.taxiStop.destroy();
-
-            this.time.delayedCall(delayedCall, () => {
-                // Spawn a new client since the taxi missed it
-                this.spawnClient(this);
-            });
-        }
-
-        // If the taxi pass away of the client
-        if (this.npc && this.npc.active && this.npc.y > this.sys.game.config.height + 50) {
-
-            const delayedCall = Phaser.Math.Between(3000, 12000);
-
-            // Taxi stop has gone off screen without being picked up
-            this.npc.destroy();
-
-            this.time.delayedCall(delayedCall, () => {
-                // Spawn a new client since the taxi missed it
-                this.spawnClient(this);
-            });
-
-        }
-
-        console.log("Current life: ", this.c)
-
+    // Create vertical streets
+    for (let i = 0; i < 5; i++) {
+      const tile = this.add
+        .image(0, screenHeight - (i + 1) * streetHeight, "street")
+        .setOrigin(0, 0)
+        .setScale(1.24);
+      this.streetTiles.push(tile);
+      tile.setDepth(-3);
     }
 
+    // Filter animations for selectedCarKey only
+    const filteredAnims = animationsData.filter(
+      (anim) => anim.assetKey === this.selectedCarKey
+    );
+
+    // Create animations for selected car
+    filteredAnims.forEach((anim) => {
+      const frames = Array.isArray(anim.frames || anim.frame)
+        ? anim.frames || anim.frame
+        : [anim.frames || anim.frame];
+
+      this.anims.create({
+        key: anim.key,
+        frames: this.anims.generateFrameNumbers(this.selectedCarKey, {
+          frames,
+        }),
+        frameRate: anim.frameRate,
+        repeat: anim.repeat ?? -1,
+      });
+    });
 
     // ======================
-    // Spawn Potholes Function
+    // Potholes Group
     // ======================
-    spawnPothole(speed) {
-        // Pick a random key from the available obstacle textures
-        const potholeFrame = this.getRandomFrame(this, ["bache_4", "bache_5"]);
+    this.potholes = this.physics.add.group();
 
-        const x = Phaser.Math.Between(
-            this.sidewalkWidth,
-            434 - this.sidewalkWidth
+    // Spawn the first few obstacles
+    for (let i = 0; i < 4; i++) {
+      this.spawnPothole.call(this, this.speed);
+    }
+
+    // ======================
+    // Player
+    // ======================
+    this.player = this.physics.add.sprite(
+      window.innerWidth / 2,
+      window.innerHeight,
+      this.selectedCarKey
+    );
+
+    // Set the scale first
+    this.player.setScale(2.5);
+    this.player.setCollideWorldBounds(true);
+
+    // Player hitbox
+    const hitboxWidth = this.player.width * this.player_config["hitbox"].width;
+    const hitboxHeight =
+      this.player.height * this.player_config["hitbox"].height;
+    const offsetX = (this.player.width - hitboxWidth) / 2;
+    const offsetY = (this.player.height - hitboxHeight) / 2;
+    this.player.body.setSize(hitboxWidth, hitboxHeight);
+    this.player.body.setOffset(offsetX, offsetY);
+
+    // Collisions with obstacles
+    this.physics.add.overlap(
+      this.player,
+      this.potholes,
+      this.handleCollision,
+      null,
+      this
+    );
+
+    // ======================
+    // NPC
+    // ======================
+    this.spawnClient(this);
+
+    this.currentLife = calculateCurrentLife(this);
+    console.log("This current life: ", this.currentLife);
+  }
+
+  update(time, delta) {
+    if (this.isDesktop) {
+      // Desktop movement with keyboard
+      if (this.cursors.left.isDown) {
+        this.player.setVelocityX(-260);
+        const leftKey = `${this.selectedCarKey}_left`;
+        if (this.player.anims.currentAnim?.key !== leftKey) {
+          this.player.anims.play(leftKey, true);
+        }
+      } else if (this.cursors.right.isDown) {
+        this.player.setVelocityX(260);
+        const rightKey = `${this.selectedCarKey}_right`;
+        if (this.player.anims.currentAnim?.key !== rightKey) {
+          this.player.anims.play(rightKey, true);
+        }
+      } else {
+        this.player.setVelocityX(0);
+        const turnKey = `${this.selectedCarKey}_turn`;
+        if (this.player.anims.currentAnim?.key !== turnKey) {
+          this.player.anims.play(turnKey);
+        }
+      }
+
+      if (this.cursors.up.isDown && this.player.body.touching.down) {
+        this.player.setVelocityY(-330);
+      }
+    } else {
+      // Mobile movement with joystick
+      let forceX = this.joystick.forceX;
+      let forceY = this.joystick.forceY;
+
+      if (forceX < -0.1) {
+        this.player.setVelocityX(-260);
+        const leftKey = `${this.selectedCarKey}_left`;
+        if (this.player.anims.currentAnim?.key !== leftKey) {
+          this.player.anims.play(leftKey, true);
+        }
+      } else if (forceX > 0.1) {
+        this.player.setVelocityX(260);
+        const rightKey = `${this.selectedCarKey}_right`;
+        if (this.player.anims.currentAnim?.key !== rightKey) {
+          this.player.anims.play(rightKey, true);
+        }
+      } else {
+        this.player.setVelocityX(0);
+        const turnKey = `${this.selectedCarKey}_turn`;
+        if (this.player.anims.currentAnim?.key !== turnKey) {
+          this.player.anims.play(turnKey);
+        }
+      }
+
+      if (forceY < -0.5 && this.player.body.touching.down) {
+        this.player.setVelocityY(-330);
+      }
+    }
+
+    // Convert delta to seconds
+    const dt = delta / 1000;
+
+    const speedKmPerSec = 20;
+    this.carKm += speedKmPerSec * dt;
+
+    this.registry.set("carKm", this.carKm);
+
+    // // === NEW: Recalculate life ===
+    // this.currentLife = calculateCurrentLife(this);
+
+    // // Store in registry (so UIScene or RepairScene can read it)
+    // this.registry.set("carLife", this.currentLife);
+
+    // let lifePercent = (this.currentLife / this.totalLife) * 100;
+
+    // 70% of life check or make a service
+    if (this.carImageShown == false) {
+      this.carImageShown = true; // prevent running again
+      // Create interactive image in create()
+      const carButton = this.add
+        .sprite(this.sys.game.config.width - 60, 100, "button_tool", 0)
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", () => {
+          carButton.setFrame(1);
+          this.scene.start("RepairScene");
+        })
+        .on("pointerup", () => {
+          carButton.setFrame(2);
+        });
+
+      carButton.displayHeight = 50;
+      carButton.displayWidth = 100;
+    }
+
+    this.streetTiles.forEach((tile) => {
+      tile.y += this.speed * dt;
+    });
+
+    // Recycle tiles that move off screen
+    this.streetTiles.forEach((tile) => {
+      if (tile.y >= this.sys.game.config.height) {
+        // Find the tile currently highest (smallest y)
+        const highestTile = this.streetTiles.reduce((prev, curr) =>
+          curr.y < prev.y ? curr : prev
         );
-        const y = Phaser.Math.Between(-600, -100);
+        tile.y = highestTile.y - tile.height;
+      }
+    });
 
-        const pothole = this.potholes.create(x, y, potholeFrame["randomKey"]);
+    // Recycle obstacles
+    this.potholes.getChildren().forEach((pothole) => {
+      if (pothole.y > this.sys.game.config.height + 50) {
+        // Pick a new random pothole frame
+        const potholeFrame = Phaser.Utils.Array.GetRandom([
+          "bache_4",
+          "bache_5",
+        ]);
 
-        // scale the pothole
-        pothole.setScale(0.452);
+        // Change the texture
+        pothole.setTexture(potholeFrame);
 
-        const hitboxWidth = pothole.width * 0.6;
+        // Adjust hitbox if needed
+        const hitboxWidth = pothole.width * 0.6; // adjust based on scale
         const hitboxHeight = pothole.height * 0.8;
-
         const offsetX = (pothole.width - hitboxWidth) / 2;
         const offsetY = (pothole.height - hitboxHeight) / 2;
         pothole.body.setSize(hitboxWidth, hitboxHeight);
         pothole.body.setOffset(offsetX, offsetY);
 
-        // Use physics velocity so it matches lines
-        pothole.body.setVelocityY(speed);
-        pothole.body.allowGravity = false;
-        pothole.body.immovable = true;
+        pothole.y = Phaser.Math.Between(-window.innerHeight, -100);
+
+        const axiX = Phaser.Math.Between(
+          0 + this.sidewalkWidth,
+          434 - this.sidewalkWidth
+        );
+
+        pothole.x = axiX;
+
+        // this function applys the pothole change texture (i dont know why, becouse only set the this.speed)
+        pothole.body.setVelocityY(this.speed);
+      }
+    });
+
+    // If the taxi pass away of the stop
+
+    if (
+      this.taxiStop &&
+      this.taxiStop.active &&
+      this.taxiStop.y > this.sys.game.config.height + 50
+    ) {
+      const delayedCall = Phaser.Math.Between(3000, 12000);
+
+      // Taxi stop has gone off screen without being picked up
+      this.taxiStop.destroy();
+
+      this.time.delayedCall(delayedCall, () => {
+        // Spawn a new client since the taxi missed it
+        this.spawnClient(this);
+      });
     }
 
-    handleCollision(player) {
-        if (player.blinkEvent) {
-            player.blinkEvent.remove();
-            player.clearTint();
+    // If the taxi pass away of the client
+    if (
+      this.npc &&
+      this.npc.active &&
+      this.npc.y > this.sys.game.config.height + 50
+    ) {
+      const delayedCall = Phaser.Math.Between(3000, 12000);
+
+      // Taxi stop has gone off screen without being picked up
+      this.npc.destroy();
+
+      this.time.delayedCall(delayedCall, () => {
+        // Spawn a new client since the taxi missed it
+        this.spawnClient(this);
+      });
+    }
+
+    console.log("Current life: ", this.c);
+  }
+
+  // ======================
+  // Spawn Potholes Function
+  // ======================
+  spawnPothole(speed) {
+    // Pick a random key from the available obstacle textures
+    const potholeFrame = this.getRandomFrame(this, ["bache_4", "bache_5"]);
+
+    const x = Phaser.Math.Between(this.sidewalkWidth, 434 - this.sidewalkWidth);
+    const y = Phaser.Math.Between(-600, -100);
+
+    const pothole = this.potholes.create(x, y, potholeFrame["randomKey"]);
+
+    // scale the pothole
+    pothole.setScale(0.452);
+
+    const hitboxWidth = pothole.width * 0.6;
+    const hitboxHeight = pothole.height * 0.8;
+
+    const offsetX = (pothole.width - hitboxWidth) / 2;
+    const offsetY = (pothole.height - hitboxHeight) / 2;
+    pothole.body.setSize(hitboxWidth, hitboxHeight);
+    pothole.body.setOffset(offsetX, offsetY);
+
+    // Use physics velocity so it matches lines
+    pothole.body.setVelocityY(speed);
+    pothole.body.allowGravity = false;
+    pothole.body.immovable = true;
+  }
+
+  handleCollision(player) {
+    if (player.blinkEvent) {
+      player.blinkEvent.remove();
+      player.clearTint();
+    }
+
+    let elapsed = 0;
+    // Apply instant pothole damage
+    this.carLife -= 200; // <-- tweak based on how harsh you want potholes
+    if (this.carLife < 0) this.carLife = 0;
+
+    this.damage += 1;
+    this.registry.set("damage", this.damage);
+
+    player.blinkEvent = player.scene.time.addEvent({
+      delay: 200,
+      callback: () => {
+        if (player.tintTopLeft === 0xff0000) {
+          player.clearTint();
+        } else {
+          player.setTint(0xff0000);
         }
 
-        let elapsed = 0;
-        // Apply instant pothole damage
-        this.carLife -= 200; // <-- tweak based on how harsh you want potholes
-        if (this.carLife < 0) this.carLife = 0;
+        elapsed += 200;
 
-        this.damage += 1;
-        this.registry.set("damage", this.damage);
+        if (elapsed >= 2000) {
+          player.clearTint();
+          player.blinkEvent.remove();
+          player.blinkEvent = null;
+        }
+      },
+      loop: true,
+    });
+  }
 
-        player.blinkEvent = player.scene.time.addEvent({
-            delay: 200,
-            callback: () => {
-                if (player.tintTopLeft === 0xff0000) {
-                    player.clearTint();
-                } else {
-                    player.setTint(0xff0000);
-                }
+  handleNPCPickup() {
+    if (this.npc.collided) return;
 
-                elapsed += 200;
+    this.npc.destroy();
+    this.npc.collided = true;
 
-                if (elapsed >= 2000) {
-                    player.clearTint();
-                    player.blinkEvent.remove();
-                    player.blinkEvent = null;
-                }
-            },
-            loop: true,
-        });
-    }
+    const delayedCall = Phaser.Math.Between(3000, 12000);
 
-    handleNPCPickup() {
-        if (this.npc.collided) return;
+    this.time.delayedCall(delayedCall, () => {
+      let x = Phaser.Utils.Array.GetRandom(this.npcX);
 
-        this.npc.destroy();
-        this.npc.collided = true;
+      // spawmn the taxi stop after 6seconds
+      this.taxiStop = this.physics.add.sprite(x, 0, "taxi_stop");
+      this.taxiStop.setScale(0.53);
+      this.taxiStop.setDepth(-1);
+      this.taxiStop.body.setAllowGravity(false);
+      this.taxiStop.body.setVelocityY(this.speed);
 
-        const delayedCall = Phaser.Math.Between(3000, 12000);
+      // Taxi stop
+      this.physics.add.overlap(
+        this.player,
+        this.taxiStop,
+        this.handleTaxiStopCollision,
+        null,
+        this
+      );
+    });
+  }
 
-        this.time.delayedCall(delayedCall, () => {
-            let x = Phaser.Utils.Array.GetRandom(this.npcX);
+  handleTaxiStopCollision() {
+    const delayedCall = Phaser.Math.Between(3000, 12000);
+    this.clients += 1;
 
-            // spawmn the taxi stop after 6seconds
-            this.taxiStop = this.physics.add.sprite(x, 0, "taxi_stop");
-            this.taxiStop.setScale(0.53);
-            this.taxiStop.setDepth(-1);
-            this.taxiStop.body.setAllowGravity(false);
-            this.taxiStop.body.setVelocityY(this.speed);
+    this.registry.set("clients", this.clients);
+    this.taxiStop.disableBody(true, true);
 
-            // Taxi stop
-            this.physics.add.overlap(
-                this.player,
-                this.taxiStop,
-                this.handleTaxiStopCollision,
-                null,
-                this
-            );
-        });
-    }
+    this.time.delayedCall(delayedCall, () => {
+      this.spawnClient(this);
+    });
+  }
 
-    handleTaxiStopCollision() {
-        const delayedCall = Phaser.Math.Between(3000, 12000);
-        this.clients += 1;
+  spawnClient(context) {
+    const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
+    const npcFrame = this.getRandomFrame(context, npcKey);
+    let x = Phaser.Utils.Array.GetRandom(this.npcX);
 
-        this.registry.set("clients", this.clients);
-        this.taxiStop.disableBody(true, true);
+    this.npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
+    this.npc.body.allowGravity = false;
+    this.npc.setVelocityY(this.speed);
+    this.npc.setDepth(-1);
 
-        this.time.delayedCall(delayedCall, () => {
+    // NPC pickup
+    context.physics.add.overlap(
+      this.player,
+      this.npc,
+      this.handleNPCPickup,
+      null,
+      context
+    );
+  }
 
-            this.spawnClient(this);
-        });
-    }
+  getRandomFrame(context, assets) {
+    const randomKey = Phaser.Utils.Array.GetRandom(assets);
+    const width = context.textures.get(randomKey).getSourceImage().width;
 
-    spawnClient(context) {
-        const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
-        const npcFrame = this.getRandomFrame(context, npcKey);
-        let x = Phaser.Utils.Array.GetRandom(this.npcX);
-
-        this.npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
-        this.npc.body.allowGravity = false;
-        this.npc.setVelocityY(this.speed);
-        this.npc.setDepth(-1);
-
-        // NPC pickup
-        context.physics.add.overlap(this.player, this.npc, this.handleNPCPickup, null, context);
-    }
-
-    getRandomFrame(context, assets) {
-        const randomKey = Phaser.Utils.Array.GetRandom(assets);
-        const width = context.textures.get(randomKey).getSourceImage().width;
-
-        return {
-            width,
-            randomKey,
-        };
-    }
-
+    return {
+      width,
+      randomKey,
+    };
+  }
 }
