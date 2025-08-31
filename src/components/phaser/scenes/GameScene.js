@@ -8,15 +8,14 @@ export default class GameScene extends Phaser.Scene {
     super({ key: "GameScene" });
 
     this.selectedCarKey = "car_green";
-    this.player;
-    this.npc;
-    this.cursors;
-    this.joystick;
-    this.isDesktop;
-    this.player_config;
+    this.player = null;
+    this.cursors = null;
+    this.joystick = null;
+    this.isDesktop = true;
+    this.player_config = null;
+
     this.clients = 0;
     this.damage = 0;
-    this.taxiStop;
     this.damageInfo = damageInfo;
 
     // params
@@ -26,6 +25,11 @@ export default class GameScene extends Phaser.Scene {
     this.carKm = 0;
     this.totalLife = 19700;
     this.carImageShown = false;
+
+    // money
+    this.balance = 0;
+    // [minRate, maxRate]
+    this.ratePerKm = [1.8, 5.941176471];
   }
 
   preload() {
@@ -69,22 +73,22 @@ export default class GameScene extends Phaser.Scene {
       .sprite(this.sys.game.config.width - 60, 30, "button_pause", 0)
       .setInteractive({ useHandCursor: true })
       .on("pointerdown", () => {
-        console.log("Car clicked!");
         pauseButton.setFrame(1);
         this.scene.pause();
         this.scene.launch("PauseScene");
       })
       .on("pointerup", () => {
-        // back to hover frame if still hovered
         pauseButton.setFrame(2);
       });
     pauseButton.setDepth(2);
-
     pauseButton.displayHeight = 50;
     pauseButton.displayWidth = 100;
 
+    // registry init
     this.registry.set("clients", 0);
     this.registry.set("damage", 0);
+    this.registry.set("balance", 0);
+    this.registry.set("carKm", 0);
 
     // Start the UI scene on top of the GameScene
     this.scene.launch("UIScene");
@@ -109,33 +113,26 @@ export default class GameScene extends Phaser.Scene {
       this.joystick.thumb.setAlpha(0.6); // 70% transparent thumb
       this.joystick.base.setDepth(1);
       this.joystick.thumb.setDepth(1);
-
-      // Optional: show velocity vector for debugging
       this.joystickForceText = this.add.text(300, 50, "");
     }
 
     // Create the street
     this.streetTiles = [];
-
     const streetHeight = this.textures.get("street").getSourceImage().height;
     const screenHeight = this.scale.height;
-
-    // Create vertical streets
     for (let i = 0; i < 5; i++) {
       const tile = this.add
         .image(0, screenHeight - (i + 1) * streetHeight, "street")
         .setOrigin(0, 0)
         .setScale(1.24);
-      this.streetTiles.push(tile);
       tile.setDepth(-3);
+      this.streetTiles.push(tile);
     }
 
     // Filter animations for selectedCarKey only
     const filteredAnims = animationsData.filter(
       (anim) => anim.assetKey === this.selectedCarKey
     );
-
-    // Create animations for selected car
     filteredAnims.forEach((anim) => {
       const frames = Array.isArray(anim.frames || anim.frame)
         ? anim.frames || anim.frame
@@ -151,26 +148,18 @@ export default class GameScene extends Phaser.Scene {
       });
     });
 
-    // ======================
     // Potholes Group
-    // ======================
     this.potholes = this.physics.add.group();
-
-    // Spawn the first few obstacles
     for (let i = 0; i < 4; i++) {
       this.spawnPothole.call(this, this.speed);
     }
 
-    // ======================
     // Player
-    // ======================
     this.player = this.physics.add.sprite(
       window.innerWidth / 2,
       window.innerHeight,
       this.selectedCarKey
     );
-
-    // Set the scale first
     this.player.setScale(2.5);
     this.player.setCollideWorldBounds(true);
 
@@ -183,7 +172,7 @@ export default class GameScene extends Phaser.Scene {
     this.player.body.setSize(hitboxWidth, hitboxHeight);
     this.player.body.setOffset(offsetX, offsetY);
 
-    // Collisions with obstacles
+    // Collisions with potholes
     this.physics.add.overlap(
       this.player,
       this.potholes,
@@ -192,13 +181,31 @@ export default class GameScene extends Phaser.Scene {
       this
     );
 
-    // ======================
     // NPC
-    // ======================
+    this.npcGroup = this.physics.add.group();
+    this.taxiStopGroup = this.physics.add.group();
+
+    // Overlaps added ONCE here
+    this.physics.add.overlap(
+      this.player,
+      this.npcGroup,
+      this.handleNPCPickup,
+      null,
+      this
+    );
+    this.physics.add.overlap(
+      this.player,
+      this.taxiStopGroup,
+      this.handleTaxiStopCollision,
+      null,
+      this
+    );
+
+    // First client
     this.spawnClient(this);
 
+    // Life
     this.currentLife = calculateCurrentLife(this);
-    console.log("This current life: ", this.currentLife);
   }
 
   update(time, delta) {
@@ -262,21 +269,11 @@ export default class GameScene extends Phaser.Scene {
 
     const speedKmPerSec = 20;
     this.carKm += speedKmPerSec * dt;
-
     this.registry.set("carKm", this.carKm);
 
-    // // === NEW: Recalculate life ===
-    // this.currentLife = calculateCurrentLife(this);
-
-    // // Store in registry (so UIScene or RepairScene can read it)
-    // this.registry.set("carLife", this.currentLife);
-
-    // let lifePercent = (this.currentLife / this.totalLife) * 100;
-
-    // 70% of life check or make a service
-    if (this.carImageShown == false) {
-      this.carImageShown = true; // prevent running again
-      // Create interactive image in create()
+    // Tool button once
+    if (!this.carImageShown) {
+      this.carImageShown = true;
       const carButton = this.add
         .sprite(this.sys.game.config.width - 60, 100, "button_tool", 0)
         .setInteractive({ useHandCursor: true })
@@ -284,26 +281,17 @@ export default class GameScene extends Phaser.Scene {
           carButton.setFrame(1);
           this.scene.start("RepairScene");
         })
-        .on("pointerup", () => {
-          carButton.setFrame(2);
-        });
-
+        .on("pointerup", () => carButton.setFrame(2));
       carButton.displayHeight = 50;
       carButton.displayWidth = 100;
     }
 
-    this.streetTiles.forEach((tile) => {
-      tile.y += this.speed * dt;
-    });
-
-    // Recycle tiles that move off screen
+    // Scroll street
+    this.streetTiles.forEach((tile) => (tile.y += this.speed * dt));
     this.streetTiles.forEach((tile) => {
       if (tile.y >= this.sys.game.config.height) {
-        // Find the tile currently highest (smallest y)
-        const highestTile = this.streetTiles.reduce((prev, curr) =>
-          curr.y < prev.y ? curr : prev
-        );
-        tile.y = highestTile.y - tile.height;
+        const highest = this.streetTiles.reduce((p, c) => (c.y < p.y ? c : p));
+        tile.y = highest.y - tile.height;
       }
     });
 
@@ -328,73 +316,36 @@ export default class GameScene extends Phaser.Scene {
         pothole.body.setOffset(offsetX, offsetY);
 
         pothole.y = Phaser.Math.Between(-window.innerHeight, -100);
-
-        const axiX = Phaser.Math.Between(
-          0 + this.sidewalkWidth,
+        pothole.x = Phaser.Math.Between(
+          this.sidewalkWidth,
           434 - this.sidewalkWidth
         );
-
-        pothole.x = axiX;
-
-        // this function applys the pothole change texture (i dont know why, becouse only set the this.speed)
-        pothole.body.setVelocityY(this.speed);
       }
     });
 
-    // If the taxi pass away of the stop
+    // Despawn taxi stops off screen
+    this.taxiStopGroup.getChildren().forEach((stop) => {
+      if (stop.active && stop.y > this.sys.game.config.height + 50)
+        stop.destroy();
+    });
 
-    if (
-      this.taxiStop &&
-      this.taxiStop.active &&
-      this.taxiStop.y > this.sys.game.config.height + 50
-    ) {
-      const delayedCall = Phaser.Math.Between(3000, 12000);
+    // Despawn NPCs off screen
+    this.npcGroup.getChildren().forEach((npc) => {
+      if (npc.active && npc.y > this.sys.game.config.height + 50) npc.destroy();
+    });
 
-      // Taxi stop has gone off screen without being picked up
-      this.taxiStop.destroy();
-
-      this.time.delayedCall(delayedCall, () => {
-        // Spawn a new client since the taxi missed it
-        this.spawnClient(this);
-      });
-    }
-
-    // If the taxi pass away of the client
-    if (
-      this.npc &&
-      this.npc.active &&
-      this.npc.y > this.sys.game.config.height + 50
-    ) {
-      const delayedCall = Phaser.Math.Between(3000, 12000);
-
-      // Taxi stop has gone off screen without being picked up
-      this.npc.destroy();
-
-      this.time.delayedCall(delayedCall, () => {
-        // Spawn a new client since the taxi missed it
-        this.spawnClient(this);
-      });
-    }
-
-    // decrease life if the playr drive inside a sidewalk
+    // Sidewalk penalty
     const roadLeft = this.sidewalkWidth;
     const roadRight = 434 - this.sidewalkWidth;
-
     const playerX = this.player.x;
-
-    // Check if outside the road
     if (playerX < roadLeft || playerX > roadRight) {
       this.onSidewalk = true;
-
       if (this.carLife < 0) this.carLife = 0;
-
       this.damage += 1;
       this.registry.set("damage", this.damage);
-    } else {
-      if (this.onSidewalk) {
-        this.onSidewalk = false;
-        console.log("✅ Player returned to the road");
-      }
+    } else if (this.onSidewalk) {
+      this.onSidewalk = false;
+      // console.log("✅ Player returned to the road");
     }
   }
 
@@ -404,27 +355,42 @@ export default class GameScene extends Phaser.Scene {
   spawnPothole(speed) {
     // Pick a random key from the available obstacle textures
     const potholeFrame = this.getRandomFrame(this, ["bache_4", "bache_5"]);
-
     const x = Phaser.Math.Between(this.sidewalkWidth, 434 - this.sidewalkWidth);
     const y = Phaser.Math.Between(-600, -100);
-
     const pothole = this.potholes.create(x, y, potholeFrame["randomKey"]);
-
-    // scale the pothole
     pothole.setScale(0.452);
 
     const hitboxWidth = pothole.width * 0.6;
     const hitboxHeight = pothole.height * 0.8;
-
     const offsetX = (pothole.width - hitboxWidth) / 2;
     const offsetY = (pothole.height - hitboxHeight) / 2;
     pothole.body.setSize(hitboxWidth, hitboxHeight);
     pothole.body.setOffset(offsetX, offsetY);
 
-    // Use physics velocity so it matches lines
     pothole.body.setVelocityY(speed);
     pothole.body.allowGravity = false;
     pothole.body.immovable = true;
+  }
+
+  spawnClient() {
+    const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
+    const randomKey = Phaser.Utils.Array.GetRandom(npcKey);
+    let x = Phaser.Utils.Array.GetRandom(this.npcX);
+
+    const npc = this.npcGroup.create(x, 0, randomKey);
+    npc.body.allowGravity = false;
+    npc.setVelocityY(this.speed);
+    npc.setDepth(-1);
+  }
+
+  spawnTaxiStop() {
+    const x = Phaser.Utils.Array.GetRandom(this.npcX);
+    const stop = this.taxiStopGroup.create(x, 0, "taxi_stop");
+    stop.setScale(0.53);
+    stop.setDepth(-1);
+    stop.body.setAllowGravity(false);
+    stop.body.setVelocityY(this.speed);
+    return stop;
   }
 
   handleCollision(player) {
@@ -434,8 +400,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     let elapsed = 0;
-    // Apply instant pothole damage
-    this.carLife -= 200; // <-- tweak based on how harsh you want potholes
+    this.carLife -= 200;
     if (this.carLife < 0) this.carLife = 0;
 
     this.damage += 1;
@@ -444,14 +409,10 @@ export default class GameScene extends Phaser.Scene {
     player.blinkEvent = player.scene.time.addEvent({
       delay: 200,
       callback: () => {
-        if (player.tintTopLeft === 0xff0000) {
-          player.clearTint();
-        } else {
-          player.setTint(0xff0000);
-        }
+        if (player.tintTopLeft === 0xff0000) player.clearTint();
+        else player.setTint(0xff0000);
 
         elapsed += 200;
-
         if (elapsed >= 2000) {
           player.clearTint();
           player.blinkEvent.remove();
@@ -462,74 +423,41 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  handleNPCPickup() {
-    if (this.npc.collided) return;
+  handleNPCPickup(player, npc) {
+    if (!npc.active) return;
 
-    this.npc.destroy();
-    this.npc.collided = true;
+    npc.destroy();
 
+    // spawn taxi stop after a small random delay (or 0)
     const delayedCall = Phaser.Math.Between(3000, 12000);
-
-    this.time.delayedCall(delayedCall, () => {
-      let x = Phaser.Utils.Array.GetRandom(this.npcX);
-
-      // spawmn the taxi stop after 6seconds
-      this.taxiStop = this.physics.add.sprite(x, 0, "taxi_stop");
-      this.taxiStop.setScale(0.53);
-      this.taxiStop.setDepth(-1);
-      this.taxiStop.body.setAllowGravity(false);
-      this.taxiStop.body.setVelocityY(this.speed);
-
-      // Taxi stop
-      this.physics.add.overlap(
-        this.player,
-        this.taxiStop,
-        this.handleTaxiStopCollision,
-        null,
-        this
-      );
-    });
+    this.time.delayedCall(delayedCall, () => this.spawnTaxiStop());
   }
 
-  handleTaxiStopCollision() {
-    const delayedCall = Phaser.Math.Between(3000, 12000);
-    this.clients += 1;
+  handleTaxiStopCollision(player, stop) {
+    if (!stop.active) return;
+    console.log("Collision");
 
-    this.registry.set("clients", this.clients);
-    this.taxiStop.disableBody(true, true);
-
-    this.time.delayedCall(delayedCall, () => {
-      this.spawnClient(this);
-    });
-  }
-
-  spawnClient(context) {
-    const npcKey = ["npc_1", "npc_2", "npc_3", "npc_4"];
-    const npcFrame = this.getRandomFrame(context, npcKey);
-    let x = Phaser.Utils.Array.GetRandom(this.npcX);
-
-    this.npc = context.physics.add.sprite(x, 0, npcFrame["randomKey"]);
-    this.npc.body.allowGravity = false;
-    this.npc.setVelocityY(this.speed);
-    this.npc.setDepth(-1);
-
-    // NPC pickup
-    context.physics.add.overlap(
-      this.player,
-      this.npc,
-      this.handleNPCPickup,
-      null,
-      context
+    // money: use FloatBetween for decimals
+    const earned = Phaser.Math.FloatBetween(
+      this.ratePerKm[0],
+      this.ratePerKm[1]
     );
+    this.balance += earned;
+
+    this.clients += 1;
+    this.registry.set("clients", this.clients);
+    this.registry.set("balance", this.balance);
+
+    stop.destroy();
+
+    // spawn next client after random delay
+    const delay = Phaser.Math.Between(3000, 12000);
+    this.time.delayedCall(delay, () => this.spawnClient());
   }
 
   getRandomFrame(context, assets) {
     const randomKey = Phaser.Utils.Array.GetRandom(assets);
     const width = context.textures.get(randomKey).getSourceImage().width;
-
-    return {
-      width,
-      randomKey,
-    };
+    return { width, randomKey };
   }
 }
