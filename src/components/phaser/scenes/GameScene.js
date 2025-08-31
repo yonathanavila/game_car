@@ -376,7 +376,26 @@ export default class GameScene extends Phaser.Scene {
       });
     }
 
-    console.log("Current life: ", this.c);
+    // decrease life if the playr drive inside a sidewalk
+    const roadLeft = this.sidewalkWidth;
+    const roadRight = 434 - this.sidewalkWidth;
+
+    const playerX = this.player.x;
+
+    // Check if outside the road
+    if (playerX < roadLeft || playerX > roadRight) {
+      this.onSidewalk = true;
+
+      if (this.carLife < 0) this.carLife = 0;
+
+      this.damage += 1;
+      this.registry.set("damage", this.damage);
+    } else {
+      if (this.onSidewalk) {
+        this.onSidewalk = false;
+        console.log("✅ Player returned to the road");
+      }
+    }
   }
 
   // ======================
