@@ -9,6 +9,8 @@ export default class PauseScene extends Phaser.Scene {
   }
 
   create() {
+    this.mainMenu = this.add.group();
+
     // background
     const bg = this.add.image(0, 0, "background").setOrigin(0, 0);
     bg.displayWidth = this.sys.game.config.width;
@@ -43,7 +45,13 @@ export default class PauseScene extends Phaser.Scene {
         fill: "#fff",
       })
       .setInteractive({ useHandCursor: true })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .on("pointerdown", () => {
+        this.mainMenu.setVisible(false);
+        this.subMenu.setVisible(true);
+      });
+
+    this.mainMenu.add(load);
 
     const mainMenu = this.add
       .text(this.scale.width / 2, 300, "Main Menu", {
@@ -52,7 +60,15 @@ export default class PauseScene extends Phaser.Scene {
         fill: "#fff",
       })
       .setInteractive({ useHandCursor: true })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .on("pointerdown", () => {
+        console.log("enter");
+        this.scene.stop("GameScene");
+        this.scene.stop("UIScene");
+        this.scene.start("MenuScene");
+      });
+
+    this.mainMenu.add(mainMenu);
 
     const configurationMenu = this.add
       .text(this.scale.width / 2, 380, "Configuration", {
@@ -67,5 +83,40 @@ export default class PauseScene extends Phaser.Scene {
         this.scene.pause();
         this.scene.launch("ConfigurationScene");
       });
+
+    this.mainMenu.add(configurationMenu);
+
+    this.subMenu = this.add.group();
+
+    const partyA = this.add
+      .text(this.scale.width / 2, 220, "Party A", {
+        fontFamily: "Minecraft",
+        fontSize: "38px",
+        fill: "#fff",
+      })
+      .setInteractive({ useHandCursor: true })
+      .setOrigin(0.5)
+      .on("pointerdown", () => {
+        this.subMenu.setVisible(false);
+        this.mainMenu.setVisible(true);
+      });
+
+    this.subMenu.add(partyA);
+
+    const partyB = this.add
+      .text(this.scale.width / 2, 300, "Party B", {
+        fontFamily: "Minecraft",
+        fontSize: "38px",
+        fill: "#fff",
+      })
+      .setInteractive({ useHandCursor: true })
+      .setOrigin(0.5)
+      .on("pointerdown", () => {
+        this.subMenu.setVisible(false);
+        this.mainMenu.setVisible(true);
+      });
+
+    this.subMenu.add(partyB);
+    this.subMenu.setVisible(false);
   }
 }

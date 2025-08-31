@@ -39,5 +39,29 @@ export default class ConfigurationScene extends Phaser.Scene {
         fill: "#fff",
       })
       .setOrigin(0.5);
+
+    const MuteMusic = this.add
+      .text(this.scale.width / 2, 210, "Mute music", {
+        fontFamily: "Minecraft",
+        fontSize: "35px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5);
+
+    const MuteSoundEffects = this.add
+      .text(this.scale.width / 2, 280, "Mute sound effects", {
+        fontFamily: "Minecraft",
+        fontSize: "35px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5);
+
+    const DeleteAccount = this.add
+      .text(this.scale.width / 2, 350, "Delete account", {
+        fontFamily: "Minecraft",
+        fontSize: "35px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5);
   }
 }
