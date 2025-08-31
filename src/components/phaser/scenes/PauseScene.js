@@ -44,5 +44,28 @@ export default class PauseScene extends Phaser.Scene {
       })
       .setInteractive({ useHandCursor: true })
       .setOrigin(0.5);
+
+    const mainMenu = this.add
+      .text(this.scale.width / 2, 300, "Main Menu", {
+        fontFamily: "Minecraft",
+        fontSize: "38px",
+        fill: "#fff",
+      })
+      .setInteractive({ useHandCursor: true })
+      .setOrigin(0.5);
+
+    const configurationMenu = this.add
+      .text(this.scale.width / 2, 380, "Configuration", {
+        fontFamily: "Minecraft",
+        fontSize: "38px",
+        fill: "#fff",
+      })
+      .setInteractive({ useHandCursor: true })
+      .setOrigin(0.5)
+      .on("pointerdown", () => {
+        console.log("enter");
+        this.scene.pause();
+        this.scene.launch("ConfigurationScene");
+      });
   }
 }
