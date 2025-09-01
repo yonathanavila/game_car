@@ -29,7 +29,7 @@ export default class GameScene extends Phaser.Scene {
     // money
     this.balance = 0;
     // [minRate, maxRate]
-    this.ratePerKm = [1.8, 5.941176471];
+    this.ratePerKm = [20, 80];
   }
 
   preload() {
