@@ -67,6 +67,8 @@ export default class LeaderboardScene extends Phaser.Scene {
       (addr) => addr && addr !== "0x0000000000000000000000000000000000000000"
     );
 
+    console.log(topPlayers);
+
     // Take first 5 valid addresses
     this.menuItems = topPlayers.slice(0, 5);
 
