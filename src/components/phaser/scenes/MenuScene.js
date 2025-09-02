@@ -42,14 +42,23 @@ export default class MenuScene extends Phaser.Scene {
       });
 
     this.add
-      .text(this.scale.width / 2, this.sys.game.config.height - 50, "Google", {
-        fontFamily: "Minecraft",
-        fontSize: "32px",
-        fill: "#fff",
-      })
+      .text(
+        this.scale.width / 2,
+        this.sys.game.config.height - 50,
+        "Metamask",
+        {
+          fontFamily: "Minecraft",
+          fontSize: "32px",
+          fill: "#fff",
+        }
+      )
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true })
-      .on("pointerdown", async () => {});
+      .on("pointerdown", () => {
+        if (window.connectWalletMetamask) {
+          window.connectWalletMetamask();
+        }
+      });
 
     this.add
       .text(
@@ -64,9 +73,10 @@ export default class MenuScene extends Phaser.Scene {
       )
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true })
-      .on("pointerdown", async () => {
-        await startGame();
-        this.scene.start("GameScene");
+      .on("pointerdown", () => {
+        if (window.connectWalletFarcaster) {
+          window.connectWalletFarcaster();
+        }
       });
   }
 }

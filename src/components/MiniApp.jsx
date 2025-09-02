@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectWallet } from "./ConnectWallet";
 
 export default function MiniApp() {
-  const [user, setUser] = useState(null);
+  const [setUser] = useState(null);
   const queryClient = new QueryClient();
 
   useEffect(() => {
