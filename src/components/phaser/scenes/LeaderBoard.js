@@ -15,13 +15,12 @@ export default class LeaderboardScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("background", "images/garage/garage_2.webp");
     this.load.image("close", "/images/close.webp");
-
-    this.load.image("background", "images/leaderboard.webp");
   }
 
   async create() {
-    const bg = this.add.image(0, 0, "background").setOrigin(0, 0);
+    let bg = this.add.image(0, 0, "background").setOrigin(0, 0);
 
     // Get game width and height
     const gameWidth = this.sys.game.config.width;
@@ -40,6 +39,8 @@ export default class LeaderboardScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true })
       .setOrigin(0, 1)
       .on("pointerdown", () => {
+        bg.destroy();
+        bg = null;
         this.scene.stop("LeaderboardScene");
         this.scene.start("MenuScene");
       });
@@ -48,7 +49,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     closeButton.displayHeight = 100;
     closeButton.rotation = Phaser.Math.DegToRad(320);
 
-    const title = this.add.text(97, 48, "Leaderboard", {
+    const title = this.add.text(100, 48, "Leaderboard", {
       ...this.baseTextStyle,
       fontSize: "34px",
       wordWrap: {
@@ -57,7 +58,7 @@ export default class LeaderboardScene extends Phaser.Scene {
       },
     });
 
-    const menuContainer = this.add.container(160, 145);
+    const menuContainer = this.add.container(120, 145);
 
     // ----- Fetch top players from contract -----
     let topPlayers = await callRead(); // array of addresses
@@ -74,9 +75,9 @@ export default class LeaderboardScene extends Phaser.Scene {
 
     // Espaciado vertical
     let offsetY = 0;
-    this.menuItems.forEach((address) => {
+    this.menuItems.forEach((address, index) => {
       const option = this.add
-        .text(0, offsetY, this.shortenAddress(address), {
+        .text(0, offsetY, `${index + 1} ${this.shortenAddress(address)}`, {
           ...this.baseTextStyle,
           wordWrap: {
             width: this.scale.width - 100,

@@ -17,10 +17,13 @@ export default class PauseScene extends Phaser.Scene {
     this.mainMenu = this.add.group();
 
     // background
-    const bg = this.add.image(0, 0, "background").setOrigin(0, 0);
-    bg.displayWidth = this.sys.game.config.width;
-    bg.displayHeight = this.sys.game.config.height;
-    bg.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+    const bgPause = this.add.image(0, 0, "background").setOrigin(0, 0);
+    bgPause.displayWidth = this.sys.game.config.width;
+    bgPause.displayHeight = this.sys.game.config.height;
+    bgPause.setDisplaySize(
+      this.sys.game.config.width,
+      this.sys.game.config.height
+    );
 
     // button close
     const button_close = this.add
@@ -31,7 +34,7 @@ export default class PauseScene extends Phaser.Scene {
     button_close.setDisplaySize(55, 55);
     button_close.setInteractive({ useHandCursor: true });
     button_close.on("pointerdown", () => {
-      this.scene.stop();
+      this.scene.stop("PauseScene");
       this.scene.resume("GameScene");
     });
 
@@ -95,8 +98,10 @@ export default class PauseScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true })
       .setOrigin(0.5)
       .on("pointerdown", () => {
+        bgPause.destroy();
         this.scene.stop("GameScene");
         this.scene.stop("UIScene");
+        this.scene.stop("PauseScene");
         this.scene.start("MenuScene");
       });
 
