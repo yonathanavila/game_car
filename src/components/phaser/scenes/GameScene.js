@@ -2,7 +2,6 @@ import { damageInfo } from "@/const";
 import assetsData from "@/assets/data/assets.json";
 import { calculateCurrentLife } from "@/services/Global";
 import animationsData from "@/assets/data/animations.json";
-import { callRead, callWrite } from "@/services/Contract.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {

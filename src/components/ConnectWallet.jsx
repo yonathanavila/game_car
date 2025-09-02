@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { useConnect } from "wagmi";
+import { useConnect, useAccount } from "wagmi";
 
 export const ConnectWallet = () => {
+  const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
 
   useEffect(() => {
@@ -22,7 +23,13 @@ export const ConnectWallet = () => {
         console.error("No wallet connectors found");
       }
     };
-  }, [connect, connectors]);
+
+    if (isConnected) {
+      window.connectedAccount = address;
+    } else {
+      window.connectedAccount = null;
+    }
+  }, [connect, connectors, address, isConnected]);
 
   return null;
 };

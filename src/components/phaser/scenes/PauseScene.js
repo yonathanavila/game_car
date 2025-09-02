@@ -1,5 +1,3 @@
-import { callRead, callWrite } from "@/services/Contract.js";
-
 export default class PauseScene extends Phaser.Scene {
   constructor() {
     super("PauseScene");
@@ -55,7 +53,17 @@ export default class PauseScene extends Phaser.Scene {
       .setOrigin(0.5)
       .on("pointerdown", async () => {
         try {
-          await callWrite(Math.floor(this.score));
+          const formData = new FormData();
+          formData.append("score", this.score);
+          formData.append("address", window.connectedAccount);
+
+          const res = await fetch("/api/set-score.json", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+          console.log("Server response:", data);
         } catch (error) {
           console.error("Contract call failed:", error);
         }

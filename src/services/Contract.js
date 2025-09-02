@@ -1,14 +1,6 @@
-import {
-  readContract,
-  writeContract,
-  waitForTransactionReceipt,
-} from "wagmi/actions";
+import { readContract } from "wagmi/actions";
 import { config } from "@/services/Wagmi";
-
-import { metaMask } from "wagmi/connectors";
 import contractAbi from "../../solidity/artifacts/GameLeaderboardTopN.json";
-
-const contractAddress = "0x5a92F373CfD75803DfB6abFd491a86636b791c64";
 
 // export async function callWrite(score) {
 //   // 1. Ensure wallet is connected
@@ -41,16 +33,4 @@ export async function callRead() {
   });
 
   return result;
-}
-
-export async function callWrite(score) {
-  const txHash = await writeContract(config, {
-    address: contractAddress,
-    abi: contractAbi.abi,
-    functionName: "submitScore",
-    args: [score],
-    account: window.connectedAccount, // explicitly pass the connected account
-  });
-
-  const receipt = await waitForTransactionReceipt(config, { hash: txHash });
 }
