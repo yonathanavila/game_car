@@ -13,7 +13,7 @@
     "splashBackgroundColor": "#202c31",
     "webhookUrl": "https://game-car-beta.vercel.app/api/webhook",
     "subtitle": "Avoid Holes, Grab Fares",
-    "description": "Strap in! Dodge potholes, dodge chaos, and pick up as many passengers as your wobbly ride can handle. Can you survive the streets and still make it to payday, or will your tires pay the ultimate price?",
+    "description": "Strap in! Dodge potholes, pick up passengers, and survive the streets. Can your wobbly ride make it to payday without losing its tires?",
     "primaryCategory": "games",
     "screenshotUrls": [
       "https://game-car-beta.vercel.app/images/screenshot/taxi.webp"
