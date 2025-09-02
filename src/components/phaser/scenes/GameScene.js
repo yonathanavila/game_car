@@ -7,7 +7,7 @@ export default class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameScene" });
 
-    this.selectedCarKey = "car_green";
+    this.selectedCarKey = "car_taxi";
     this.player = null;
     this.cursors = null;
     this.joystick = null;
@@ -278,6 +278,11 @@ export default class GameScene extends Phaser.Scene {
         this.player.setVelocityY(-330);
       }
     }
+    // increase the pothole velocity
+
+    this.potholes.getChildren().forEach((pothole) => {
+      pothole.body.setVelocityY(this.speed);
+    });
 
     // Convert delta to seconds
     const dt = delta / 1000;
@@ -472,6 +477,9 @@ export default class GameScene extends Phaser.Scene {
 
   handleTaxiStopCollision(player, stop) {
     if (!stop.active) return;
+
+    // increase the game speed
+    this.speed += 50;
 
     // money: use FloatBetween for decimals
     const earned = Phaser.Math.FloatBetween(

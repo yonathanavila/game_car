@@ -11,12 +11,12 @@ export default class UIScene extends Phaser.Scene {
     this.carKm = 0;
     this.balance = 0;
 
-    // this.scoreText = this.add.text(16, 16, "Damage: 0", {
-    //   fontFamily: "Minecraft",
-    //   fontSize: "32px",
-    //   fill: "#fff",
-    // });
-    this.clientsText = this.add.text(16, 16, "Clients: 0", {
+    this.damageText = this.add.text(16, 16, "Damage: 0", {
+      fontFamily: "Minecraft",
+      fontSize: "32px",
+      fill: "#fff",
+    });
+    this.clientsText = this.add.text(16, 60, "Clients: 0", {
       fontFamily: "Minecraft",
       fontSize: "32px",
       fill: "#fff",
@@ -32,7 +32,7 @@ export default class UIScene extends Phaser.Scene {
     //   fill: "#fff",
     // });
 
-    // this.scoreText.setScrollFactor(0).setDepth(1);
+    this.damageText.setScrollFactor(0).setDepth(1);
     this.clientsText.setScrollFactor(0).setDepth(2);
     // this.carKmText.setScrollFactor(0).setDepth(2);
     // this.balanceText.setScrollFactor(0).setDepth(2);
@@ -41,9 +41,9 @@ export default class UIScene extends Phaser.Scene {
       if (key === "clients") {
         this.clientsText.setText("Clients: " + data);
       }
-      // if (key === "damage") {
-      //   this.scoreText.setText("Damage: " + data);
-      // }
+      if (key === "damage") {
+        this.damageText.setText("Damage: " + data);
+      }
 
       // if (key === "carKm") {
       //   this.carKmText.setText("Car Km: " + data);
