@@ -1,0 +1,21 @@
+{
+  "name": "Taxi Driver",
+  "description": "A Phaser game for Onchain Summer Awards",
+  "icon": "/splasharts/taxi_in_game.webp",
+  "frame": {
+    "version": "1",
+    "imageUrl": "/splasharts/large_splashart.webp",
+    "button": {
+      "title": "🚕 Start",
+      "action": {
+        "type": "launch_miniapp",
+        "url": "https://game-car-beta.vercel.app/",
+        "name": "Taxi Driver"
+      }
+    }
+  },
+
+  "baseBuilder": {
+    "allowedAddresses": ["0x61CB43DA2AD339cAc8CaaCa47fa86c8a8227b32a"]
+  }
+}
