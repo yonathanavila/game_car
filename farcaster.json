@@ -3,18 +3,29 @@
   "description": "A Phaser game for Onchain Summer Awards",
   "icon": "https://game-car-beta.vercel.app/images/splasharts/taxi_in_game.webp",
   "frame": {
+    "name": "Taxi Driver",
     "version": "1",
-    "imageUrl": "https://game-car-beta.vercel.app/images/splasharts/large_splashart.webp",
-    "button": {
-      "title": "🚕 Start",
-      "action": {
-        "type": "launch_miniapp",
-        "url": "https://game-car-beta.vercel.app/",
-        "name": "Taxi Driver"
-      }
-    }
+    "iconUrl": "https://game-car-beta.vercel.app/images/splasharts/taxi_in_game.webp",
+    "homeUrl": "https://game-car-beta.vercel.app",
+    "imageUrl": "https://game-car-beta.vercel.app/image.png",
+    "buttonTitle": "🚕 Start",
+    "splashImageUrl": "https://game-car-beta.vercel.app/images/splasharts/ToolChest.webp",
+    "splashBackgroundColor": "#202c31",
+    "webhookUrl": "https://game-car-beta.vercel.app/api/webhook",
+    "subtitle": "Avoid Holes, Grab Fares",
+    "description": "Strap in! Dodge potholes, dodge chaos, and pick up as many passengers as your wobbly ride can handle. Can you survive the streets and still make it to payday, or will your tires pay the ultimate price?",
+    "primaryCategory": "games",
+    "screenshotUrls": [
+      "https://game-car-beta.vercel.app/images/screenshot/taxi.webp"
+    ],
+    "heroImageUrl": "https://game-car-beta.vercel.app/images/splasharts/large_splashart.webp",
+    "tags": ["driving", "potholes", "taxi", "drive"],
+    "tagline": "Dodge Potholes, Earn Cash!",
+    "ogTitle": "Avoid Holes, Score Big!",
+    "ogDescription": "Hop in! Dodge potholes, pick up passengers, and see if you can survive the chaos of the street",
+    "ogImageUrl": "https://game-car-beta.vercel.app/images/splasharts/large_splashart.webp",
+    "castShareUrl": "https://wapcast.com/~/compose?text=Play+Taxi+Driver!+Dodge+potholes+and+grab+fares:+https://game-car-beta.vercel.app/"
   },
-
   "baseBuilder": {
     "allowedAddresses": ["0x61CB43DA2AD339cAc8CaaCa47fa86c8a8227b32a"]
   }
