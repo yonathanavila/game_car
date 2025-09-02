@@ -29,7 +29,7 @@
     "ogTitle": "Avoid Holes, Score Big!",
     "ogDescription": "Hop in! Dodge potholes, pick up passengers, and see if you can survive the chaos of the street",
     "ogImageUrl": "https://game-car-beta.vercel.app/images/splasharts/large_splashart.webp",
-    "castShareUrl": "https://wapcast.com/~/compose?text=Play+Taxi+Driver!+Dodge+potholes+and+grab+fares:+https://game-car-beta.vercel.app/"
+    "castShareUrl": "https://game-car-beta.vercel.app"
   },
 
   "baseBuilder": {
