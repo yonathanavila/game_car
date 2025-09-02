@@ -2,6 +2,11 @@
   "name": "Taxi Driver",
   "description": "A Phaser game for Onchain Summer Awards",
   "icon": "https://game-car-beta.vercel.app/images/splasharts/taxi_in_game.webp",
+  "accountAssociation": {
+    "header": "eyJmaWQiOjExMTY4ODgsInR5cGUiOiJhdXRoIiwia2V5IjoiMHg0RDRjQjk3N0E5ZGYyREVkNDY0YmJkNTQwMDA5MzIyRTI1NzFhYjcyIn0",
+    "payload": "eyJkb21haW4iOiJnYW1lLWNhci1iZXRhLnZlcmNlbC5hcHAifQ",
+    "signature": "8MQY6/8QLNtEK2w3C7Dsz2oJNMunyUNfDuzn/KIzBxdACLiIgogUfM3dTtY8EGhPDSdGx22SmXpgdp95E2nczhw="
+  },
   "frame": {
     "name": "Taxi Driver",
     "version": "1",
@@ -26,11 +31,7 @@
     "ogImageUrl": "https://game-car-beta.vercel.app/images/splasharts/large_splashart.webp",
     "castShareUrl": "https://wapcast.com/~/compose?text=Play+Taxi+Driver!+Dodge+potholes+and+grab+fares:+https://game-car-beta.vercel.app/"
   },
-  "accountAssociation": {
-    "header": "eyJmaWQiOjExMTY4ODgsInR5cGUiOiJhdXRoIiwia2V5IjoiMHg0RDRjQjk3N0E5ZGYyREVkNDY0YmJkNTQwMDA5MzIyRTI1NzFhYjcyIn0",
-    "payload": "eyJkb21haW4iOiJnYW1lLWNhci1iZXRhLnZlcmNlbC5hcHAifQ",
-    "signature": "8MQY6/8QLNtEK2w3C7Dsz2oJNMunyUNfDuzn/KIzBxdACLiIgogUfM3dTtY8EGhPDSdGx22SmXpgdp95E2nczhw="
-  },
+
   "baseBuilder": {
     "allowedAddresses": ["0x61CB43DA2AD339cAc8CaaCa47fa86c8a8227b32a"]
   }
