@@ -70,6 +70,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.bgMusic = this.sound.add("engineStart", { loop: false, volume: 0.5 });
+    this.bgMusic.play();
+
     this.registry.set("clients", 0);
     this.registry.set("damage", 0);
 
