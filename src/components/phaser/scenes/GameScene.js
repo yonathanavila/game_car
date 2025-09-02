@@ -18,6 +18,7 @@ export default class GameScene extends Phaser.Scene {
     this.clients = 0;
     this.damage = 0;
     this.damageInfo = damageInfo;
+    this.score = 0;
 
     // params
     this.npcX = [36, 400];
@@ -74,9 +75,12 @@ export default class GameScene extends Phaser.Scene {
       .sprite(this.sys.game.config.width - 60, 30, "button_pause", 0)
       .setInteractive({ useHandCursor: true })
       .on("pointerdown", () => {
+        // 1️⃣ Calculate score here
+        const score = this.carKm * this.clients;
+
         pauseButton.setFrame(1);
         this.scene.pause();
-        this.scene.launch("PauseScene");
+        this.scene.launch("PauseScene", { score: score });
       })
       .on("pointerup", () => {
         pauseButton.setFrame(2);
@@ -208,16 +212,16 @@ export default class GameScene extends Phaser.Scene {
     // Life
     this.currentLife = calculateCurrentLife(this);
 
-    this.input.keyboard.on("keydown-SPACE", async () => {
-      try {
-        const score = await callRead();
-        console.log("Contract Score:", score);
+    // this.input.keyboard.on("keydown-SPACE", async () => {
+    //   try {
+    //     const score = await callRead();
+    //     console.log("Contract Score:", score);
 
-        await callWrite(10);
-      } catch (error) {
-        console.error("Contract call failed:", error);
-      }
-    });
+    //     await callWrite(10);
+    //   } catch (error) {
+    //     console.error("Contract call failed:", error);
+    //   }
+    // });
   }
 
   update(time, delta) {
@@ -283,20 +287,20 @@ export default class GameScene extends Phaser.Scene {
     this.carKm += speedKmPerSec * dt;
     this.registry.set("carKm", this.carKm);
 
-    // Tool button once
-    if (!this.carImageShown) {
-      this.carImageShown = true;
-      const carButton = this.add
-        .sprite(this.sys.game.config.width - 60, 100, "button_tool", 0)
-        .setInteractive({ useHandCursor: true })
-        .on("pointerdown", () => {
-          carButton.setFrame(1);
-          this.scene.start("RepairScene");
-        })
-        .on("pointerup", () => carButton.setFrame(2));
-      carButton.displayHeight = 50;
-      carButton.displayWidth = 100;
-    }
+    // // Tool button once
+    // if (!this.carImageShown) {
+    //   this.carImageShown = true;
+    //   const carButton = this.add
+    //     .sprite(this.sys.game.config.width - 60, 100, "button_tool", 0)
+    //     .setInteractive({ useHandCursor: true })
+    //     .on("pointerdown", () => {
+    //       carButton.setFrame(1);
+    //       this.scene.start("RepairScene");
+    //     })
+    //     .on("pointerup", () => carButton.setFrame(2));
+    //   carButton.displayHeight = 50;
+    //   carButton.displayWidth = 100;
+    // }
 
     // Scroll street
     this.streetTiles.forEach((tile) => (tile.y += this.speed * dt));
@@ -469,7 +473,6 @@ export default class GameScene extends Phaser.Scene {
 
   handleTaxiStopCollision(player, stop) {
     if (!stop.active) return;
-    console.log("Collision");
 
     // money: use FloatBetween for decimals
     const earned = Phaser.Math.FloatBetween(

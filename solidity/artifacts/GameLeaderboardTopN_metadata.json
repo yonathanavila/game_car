@@ -6,6 +6,11 @@
 	"output": {
 		"abi": [
 			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
 				"anonymous": false,
 				"inputs": [
 					{
@@ -118,6 +123,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -143,6 +161,11 @@
 			},
 			{
 				"inputs": [
+					{
+						"internalType": "address",
+						"name": "playerAddr",
+						"type": "address"
+					},
 					{
 						"internalType": "uint256",
 						"name": "score",
@@ -234,11 +257,11 @@
 	},
 	"sources": {
 		"main.sol": {
-			"keccak256": "0x67e38ae967d33e9009f8228b6113e2a3bb889b36669c7d7492366cf6a418d15b",
+			"keccak256": "0xa60fe4a9a10e1f16997f40dfe52fb7a8f680ab79ab60b13d7becf8c6a5f53533",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://2eb6c69042e6b37c7256773f7f87f9b6c19f21c5b18a64aee432952ad5be4043",
-				"dweb:/ipfs/QmVjNCHqRGz2FGb1CMc3p1f9AXjV1hChZmi9aNHhvsmQuy"
+				"bzz-raw://25194bf5deb60f314c1f60bef8a0a2d447053ec655d6e35a3e371a6ffa65ba62",
+				"dweb:/ipfs/QmQMVaR24HtvcXSYEvFvPKz3TUxQbcuYm5rvCAuCGsc1m1"
 			]
 		}
 	},

@@ -40,6 +40,24 @@ export default class MenuScene extends Phaser.Scene {
         startButton.setStyle({ fill: "#8aebf1" });
       });
 
+    const leaderBoard = this.add
+      .text(this.scale.width / 2, this.scale.height / 2 + 70, "Leaderboard", {
+        fontFamily: "Minecraft",
+        fontSize: "32px",
+        fill: "#8aebf1",
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", async () => {
+        this.scene.start("LeaderboardScene");
+      })
+      .on("pointerover", () => {
+        leaderBoard.setStyle({ fill: "#ff0" });
+      })
+      .on("pointerout", () => {
+        leaderBoard.setStyle({ fill: "#8aebf1" });
+      });
+
     this.add
       .text(
         this.scale.width / 2,

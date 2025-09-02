@@ -7,6 +7,7 @@ import GameScene from "@/components/phaser/scenes/GameScene";
 import BootScene from "@/components/phaser/scenes/BootScene";
 import PauseScene from "@/components/phaser/scenes/PauseScene";
 import RepairScene from "@/components/phaser/scenes/RepairScene";
+import LeaderboardScene from "@/components/phaser/scenes/LeaderBoard";
 import ConfigurationScene from "@/components/phaser/scenes/ConfigurationScene";
 
 export default class Game extends Phaser.Game {
@@ -36,6 +37,7 @@ export default class Game extends Phaser.Game {
         RepairScene,
         PauseScene,
         ConfigurationScene,
+        LeaderboardScene,
       ],
       plugins: {
         scene: [

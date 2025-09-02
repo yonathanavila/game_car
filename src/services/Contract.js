@@ -8,7 +8,7 @@ import { config } from "@/services/Wagmi";
 import { metaMask } from "wagmi/connectors";
 import contractAbi from "../../solidity/artifacts/GameLeaderboardTopN.json";
 
-const contractAddress = "0x2675cD745AE2892d8118B849282788D390b793A5";
+const contractAddress = "0x5a92F373CfD75803DfB6abFd491a86636b791c64";
 
 // export async function callWrite(score) {
 //   // 1. Ensure wallet is connected
@@ -40,7 +40,6 @@ export async function callRead() {
     functionName: "getTopPlayers",
   });
 
-  console.log("Result:", result);
   return result;
 }
 
@@ -54,5 +53,4 @@ export async function callWrite(score) {
   });
 
   const receipt = await waitForTransactionReceipt(config, { hash: txHash });
-  console.log("Tx confirmed:", receipt);
 }

@@ -4,7 +4,7 @@
 npm create astro@latest -- --template basics
 ```
 
-# 0x2675cD745AE2892d8118B849282788D390b793A5 Game Contract
+# 0x5a92F373CfD75803DfB6abFd491a86636b791c64 Game Contract
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
 [![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)

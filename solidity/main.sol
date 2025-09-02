@@ -2,13 +2,19 @@
 pragma solidity ^0.8.20;
 
 contract GameLeaderboardTopN {
+    // Owner address
+    address public owner;
+
+    // Top N constant
     uint256 public constant TOP_N = 10;
 
+    // Player struct
     struct Player {
         uint256 highScore;
         uint256 achievements;
     }
 
+    // Player mapping
     mapping(address => Player) public players;
 
     // Top N leaderboard
@@ -20,21 +26,35 @@ contract GameLeaderboardTopN {
     event AchievementUnlocked(address indexed player, uint256 achievementId);
     event LeaderboardUpdated(address[TOP_N] topPlayers, uint256[TOP_N] topScores);
 
-    // Submit a new score
-    function submitScore(uint256 score) external {
-        Player storage player = players[msg.sender];
+    // Constructor sets deployer as owner
+    constructor() {
+        owner = msg.sender;
+    }
+
+    // Modifier to restrict access to owner
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
+
+    // Submit a new score (only owner)
+    function submitScore(address playerAddr, uint256 score) external onlyOwner {
+        Player storage player = players[playerAddr];
         require(score > player.highScore, "Score not higher than current high score");
 
         player.highScore = score;
-        _updateLeaderboard(msg.sender, score);
+        _updateLeaderboard(playerAddr, score);
 
-        emit ScoreSubmitted(msg.sender, score);
+        emit ScoreSubmitted(playerAddr, score);
     }
 
-    // Unlock an achievement
+    // Unlock an achievement (any player)
     function unlockAchievement(uint256 achievementId) external {
         Player storage player = players[msg.sender];
-        require((player.achievements & (1 << achievementId)) == 0, "Achievement already unlocked");
+        require(
+            (player.achievements & (1 << achievementId)) == 0,
+            "Achievement already unlocked"
+        );
 
         player.achievements |= (1 << achievementId);
 

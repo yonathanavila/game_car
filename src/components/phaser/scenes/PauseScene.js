@@ -1,3 +1,5 @@
+import { callRead, callWrite } from "@/services/Contract.js";
+
 export default class PauseScene extends Phaser.Scene {
   constructor() {
     super("PauseScene");
@@ -6,6 +8,11 @@ export default class PauseScene extends Phaser.Scene {
   preload() {
     this.load.image("background", "images/garage/garage_2.webp");
     this.load.image("button_close", "images/button/button_close.webp");
+  }
+
+  // <-- Use init() to receive the score
+  init(data) {
+    this.score = data.score;
   }
 
   create() {
@@ -39,19 +46,37 @@ export default class PauseScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const load = this.add
-      .text(this.scale.width / 2, 220, "Load Game", {
+      .text(this.scale.width / 2, 220, "Save Score", {
         fontFamily: "Minecraft",
         fontSize: "38px",
         fill: "#fff",
       })
       .setInteractive({ useHandCursor: true })
       .setOrigin(0.5)
-      .on("pointerdown", () => {
-        this.mainMenu.setVisible(false);
-        this.subMenu.setVisible(true);
+      .on("pointerdown", async () => {
+        try {
+          await callWrite(Math.floor(this.score));
+        } catch (error) {
+          console.error("Contract call failed:", error);
+        }
       });
 
     this.mainMenu.add(load);
+
+    // const load = this.add
+    //   .text(this.scale.width / 2, 220, "Load Game", {
+    //     fontFamily: "Minecraft",
+    //     fontSize: "38px",
+    //     fill: "#fff",
+    //   })
+    //   .setInteractive({ useHandCursor: true })
+    //   .setOrigin(0.5)
+    //   .on("pointerdown", () => {
+    //     this.mainMenu.setVisible(false);
+    //     this.subMenu.setVisible(true);
+    //   });
+
+    // this.mainMenu.add(load);
 
     const mainMenu = this.add
       .text(this.scale.width / 2, 300, "Main Menu", {
@@ -62,7 +87,6 @@ export default class PauseScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true })
       .setOrigin(0.5)
       .on("pointerdown", () => {
-        console.log("enter");
         this.scene.stop("GameScene");
         this.scene.stop("UIScene");
         this.scene.start("MenuScene");
@@ -70,21 +94,21 @@ export default class PauseScene extends Phaser.Scene {
 
     this.mainMenu.add(mainMenu);
 
-    const configurationMenu = this.add
-      .text(this.scale.width / 2, 380, "Configuration", {
-        fontFamily: "Minecraft",
-        fontSize: "38px",
-        fill: "#fff",
-      })
-      .setInteractive({ useHandCursor: true })
-      .setOrigin(0.5)
-      .on("pointerdown", () => {
-        console.log("enter");
-        this.scene.pause();
-        this.scene.launch("ConfigurationScene");
-      });
+    // const configurationMenu = this.add
+    //   .text(this.scale.width / 2, 380, "Configuration", {
+    //     fontFamily: "Minecraft",
+    //     fontSize: "38px",
+    //     fill: "#fff",
+    //   })
+    //   .setInteractive({ useHandCursor: true })
+    //   .setOrigin(0.5)
+    //   .on("pointerdown", () => {
+    //     console.log("enter");
+    //     this.scene.pause();
+    //     this.scene.launch("ConfigurationScene");
+    //   });
 
-    this.mainMenu.add(configurationMenu);
+    // this.mainMenu.add(configurationMenu);
 
     this.subMenu = this.add.group();
 
