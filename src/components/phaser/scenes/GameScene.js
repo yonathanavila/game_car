@@ -15,7 +15,7 @@ export default class GameScene extends Phaser.Scene {
     this.player_config = null;
 
     this.clients = 0;
-    this.damage = 19000;
+    this.damage = 0;
     this.damageInfo = damageInfo;
     this.score = 0;
 
