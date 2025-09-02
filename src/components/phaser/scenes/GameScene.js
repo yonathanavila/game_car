@@ -2,6 +2,7 @@ import { damageInfo } from "@/const";
 import assetsData from "@/assets/data/assets.json";
 import { calculateCurrentLife } from "@/services/Global";
 import animationsData from "@/assets/data/animations.json";
+import { callRead, callWrite } from "@/services/Contract.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -206,6 +207,17 @@ export default class GameScene extends Phaser.Scene {
 
     // Life
     this.currentLife = calculateCurrentLife(this);
+
+    this.input.keyboard.on("keydown-SPACE", async () => {
+      try {
+        const score = await callRead();
+        console.log("Contract Score:", score);
+
+        await callWrite(10);
+      } catch (error) {
+        console.error("Contract call failed:", error);
+      }
+    });
   }
 
   update(time, delta) {
