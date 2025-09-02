@@ -9,6 +9,7 @@ import PauseScene from "@/components/phaser/scenes/PauseScene";
 import RepairScene from "@/components/phaser/scenes/RepairScene";
 import LeaderboardScene from "@/components/phaser/scenes/LeaderBoard";
 import ConfigurationScene from "@/components/phaser/scenes/ConfigurationScene";
+import GameOverScene from "./scenes/GameOver";
 
 export default class Game extends Phaser.Game {
   constructor() {
@@ -38,6 +39,7 @@ export default class Game extends Phaser.Game {
         PauseScene,
         ConfigurationScene,
         LeaderboardScene,
+        GameOverScene,
       ],
       plugins: {
         scene: [

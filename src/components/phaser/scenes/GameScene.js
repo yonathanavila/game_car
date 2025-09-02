@@ -15,7 +15,7 @@ export default class GameScene extends Phaser.Scene {
     this.player_config = null;
 
     this.clients = 0;
-    this.damage = 0;
+    this.damage = 19000;
     this.damageInfo = damageInfo;
     this.score = 0;
 
@@ -70,6 +70,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.registry.set("clients", 0);
+    this.registry.set("damage", 0);
+
     const pauseButton = this.add
       .sprite(this.sys.game.config.width - 60, 30, "button_pause", 0)
       .setInteractive({ useHandCursor: true })
@@ -389,6 +392,12 @@ export default class GameScene extends Phaser.Scene {
         this.time.delayedCall(delay, () => this.spawnClient());
       }
     });
+
+    // Check if damage reached total life
+    if (this.damage >= this.totalLife) {
+      this.damage = this.totalLife; // optional, clamp value
+      this.scene.start("GameOverScene"); // launch Game Over scene
+    }
   }
 
   // ======================

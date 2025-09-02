@@ -98,11 +98,10 @@ export default class PauseScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true })
       .setOrigin(0.5)
       .on("pointerdown", () => {
-        bgPause.destroy();
         this.scene.stop("GameScene");
         this.scene.stop("UIScene");
         this.scene.stop("PauseScene");
-        this.scene.start("MenuScene");
+        window.location.reload(); // full page reload
       });
 
     this.mainMenu.add(mainMenu);

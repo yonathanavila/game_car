@@ -13,7 +13,7 @@ export default class UIScene extends Phaser.Scene {
 
     this.damageText = this.add.text(16, 16, "Damage: 0", {
       fontFamily: "Minecraft",
-      fontSize: "32px",
+      fontSize: "28px",
       fill: "#fff",
     });
     this.clientsText = this.add.text(16, 60, "Clients: 0", {
@@ -37,13 +37,15 @@ export default class UIScene extends Phaser.Scene {
     // this.carKmText.setScrollFactor(0).setDepth(2);
     // this.balanceText.setScrollFactor(0).setDepth(2);
 
-    this.registry.events.on("changedata", (parent, key, data) => {
-      if (key === "clients") {
-        this.clientsText.setText("Clients: " + data);
-      }
-      if (key === "damage") {
-        this.damageText.setText("Damage: " + data);
-      }
+    if (this.registryEventsHandler) {
+      // Remove previous listener if exists
+      this.registry.events.off("changedata", this.registryEventsHandler);
+    }
+
+    this.registryEventsHandler = (parent, key, data) => {
+      if (!this.clientsText) return; // safety check
+      if (key === "clients") this.clientsText.setText("Clients: " + data);
+      if (key === "damage") this.damageText.setText(`Damage: ${data}/19700`);
 
       // if (key === "carKm") {
       //   this.carKmText.setText("Car Km: " + data);
@@ -52,6 +54,8 @@ export default class UIScene extends Phaser.Scene {
       // if (key === "balance") {
       //   this.balanceText.setText("Balance: $" + data);
       // }
-    });
+    };
+
+    this.registry.events.on("changedata", this.registryEventsHandler);
   }
 }

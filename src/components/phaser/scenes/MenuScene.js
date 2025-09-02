@@ -31,7 +31,8 @@ export default class MenuScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true })
       .on("pointerdown", async () => {
-        this.scene.start("GameScene");
+        this.scene.stop("GameScene"); // stop old scene
+        this.scene.start("GameScene"); // start fresh
       })
       .on("pointerover", () => {
         startButton.setStyle({ fill: "#ff0" });
