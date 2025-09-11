@@ -368,8 +368,8 @@ export default class GameScene extends Phaser.Scene {
       this.onSidewalk = true;
       if (this.carLife < 0) this.carLife = 0;
       this.damage += 10 * (delta / 700);
-
-      this.registry.set("damage", this.damage);
+      let displayDamage = Math.round(this.damage);
+      this.registry.set("damage", displayDamage);
     } else if (this.onSidewalk) {
       this.onSidewalk = false;
       // console.log("✅ Player returned to the road");
@@ -459,7 +459,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.carLife < 0) this.carLife = 0;
 
     this.damage += 20;
-    this.registry.set("damage", this.damage);
+    let displayDamage = Math.round(this.damage);
+    this.registry.set("damage", displayDamage);
 
     player.blinkEvent = player.scene.time.addEvent({
       delay: 200,
