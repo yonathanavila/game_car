@@ -7,7 +7,7 @@ export default class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameScene" });
 
-    this.selectedCarKey = "motorcycle";
+    this.selectedCarKey = "car_taxi";
     this.player = null;
     this.cursors = null;
     this.joystick = null;
@@ -64,9 +64,32 @@ export default class GameScene extends Phaser.Scene {
     } else if (this.player_config.type === "image") {
       this.load.image(this.player_config.key, this.player_config.path);
     }
+
+    this.load.spritesheet("motorcycle", "images/motorcycle/motorcycle.png", {
+      frameWidth: 63.9,
+      frameHeight: 77,
+    });
   }
 
   create() {
+    // Add motorcycle sprite starting below the screen
+    this.motorcycle = this.add.sprite(
+      this.cameras.main.centerX,
+      this.cameras.main.height + 50, // start just outside bottom
+      "motorcycle"
+    );
+
+    // Tween: move motorcycle from bottom to top
+    this.tweens.add({
+      targets: this.motorcycle,
+      y: -50, // exit past the top
+      duration: 3000, // time in ms
+      ease: "Linear", // steady movement
+      onComplete: () => {
+        console.log("Motorcycle finished animation!");
+      },
+    });
+
     this.bgMusic = this.sound.add("engineStart", { loop: false, volume: 0.5 });
     this.bgMusic.play();
 
