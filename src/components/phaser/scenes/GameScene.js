@@ -573,7 +573,7 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  motorcycleCollision(player) {
+  motorcycleCollision(player, motorcycle) {
     if (player.blinkEvent) {
       player.blinkEvent.remove();
       player.clearTint();
@@ -586,6 +586,14 @@ export default class GameScene extends Phaser.Scene {
     this.damage += 20;
     let displayDamage = Math.round(this.damage);
     this.registry.set("damage", displayDamage);
+
+    // Avanzar primero hacia arriba
+    this.tweens.add({
+      targets: player,
+      y: player.y - 50, // sube 50px
+      duration: 300,
+      ease: "Power2",
+    });
 
     player.blinkEvent = player.scene.time.addEvent({
       delay: 200,
