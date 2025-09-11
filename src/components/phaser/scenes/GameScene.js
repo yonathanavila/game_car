@@ -7,7 +7,7 @@ export default class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameScene" });
 
-    this.selectedCarKey = "car_taxi";
+    this.selectedCarKey = "motorcycle";
     this.player = null;
     this.cursors = null;
     this.joystick = null;
@@ -58,14 +58,11 @@ export default class GameScene extends Phaser.Scene {
     if (this.player_config.type === "image" && this.player_config.frameConfig) {
       this.load.spritesheet(
         this.player_config.key,
-        `/${group.path}/${this.player_config.url}`,
+        this.player_config.path,
         this.player_config.frameConfig
       );
     } else if (this.player_config.type === "image") {
-      this.load.image(
-        this.player_config.key,
-        `/${group.path}/${this.player_config.url}`
-      );
+      this.load.image(this.player_config.key, this.player_config.path);
     }
   }
 

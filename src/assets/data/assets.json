@@ -1,11 +1,10 @@
 [
   {
-    "path": "images/car",
     "files": [
       {
+        "path": "images/car/car_blue.png",
         "type": "image",
         "key": "car_blue",
-        "url": "car_blue.png",
         "frameConfig": {
           "frameWidth": 66,
           "frameHeight": 67
@@ -16,9 +15,9 @@
         }
       },
       {
+        "path": "images/car/car_green.png",
         "type": "image",
         "key": "car_green",
-        "url": "car_green.png",
         "frameConfig": {
           "frameWidth": 54,
           "frameHeight": 51
@@ -29,9 +28,9 @@
         }
       },
       {
+        "path": "images/car/car_white.png",
         "type": "image",
         "key": "car_white",
-        "url": "car_white.png",
         "frameConfig": {
           "frameWidth": 61,
           "frameHeight": 61
@@ -42,9 +41,9 @@
         }
       },
       {
+        "path": "images/car/car_taxi.png",
         "type": "image",
         "key": "car_taxi",
-        "url": "car_taxi.png",
         "frameConfig": {
           "frameWidth": 65,
           "frameHeight": 67
@@ -55,12 +54,25 @@
         }
       },
       {
+        "path": "images/car/car_red.png",
         "type": "image",
         "key": "car_red",
-        "url": "car_red.png",
         "frameConfig": {
           "frameWidth": 62,
           "frameHeight": 64
+        },
+        "hitbox": {
+          "width": 0.6,
+          "height": 0.95
+        }
+      },
+      {
+        "path": "images/motorcycle/motorcycle.png",
+        "type": "image",
+        "key": "motorcycle",
+        "frameConfig": {
+          "frameWidth": 63.9,
+          "frameHeight": 77
         },
         "hitbox": {
           "width": 0.6,
