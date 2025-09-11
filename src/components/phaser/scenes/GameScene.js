@@ -21,10 +21,10 @@ export default class GameScene extends Phaser.Scene {
 
     // params
     this.npcX = [36, 400];
-    this.speed = 200;
+    this.speed = 300;
     this.sidewalkWidth = 100;
     this.carKm = 0;
-    this.totalLife = 19700;
+    this.totalLife = 19700; //
     this.carImageShown = false;
 
     // money
@@ -367,7 +367,8 @@ export default class GameScene extends Phaser.Scene {
     if (playerX < roadLeft || playerX > roadRight) {
       this.onSidewalk = true;
       if (this.carLife < 0) this.carLife = 0;
-      this.damage += 1;
+      this.damage += 10 * (delta / 700);
+
       this.registry.set("damage", this.damage);
     } else if (this.onSidewalk) {
       this.onSidewalk = false;
@@ -457,7 +458,7 @@ export default class GameScene extends Phaser.Scene {
     this.carLife -= 200;
     if (this.carLife < 0) this.carLife = 0;
 
-    this.damage += 1;
+    this.damage += 20;
     this.registry.set("damage", this.damage);
 
     player.blinkEvent = player.scene.time.addEvent({
