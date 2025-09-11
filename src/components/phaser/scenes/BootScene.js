@@ -35,6 +35,16 @@ export default class BootScene extends Phaser.Scene {
       "engineStart",
       "audio/engine_start/Muscle Car Start Rev and Idle_damage_car_started_compressed-[AudioTrimmer.com].mp3"
     );
+
+    // Motorcycle
+
+    this.load.audio("motorcycle", "audio/effects/Motorcycle.mp3");
+
+    // bg music
+    this.load.audio(
+      "bgAudio",
+      "audio/music/Resolution Or Reflection - The Grey Room _ Clark Sims_compressed.mp3"
+    );
     // Game over music
     // this.load.audio("gameOver", "assets/sounds/game_over.mp3");
   }

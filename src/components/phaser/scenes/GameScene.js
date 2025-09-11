@@ -72,26 +72,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Add motorcycle sprite starting below the screen
-    this.motorcycle = this.add.sprite(
-      this.cameras.main.centerX,
-      this.cameras.main.height + 50, // start just outside bottom
-      "motorcycle"
-    );
-
-    // Tween: move motorcycle from bottom to top
-    this.tweens.add({
-      targets: this.motorcycle,
-      y: -50, // exit past the top
-      duration: 3000, // time in ms
-      ease: "Linear", // steady movement
-      onComplete: () => {
-        console.log("Motorcycle finished animation!");
-      },
-    });
-
-    this.bgMusic = this.sound.add("engineStart", { loop: false, volume: 0.5 });
+    this.bgMusic = this.sound.add("bgAudio", { loop: true, volume: 0.5 });
     this.bgMusic.play();
+    this.engineStartSound = this.sound.add("engineStart", {
+      loop: false,
+      volume: 0.5,
+    });
+    this.engineStartSound.play();
 
     this.registry.set("clients", 0);
     this.registry.set("damage", 0);
@@ -237,16 +224,24 @@ export default class GameScene extends Phaser.Scene {
     // Life
     this.currentLife = calculateCurrentLife(this);
 
-    // this.input.keyboard.on("keydown-SPACE", async () => {
-    //   try {
-    //     const score = await callRead();
-    //     console.log("Contract Score:", score);
+    // create a group for motorcycles
+    this.motorcycles = this.add.group();
 
-    //     await callWrite(10);
-    //   } catch (error) {
-    //     console.error("Contract call failed:", error);
-    //   }
-    // });
+    // collission with motorcycle
+    this.physics.add.overlap(
+      this.player,
+      this.motorcycles,
+      this.motorcycleCollision,
+      null,
+      this
+    );
+
+    // spawn motorcycles every 1.5 seconds
+    this.time.addEvent({
+      delay: Phaser.Math.Between(3000, 12000),
+      callback: () => this.spawnMotorcycle(),
+      loop: true,
+    });
   }
 
   update(time, delta) {
@@ -428,7 +423,6 @@ export default class GameScene extends Phaser.Scene {
   // Spawn Potholes Function
   // ======================
   spawnPothole(speed) {
-    // Pick a random key from the available obstacle textures
     const potholeFrame = this.getRandomFrame(this, ["bache_4", "bache_5"]);
     const x = Phaser.Math.Between(this.sidewalkWidth, 434 - this.sidewalkWidth);
     const y = Phaser.Math.Between(-600, -100);
@@ -475,7 +469,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     let elapsed = 0;
-    this.carLife -= 200;
+    this.carLife -= 100;
     if (this.carLife < 0) this.carLife = 0;
 
     this.damage += 20;
@@ -537,5 +531,76 @@ export default class GameScene extends Phaser.Scene {
     const randomKey = Phaser.Utils.Array.GetRandom(assets);
     const width = context.textures.get(randomKey).getSourceImage().width;
     return { width, randomKey };
+  }
+
+  spawnMotorcycle() {
+    // random x position
+    const x = Phaser.Math.Between(100, this.cameras.main.width - 100);
+    const y = this.cameras.main.height + 50;
+
+    // get an existing motorcycle from the group, or create a new one
+    let moto = this.motorcycles.getFirstDead();
+
+    if (!moto) {
+      moto = this.physics.add.sprite(x, y, "motorcycle");
+      this.motorcycles.add(moto);
+
+      // desactivar gravedad y que no se mueva automáticamente
+      moto.body.setAllowGravity(false);
+      moto.body.setImmovable(true);
+    } else {
+      moto.setPosition(x, y);
+      moto.setActive(true);
+      moto.setVisible(true);
+    }
+
+    moto.setSize(35, 65);
+    moto.setOffset(0, 0);
+
+    this.bgMusic = this.sound.add("motorcycle", { loop: false, volume: 0.3 });
+    this.bgMusic.play();
+
+    // animate motorcycle upward
+    this.tweens.add({
+      targets: moto,
+      y: -50,
+      duration: 2500,
+      ease: "Linear",
+      onComplete: () => {
+        moto.setActive(false);
+        moto.setVisible(false);
+      },
+    });
+  }
+
+  motorcycleCollision(player) {
+    if (player.blinkEvent) {
+      player.blinkEvent.remove();
+      player.clearTint();
+    }
+
+    let elapsed = 0;
+    this.carLife -= 200;
+    if (this.carLife < 0) this.carLife = 0;
+
+    this.damage += 20;
+    let displayDamage = Math.round(this.damage);
+    this.registry.set("damage", displayDamage);
+
+    player.blinkEvent = player.scene.time.addEvent({
+      delay: 200,
+      callback: () => {
+        if (player.tintTopLeft === 0xff0000) player.clearTint();
+        else player.setTint(0xff0000);
+
+        elapsed += 200;
+        if (elapsed >= 2000) {
+          player.clearTint();
+          player.blinkEvent.remove();
+          player.blinkEvent = null;
+        }
+      },
+      loop: true,
+    });
   }
 }
