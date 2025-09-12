@@ -12,36 +12,45 @@ export default function MiniApp() {
   useEffect(() => {
     const initFarcaster = async () => {
       try {
+        // Wait for SDK to be ready
         await sdk.actions.ready();
         console.log("Farcaster MiniApp SDK is ready!");
+
         window.isFarcaster = true;
 
-        const profile = sdk.context.user;
+        // sdk.context.user contains info about the connected wallet/user
+        const user = sdk.context.user;
 
-        if (profile) {
-          console.log("Profile from sdk.context.user:", profile);
+        if (user) {
+          console.log("Farcaster wallet is connected!");
+          console.log("FID:", user.fid);
+          console.log("Username:", user.username);
+          console.log("Display Name:", user.displayName);
+          console.log("Profile Picture URL:", user.pfpUrl);
         } else {
-          console.log("No user connected yet. Prompting sign-in...");
+          console.log("No Farcaster wallet connected yet.");
+
+          // Optionally, trigger the wallet connection
           if (window.connectWalletFarcaster) {
             await window.connectWalletFarcaster();
-            console.log("Profile after sign-in:", sdk.context.user);
-          }
-        }
 
-        // Subscribe to events safely
-        if (sdk.events && typeof sdk.events.on === "function") {
-          sdk.events.on("message", (msg) => {
-            console.log("New Farcaster message:", msg);
-          });
-        } else {
-          console.log("Farcaster events not available in this environment.");
+            // After connecting, sdk.context.user is updated
+            const connectedUser = sdk.context.user;
+            if (connectedUser) {
+              console.log("Farcaster wallet connected after signin!");
+              console.log("FID:", connectedUser.fid);
+              console.log("Username:", connectedUser.username);
+            } else {
+              console.log("User still not connected.");
+            }
+          }
         }
       } catch (err) {
         console.error("Farcaster SDK failed to initialize", err);
       }
     };
 
-    new Game();
+    new Game(); // Initialize Phaser game
     initFarcaster();
   }, []);
 
