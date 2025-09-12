@@ -81,8 +81,13 @@ export default class GameOverScene extends Phaser.Scene {
 
           const data = await res.json();
           console.log("Server response:", data);
+          this.showScoreSavedNotification(this);
         } catch (error) {
           console.error("Contract call failed:", error);
+          this.showScoreSavedNotification(
+            this,
+            "We have problems to save your score, be sure you have your wallet already connected!"
+          );
         }
       });
 
@@ -100,5 +105,43 @@ export default class GameOverScene extends Phaser.Scene {
         this.scene.stop("GameOverScene");
         window.location.reload(); // full page reload
       });
+  }
+
+  // Inside your Phaser scene
+  showScoreSavedNotification(scene, text = "Your score was saved") {
+    const width = scene.cameras.main.width;
+    const height = scene.cameras.main.height;
+
+    const notification = scene.add
+      .text(width / 2, height / 2, text, {
+        fontSize: "24px",
+        color: "#00ff00",
+        fontStyle: "bold",
+        backgroundColor: "rgba(0,0,0,0.7)",
+        padding: { x: 10, y: 5 },
+      })
+      .setOrigin(0.5)
+      .setAlpha(0); // start invisible
+
+    // Fade in
+    scene.tweens.add({
+      targets: notification,
+      alpha: 1,
+      duration: 300,
+      ease: "Power1",
+      onComplete: () => {
+        // Stay visible for 1 second
+        scene.time.delayedCall(1000, () => {
+          // Fade out
+          scene.tweens.add({
+            targets: notification,
+            alpha: 0,
+            duration: 500,
+            ease: "Power1",
+            onComplete: () => notification.destroy(),
+          });
+        });
+      },
+    });
   }
 }
