@@ -78,38 +78,59 @@ export default class MenuScene extends Phaser.Scene {
         }
       });
 
-    if (window.isFarcaster) {
-      if (!window.farcasterProfile) {
-        this.add
-          .text(
-            this.scale.width / 2,
-            this.sys.game.config.height - 100,
-            "Farcaster",
-            {
-              fontFamily: "Minecraft",
-              fontSize: "32px",
-              fill: "#fff",
-            }
-          )
-          .setOrigin(0.5)
-          .setInteractive({ useHandCursor: true })
-          .on("pointerdown", () => {
-            if (window.connectWalletFarcaster) {
-              window.connectWalletFarcaster();
-            }
-          });
-      } else {
-        this.add.text(
+    if (window.isFarcaster && !window.farcasterProfile) {
+      this.add
+        .text(
           this.scale.width / 2,
           this.sys.game.config.height - 100,
-          `Farcaster info: ${windows.farcasterProfile.fid} ${windows.farcasterProfile.username}`,
+          "Farcaster",
           {
             fontFamily: "Minecraft",
             fontSize: "32px",
             fill: "#fff",
           }
+        )
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", () => {
+          if (window.connectWalletFarcaster) {
+            window.connectWalletFarcaster();
+          }
+        });
+
+      // 🔥 Listen for profile becoming available
+      window.addEventListener("farcasterProfileReady", () => {
+        this.farcasterText.setText(
+          `Farcaster info: ${window.farcasterProfile.fid} ${window.farcasterProfile.username}`
         );
-      }
+      });
+    } else if (window.farcasterProfile) {
+      this.add.text(
+        this.scale.width / 2,
+        this.sys.game.config.height - 100,
+        `Farcaster info: ${windows.farcasterProfile.fid} ${windows.farcasterProfile.username}`,
+        {
+          fontFamily: "Minecraft",
+          fontSize: "32px",
+          fill: "#fff",
+        }
+      );
+    }
+  }
+
+  update() {
+    if (window.isFarcaster && window.farcasterProfile && !this.profileShown) {
+      this.add.text(
+        this.scale.width / 2,
+        this.sys.game.config.height - 100,
+        `Farcaster info: ${window.farcasterProfile.fid} ${window.farcasterProfile.username}`,
+        {
+          fontFamily: "Minecraft",
+          fontSize: "32px",
+          fill: "#fff",
+        }
+      );
+      this.profileShown = true;
     }
   }
 }
