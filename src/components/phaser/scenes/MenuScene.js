@@ -61,25 +61,6 @@ export default class MenuScene extends Phaser.Scene {
         leaderBoard.setStyle({ fill: "#8aebf1" });
       });
 
-    this.add
-      .text(
-        this.scale.width / 2,
-        this.sys.game.config.height - 50,
-        "Metamask",
-        {
-          fontFamily: "Minecraft",
-          fontSize: "32px",
-          fill: "#fff",
-        }
-      )
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true })
-      .on("pointerdown", () => {
-        if (window.connectWalletMetamask) {
-          window.connectWalletMetamask();
-        }
-      });
-
     if (window.isFarcaster == true) {
       this.add
         .text(
