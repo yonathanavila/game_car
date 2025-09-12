@@ -78,7 +78,7 @@ export default class MenuScene extends Phaser.Scene {
         }
       });
 
-    if (window.isFarcaster && !window.farcasterProfile) {
+    if (window.isFarcaster) {
       this.add
         .text(
           this.scale.width / 2,
@@ -97,24 +97,6 @@ export default class MenuScene extends Phaser.Scene {
             window.connectWalletFarcaster();
           }
         });
-
-      // 🔥 Listen for profile becoming available
-      window.addEventListener("farcasterProfileReady", () => {
-        this.farcasterText.setText(
-          `Farcaster info: ${window.farcasterProfile.fid} ${window.farcasterProfile.username}`
-        );
-      });
-    } else if (window.farcasterProfile) {
-      this.add.text(
-        this.scale.width / 2,
-        this.sys.game.config.height - 100,
-        `Farcaster info: ${windows.farcasterProfile.fid} ${windows.farcasterProfile.username}`,
-        {
-          fontFamily: "Minecraft",
-          fontSize: "32px",
-          fill: "#fff",
-        }
-      );
     }
   }
 
