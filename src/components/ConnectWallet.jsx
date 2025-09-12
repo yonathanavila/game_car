@@ -29,6 +29,8 @@ export const ConnectWallet = () => {
     } else {
       window.connectedAccount = null;
     }
+
+    console.log("Update wallet: ", address);
   }, [connect, connectors, address, isConnected]);
 
   return null;
