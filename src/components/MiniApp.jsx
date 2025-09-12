@@ -13,6 +13,7 @@ export default function MiniApp() {
     const initFarcaster = async () => {
       try {
         // Wait for SDK to be ready
+        await sdk.actions.addMiniApp();
         await sdk.actions.ready();
         console.log("Farcaster MiniApp SDK is ready!");
 
