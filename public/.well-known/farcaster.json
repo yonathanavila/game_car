@@ -33,6 +33,9 @@
   },
 
   "baseBuilder": {
-    "allowedAddresses": ["0x0Ba25FD7e4F61bFde7971ae11DAE0c6A2286046B"]
+    "allowedAddresses": [
+      "0x0Ba25FD7e4F61bFde7971ae11DAE0c6A2286046B",
+      "0x81461893401Df89a8453b8d77131Ca6Bf93Ad383"
+    ]
   }
 }
