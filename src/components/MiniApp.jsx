@@ -20,6 +20,7 @@ export default function MiniApp() {
         const profile = await sdk.context.user;
 
         if (profile) {
+          console.log(profile);
           window.farcasterProfile = profile;
         }
 
