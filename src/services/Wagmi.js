@@ -1,5 +1,5 @@
 import { createConfig, http } from "wagmi";
-import { base, baseSepolia } from "wagmi/chains";
+import { baseSepolia } from "wagmi/chains";
 import { metaMask } from "wagmi/connectors";
 
 import { farcasterMiniApp as miniAppConnector } from "@farcaster/miniapp-wagmi-connector";
@@ -7,9 +7,8 @@ import { farcasterMiniApp as miniAppConnector } from "@farcaster/miniapp-wagmi-c
 const isFarcasterMiniApp = !!window.farcaster; // check if in miniapp
 
 export const config = createConfig({
-  chains: [base, baseSepolia],
+  chains: [baseSepolia],
   transports: {
-    [base.id]: http(),
     [baseSepolia.id]: http(),
   },
   connectors: [metaMask(), ...(isFarcasterMiniApp ? [miniAppConnector] : [])],

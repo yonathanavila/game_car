@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { useConnect, useAccount } from "wagmi";
+import { useConnect, useAccount, useChainId } from "wagmi";
 
 export const ConnectWallet = () => {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
+  const chainId = useChainId();
 
   useEffect(() => {
     // Exponer función global para Phaser
@@ -31,6 +32,8 @@ export const ConnectWallet = () => {
     }
 
     console.log("Update wallet: ", address);
+
+    console.log("Current chainId:", chainId);
   }, [connect, connectors, address, isConnected]);
 
   return null;
