@@ -18,6 +18,8 @@ export default function MiniApp() {
 
         window.isFarcaster = true;
 
+        console.log((await sdk.context).user);
+
         // sdk.context.user contains info about the connected wallet/user
         const user = sdk.context.user;
 
