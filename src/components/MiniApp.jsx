@@ -18,6 +18,8 @@ export default function MiniApp() {
       try {
         await sdk.actions.ready();
         console.log("Farcaster MiniApp SDK is ready!");
+        window.isFarcaster = true;
+        const profile = await sdk.actions.getUserProfile();
 
         if (profile) {
           window.farcasterProfile = profile;
@@ -29,6 +31,7 @@ export default function MiniApp() {
         // You can now use sdk.actions.* safely
       } catch (err) {
         console.error("Farcaster SDK failed to initialize", err);
+        window.isFarcaster = false;
       }
     };
 

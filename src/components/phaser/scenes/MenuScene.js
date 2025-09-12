@@ -78,36 +78,38 @@ export default class MenuScene extends Phaser.Scene {
         }
       });
 
-    if (!windows.farcasterProfile) {
-      this.add
-        .text(
+    if (window.isFarcaster) {
+      if (!window.farcasterProfile) {
+        this.add
+          .text(
+            this.scale.width / 2,
+            this.sys.game.config.height - 100,
+            "Farcaster",
+            {
+              fontFamily: "Minecraft",
+              fontSize: "32px",
+              fill: "#fff",
+            }
+          )
+          .setOrigin(0.5)
+          .setInteractive({ useHandCursor: true })
+          .on("pointerdown", () => {
+            if (window.connectWalletFarcaster) {
+              window.connectWalletFarcaster();
+            }
+          });
+      } else {
+        this.add.text(
           this.scale.width / 2,
           this.sys.game.config.height - 100,
-          "Farcaster",
+          `Farcaster info: ${windows.farcasterProfile.fid} ${windows.farcasterProfile.username}`,
           {
             fontFamily: "Minecraft",
             fontSize: "32px",
             fill: "#fff",
           }
-        )
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true })
-        .on("pointerdown", () => {
-          if (window.connectWalletFarcaster) {
-            window.connectWalletFarcaster();
-          }
-        });
-    } else {
-      this.add.text(
-        this.scale.width / 2,
-        this.sys.game.config.height - 100,
-        `Farcaster info: ${windows.farcasterProfile.fid} ${windows.farcasterProfile.username}`,
-        {
-          fontFamily: "Minecraft",
-          fontSize: "32px",
-          fill: "#fff",
-        }
-      );
+        );
+      }
     }
   }
 }
