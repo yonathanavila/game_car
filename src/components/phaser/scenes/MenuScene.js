@@ -78,7 +78,7 @@ export default class MenuScene extends Phaser.Scene {
         }
       });
 
-    if (window.isFarcaster) {
+    if (window.isFarcaster == true) {
       this.add
         .text(
           this.scale.width / 2,
