@@ -17,12 +17,19 @@ export default function MiniApp() {
         await sdk.actions.ready();
         console.log("Farcaster MiniApp SDK is ready!");
         window.isFarcaster = true;
-        const profile = sdk.context.location;
+        const profile = sdk.context.user;
 
         if (profile) {
           console.log("Profile from sdk.context.user:", profile);
+        } else {
+          console.log("No user connected yet. Prompting sign-in...");
 
-          window.farcasterProfile = JSON.stringify(profile);
+          // If you want, call connectWalletFarcaster
+          if (window.connectWalletFarcaster) {
+            await window.connectWalletFarcaster();
+            const newProfile = sdk.context.user;
+            console.log("Profile after sign-in:", newProfile);
+          }
         }
 
         sdk.events.on("message", (msg) => {
