@@ -17,7 +17,7 @@ export default function MiniApp() {
         await sdk.actions.ready();
         console.log("Farcaster MiniApp SDK is ready!");
         window.isFarcaster = true;
-        const profile = sdk.context.user;
+        const profile = sdk.context.location;
 
         if (profile) {
           console.log("Profile from sdk.context.user:", profile);
