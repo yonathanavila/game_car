@@ -7,6 +7,11 @@ export default class GameOverScene extends Phaser.Scene {
     this.load.image("background", "images/splasharts/taxi_damage.webp");
   }
 
+  // <-- Use init() to receive the score
+  init(data) {
+    this.score = data.score;
+  }
+
   create() {
     // background
     const bgPause = this.add.image(-400, -90, "background").setOrigin(0, 0);
@@ -40,6 +45,19 @@ export default class GameOverScene extends Phaser.Scene {
         fontSize: "48px",
         fill: "#fff",
       })
+      .setOrigin(0.5);
+
+    const yourScroe = this.add
+      .text(
+        this.scale.width / 2,
+        140,
+        `"Your score": ${Math.round(this.score)}`,
+        {
+          fontFamily: "Minecraft",
+          fontSize: "38px",
+          fill: "#fff",
+        }
+      )
       .setOrigin(0.5);
 
     const saveScore = this.add

@@ -21,7 +21,7 @@ export default class GameScene extends Phaser.Scene {
 
     // params
     this.npcX = [36, 400];
-    this.speed = 300;
+    this.speed = 600;
     this.sidewalkWidth = 100;
     this.carKm = 0;
     this.totalLife = 19700; //
@@ -415,7 +415,11 @@ export default class GameScene extends Phaser.Scene {
     // Check if damage reached total life
     if (this.damage >= this.totalLife) {
       this.damage = this.totalLife; // optional, clamp value
-      this.scene.start("GameOverScene"); // launch Game Over scene
+
+      // 1️⃣ Calculate score here
+      const score = this.carKm * this.clients;
+
+      this.scene.start("GameOverScene", { score: score }); // launch Game Over scene
     }
   }
 
@@ -499,7 +503,7 @@ export default class GameScene extends Phaser.Scene {
     npc.destroy();
 
     // spawn taxi stop after a small random delay (or 0)
-    const delayedCall = Phaser.Math.Between(3000, 12000);
+    const delayedCall = Phaser.Math.Between(1500, 6000);
     this.time.delayedCall(delayedCall, () => this.spawnTaxiStop());
   }
 
@@ -523,7 +527,7 @@ export default class GameScene extends Phaser.Scene {
     stop.destroy();
 
     // spawn next client after random delay
-    const delay = Phaser.Math.Between(3000, 12000);
+    const delay = Phaser.Math.Between(1500, 6000);
     this.time.delayedCall(delay, () => this.spawnClient());
   }
 

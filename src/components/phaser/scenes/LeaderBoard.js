@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-import { callRead } from "@/services/Contract";
+import { callReadTopPlayers } from "@/services/Contract";
 import { shortenAddress } from "@/lib/utils"; // your web3 helper
 
 export default class LeaderboardScene extends Phaser.Scene {
@@ -62,7 +62,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     const menuContainer = this.add.container(120, 145);
 
     // ----- Fetch top players from contract -----
-    let topPlayers = await callRead(); // array of addresses
+    let topPlayers = await callReadTopPlayers(); // array of addresses
 
     // Filter out empty or zero addresses
     topPlayers = topPlayers[0].filter(
