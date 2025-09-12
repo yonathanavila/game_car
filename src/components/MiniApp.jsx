@@ -9,40 +9,39 @@ import { ConnectWallet } from "@/components/ConnectWallet";
 
 export default function MiniApp() {
   const queryClient = new QueryClient();
-
   useEffect(() => {
-    // Wait for Farcaster SDK to be ready
     const initFarcaster = async () => {
       try {
         await sdk.actions.ready();
         console.log("Farcaster MiniApp SDK is ready!");
         window.isFarcaster = true;
+
         const profile = sdk.context.user;
 
         if (profile) {
           console.log("Profile from sdk.context.user:", profile);
         } else {
           console.log("No user connected yet. Prompting sign-in...");
-
-          // If you want, call connectWalletFarcaster
           if (window.connectWalletFarcaster) {
             await window.connectWalletFarcaster();
-            const newProfile = sdk.context.user;
-            console.log("Profile after sign-in:", newProfile);
+            console.log("Profile after sign-in:", sdk.context.user);
           }
         }
 
-        sdk.events.on("message", (msg) => {
-          console.log("New Farcaster message:", msg);
-        });
-        // You can now use sdk.actions.* safely
+        // Subscribe to events safely
+        if (sdk.events && typeof sdk.events.on === "function") {
+          sdk.events.on("message", (msg) => {
+            console.log("New Farcaster message:", msg);
+          });
+        } else {
+          console.log("Farcaster events not available in this environment.");
+        }
       } catch (err) {
         console.error("Farcaster SDK failed to initialize", err);
-        window.isFarcaster = false;
       }
     };
-    new Game(); // Initialize Phaser game only once
 
+    new Game();
     initFarcaster();
   }, []);
 
