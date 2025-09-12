@@ -11,8 +11,6 @@ export default function MiniApp() {
   const queryClient = new QueryClient();
 
   useEffect(() => {
-    new Game(); // Initialize Phaser game only once
-
     // Wait for Farcaster SDK to be ready
     const initFarcaster = async () => {
       try {
@@ -34,6 +32,7 @@ export default function MiniApp() {
         window.isFarcaster = false;
       }
     };
+    new Game(); // Initialize Phaser game only once
 
     initFarcaster();
   }, []);
