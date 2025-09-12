@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 
-import { callRead } from "@/services/Contract"; // your web3 helper
+import { callRead } from "@/services/Contract";
+import { shortenAddress } from "@/lib/utils"; // your web3 helper
 
 export default class LeaderboardScene extends Phaser.Scene {
   constructor() {
@@ -68,8 +69,6 @@ export default class LeaderboardScene extends Phaser.Scene {
       (addr) => addr && addr !== "0x0000000000000000000000000000000000000000"
     );
 
-    console.log(topPlayers);
-
     // Take first 5 valid addresses
     this.menuItems = topPlayers.slice(0, 5);
 
@@ -77,7 +76,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     let offsetY = 0;
     this.menuItems.forEach((address, index) => {
       const option = this.add
-        .text(0, offsetY, `${index + 1} ${this.shortenAddress(address)}`, {
+        .text(0, offsetY, `${index + 1} ${shortenAddress(address)}`, {
           ...this.baseTextStyle,
           wordWrap: {
             width: this.scale.width - 100,
@@ -93,10 +92,5 @@ export default class LeaderboardScene extends Phaser.Scene {
       // Aumentar Y para la siguiente línea
       offsetY += option.height + 7; // margen de 10px entre textos
     });
-  }
-
-  shortenAddress(address) {
-    if (!address) return "";
-    return address.slice(0, 6) + "..." + address.slice(-4);
   }
 }

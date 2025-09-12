@@ -1,3 +1,5 @@
+import { shortenAddress } from "@/lib/utils"; // your web3 helper
+
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: "MenuScene" });
@@ -97,6 +99,21 @@ export default class MenuScene extends Phaser.Scene {
             window.connectWalletFarcaster();
           }
         });
+    }
+
+    if (window.connectedAccount) {
+      this.add
+        .text(
+          this.scale.width / 2,
+          this.sys.game.config.height - 200,
+          `Connected ${shortenAddress(window.connectedAccount)}`,
+          {
+            fontFamily: "Minecraft",
+            fontSize: "24px",
+            fill: "#fff",
+          }
+        )
+        .setOrigin(0.5);
     }
   }
 
