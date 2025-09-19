@@ -6,6 +6,23 @@ export const ConnectWallet = () => {
   const { connect, connectors } = useConnect();
   const chainId = useChainId();
 
+  const GetOrCreateAccount = async () => {
+    const response = await fetch("/api/wallets/get-wallet.json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        address,
+      }),
+    });
+    console.log(response);
+  };
+
+  useEffect(() => {
+    if (address) {
+      GetOrCreateAccount();
+    }
+  }, [address]);
+
   useEffect(() => {
     // Exponer función global para Phaser
     window.connectWalletMetamask = () => {
@@ -30,10 +47,6 @@ export const ConnectWallet = () => {
     } else {
       window.connectedAccount = null;
     }
-
-    console.log("Update wallet: ", address);
-
-    console.log("Current chainId:", chainId);
   }, [connect, connectors, address, isConnected]);
 
   return null;
