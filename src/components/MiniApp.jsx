@@ -23,7 +23,6 @@ export default function MiniApp() {
       }
     };
 
-    new Game(); // Initialize Phaser game
     initFarcaster();
   }, []);
 
