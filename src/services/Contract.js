@@ -45,7 +45,7 @@ export async function getLeaderboard(offset, limit) {
   return decoded;
 }
 
-export async function submitScore(baseAccountName, score) {
+export async function submitScore({ baseAccountName, score }) {
   // get or create the admin account
   const admin = await cdp.evm.getAccount({
     name: ADMIN_WALLET_NAME,
