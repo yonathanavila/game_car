@@ -59,6 +59,13 @@ export default class LeaderboardScene extends Phaser.Scene {
     const menuContainer = this.add.container(120, 145);
 
     // ----- Fetch top players from contract -----
+    const response = await fetch("/api/get-leaderboard.json?offset=0&limit=10");
+
+    const data = await response.json();
+
+    console.log(data);
+
+    // let topPlayers = data?.tx || [];
 
     // // Filter out empty or zero addresses
     // topPlayers = topPlayers[0].filter(
@@ -68,7 +75,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     // // Take first 5 valid addresses
     // this.menuItems = topPlayers.slice(0, 5);
 
-    // Espaciado vertical
+    // // Espaciado vertical
     // let offsetY = 0;
     // this.menuItems.forEach((address, index) => {
     //   const option = this.add

@@ -11,8 +11,8 @@ export const GET = async ({ request }) => {
     const limit = params.get("limit");
 
     const receipt = await getLeaderboard({
-      offset,
-      limit,
+      offset: parseInt(offset),
+      limit: parseInt(limit),
     });
 
     return new Response(JSON.stringify({ success: true, tx: receipt }), {

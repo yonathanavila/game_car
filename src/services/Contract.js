@@ -1,5 +1,6 @@
 import { CdpClient } from "@coinbase/cdp-sdk";
 import { createPublicClient, encodeFunctionData, http } from "viem";
+import { readContract } from "viem/actions";
 import { baseSepolia } from "viem/chains";
 import contractAbi from "../../solidity/artifacts/GameLogic_metadata.json";
 
@@ -20,29 +21,26 @@ const publicClient = createPublicClient({
   transport: http(),
 });
 
-export async function getLeaderboard(offset, limit) {
-  // create tx
-  const data = encodeFunctionData({
+export async function getLeaderboard({ offset = 0, limit = 10 }) {
+  const decoded = await readContract(publicClient, {
     abi: contractAbi.output.abi,
+    address: GAME_CONTRACT_ADDRESS,
     functionName: "getLeaderboard",
-    args: [offset, limit],
+    args: [BigInt(offset), BigInt(limit)], // must be bigint
   });
+  const response = // convert bigint to string
+    decoded.map((x) => x.toString());
 
-  const result = await cdp.eth_call({
-    to: GAME_CONTRACT_ADDRESS,
-    data,
-  });
+  console.log("Leaderboard:", response);
 
-  // 3. Decode the result
-  const decoded = decodeFunctionResult({
-    abi,
-    functionName: "balanceOf",
-    data: result,
-  });
+  console.log("Tx confirmed: ", response);
 
-  console.log("Tx confirmed: ", decoded);
+  const serialized = serializeBigInt(decoded);
 
-  return decoded;
+  return {
+    success: true,
+    tx: serialized,
+  };
 }
 
 export async function submitScore({ baseAccountName, score }) {
@@ -102,4 +100,15 @@ export async function submitScore({ baseAccountName, score }) {
 
   console.log(`Tx confirmed in block ${receipt.blockNumber} ✅`);
   return receipt;
+}
+
+function serializeBigInt(obj) {
+  if (typeof obj === "bigint") return obj.toString();
+  if (Array.isArray(obj)) return obj.map(serializeBigInt);
+  if (obj && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [k, serializeBigInt(v)])
+    );
+  }
+  return obj;
 }
