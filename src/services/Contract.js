@@ -1,7 +1,7 @@
-import contractAbi from "@@/solidity/artifacts/GameLogic_metadata.json";
 import { CdpClient } from "@coinbase/cdp-sdk";
 import { createPublicClient, encodeFunctionData, http } from "viem";
 import { baseSepolia } from "viem/chains";
+import contractAbi from "../../solidity/artifacts/GameLogic_metadata.json";
 
 const CDP_API_KEY_ID = import.meta.env.CDP_API_KEY_ID;
 const CDP_API_KEY_SECRET = import.meta.env.CDP_API_KEY_SECRET;

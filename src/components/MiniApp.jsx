@@ -1,11 +1,10 @@
-import { WagmiProvider } from "wagmi";
 import { useEffect } from "react";
+import { WagmiProvider } from "wagmi";
 
+import { ConnectWallet } from "@/components/ConnectWallet";
 import { config } from "@/services/Wagmi";
-import Game from "@/components/phaser/Game";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ConnectWallet } from "@/components/ConnectWallet";
 
 export default function MiniApp() {
   const queryClient = new QueryClient();
@@ -13,9 +12,10 @@ export default function MiniApp() {
     const initFarcaster = async () => {
       try {
         // Wait for SDK to be ready
-        await sdk.actions.addMiniApp();
         await sdk.actions.ready();
         console.log("Farcaster MiniApp SDK is ready!");
+        await sdk.actions.addMiniApp();
+
         window.isFarcaster = true;
       } catch (err) {
         console.error("Farcaster SDK failed to initialize", err);

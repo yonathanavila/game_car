@@ -1,15 +1,16 @@
 import Phaser from "phaser";
 import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
-import UIScene from "@/components/phaser/scenes/UIScene";
-import MenuScene from "@/components/phaser/scenes/MenuScene";
-import GameScene from "@/components/phaser/scenes/GameScene";
 import BootScene from "@/components/phaser/scenes/BootScene";
+import ConfigurationScene from "@/components/phaser/scenes/ConfigurationScene";
+import GameOverScene from "@/components/phaser/scenes/GameOver";
+import GameScene from "@/components/phaser/scenes/GameScene";
+import LeaderboardScene from "@/components/phaser/scenes/LeaderBoard";
+import LoginScene from "@/components/phaser/scenes/LoginScene";
+import MenuScene from "@/components/phaser/scenes/MenuScene";
 import PauseScene from "@/components/phaser/scenes/PauseScene";
 import RepairScene from "@/components/phaser/scenes/RepairScene";
-import LeaderboardScene from "@/components/phaser/scenes/LeaderBoard";
-import ConfigurationScene from "@/components/phaser/scenes/ConfigurationScene";
-import GameOverScene from "./scenes/GameOver";
+import UIScene from "@/components/phaser/scenes/UIScene";
 
 export default class Game extends Phaser.Game {
   constructor() {
@@ -32,6 +33,7 @@ export default class Game extends Phaser.Game {
       },
       scene: [
         BootScene,
+        LoginScene,
         MenuScene,
         GameScene,
         UIScene,
