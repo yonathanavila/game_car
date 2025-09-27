@@ -24,6 +24,17 @@ export default class MenuScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    // username
+    const username = localStorage.getItem("playerName");
+    if (username) {
+      this.add
+        .text(10, 0, `Welcome, ${username}!`, {
+          fontSize: "20px",
+          fill: "#fff",
+        })
+        .setOrigin(0, 0);
+    }
+
     const startButton = this.add
       .text(this.scale.width / 2, this.scale.height / 2, "Start Game", {
         fontFamily: "Minecraft",

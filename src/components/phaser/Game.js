@@ -1,4 +1,6 @@
 import Phaser from "phaser";
+import BBCodeTextPlugin from "phaser3-rex-plugins/plugins/bbcodetext-plugin.js";
+import TextEditPlugin from "phaser3-rex-plugins/plugins/textedit-plugin.js";
 import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
 import BootScene from "@/components/phaser/scenes/BootScene";
@@ -19,6 +21,10 @@ export default class Game extends Phaser.Game {
       pixelArt: true,
       width: 434,
       height: 700,
+      parent: "game-container",
+      dom: {
+        createContainer: true,
+      },
       physics: {
         default: "arcade",
         arcade: {
@@ -26,8 +32,10 @@ export default class Game extends Phaser.Game {
           debug: false,
         },
       },
+
       scale: {
         parent: "game-container",
+
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
       },
@@ -49,6 +57,18 @@ export default class Game extends Phaser.Game {
             key: "rexVirtualJoystick",
             plugin: VirtualJoystickPlugin,
             mapping: "rexVirtualJoystick",
+          },
+        ],
+        global: [
+          {
+            key: "rexBBCodeTextPlugin",
+            plugin: BBCodeTextPlugin,
+            start: true,
+          },
+          {
+            key: "rexTextEdit",
+            plugin: TextEditPlugin,
+            start: true, // so you can call this.plugins.get("rexTextEdit")
           },
         ],
       },

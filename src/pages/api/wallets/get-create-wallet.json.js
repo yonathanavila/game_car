@@ -26,7 +26,7 @@ export async function POST({ request }) {
     }
     return new Response(
       JSON.stringify({
-        message: `The wallet ${player.address} was created successfully`,
+        message: `Your wallet is: ${player.address}`,
       }),
       {
         status: 200,
