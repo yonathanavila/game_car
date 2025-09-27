@@ -3,12 +3,14 @@
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "strictNullChecks": true,
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@@/*": ["/*"]
+      "@@/solidity": ["game_car/solidity/*"]
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react"
