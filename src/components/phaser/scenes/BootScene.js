@@ -51,6 +51,6 @@ export default class BootScene extends Phaser.Scene {
 
   create() {
     // Once assets are ready, go to menu
-    this.scene.start("MenuScene");
+    this.scene.start("LoginScene");
   }
 }

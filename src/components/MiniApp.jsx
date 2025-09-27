@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { WagmiProvider } from "wagmi";
 
 import { ConnectWallet } from "@/components/ConnectWallet";
+import Game from "@/components/phaser/Game";
 import { config } from "@/services/Wagmi";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -23,6 +24,7 @@ export default function MiniApp() {
       }
     };
 
+    new Game();
     initFarcaster();
   }, []);
 
