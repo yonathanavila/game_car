@@ -56,22 +56,27 @@ export async function submitScore({ baseAccountName, score }) {
     name: baseAccountName,
   });
 
-  // request eth to the faucet
-  const { transactionHash: faucetTransactionHash } =
-    await cdp.evm.requestFaucet({
-      address: admin.address,
-      network: "base-sepolia",
-      token: "eth",
-    });
+  // // request eth to the faucet
+  // const { transactionHash: faucetTransactionHash } =
+  //   await cdp.evm.requestFaucet({
+  //     address: admin.address,
+  //     network: "base-sepolia",
+  //     token: "eth",
+  //   });
 
-  const faucetTxReceipt = await publicClient.waitForTransactionReceipt({
-    hash: faucetTransactionHash,
+  // const faucetTxReceipt = await publicClient.waitForTransactionReceipt({
+  //   hash: faucetTransactionHash,
+  // });
+
+  // console.log(
+  //   "Successfully requested ETH from faucet:",
+  //   faucetTxReceipt.transactionHash
+  // );
+  console.log("Submitting score:", {
+    player: player.address,
+    score,
+    admin: admin.address,
   });
-
-  console.log(
-    "Successfully requested ETH from faucet:",
-    faucetTxReceipt.transactionHash
-  );
 
   // send transaction
   const data = encodeFunctionData({
@@ -92,7 +97,7 @@ export async function submitScore({ baseAccountName, score }) {
   console.log("Transaction sent:", transactionResult.transactionHash);
 
   const receipt = await publicClient.waitForTransactionReceipt({
-    hash: txResult.transactionHash,
+    hash: transactionResult.transactionHash,
   });
 
   console.log(`Tx confirmed in block ${receipt.blockNumber} ✅`);

@@ -72,15 +72,13 @@ export default class GameOverScene extends Phaser.Scene {
         try {
           const formData = new FormData();
           formData.append("score", this.score);
-          formData.append("address", window.connectedAccount);
+          formData.append("player", localStorage.getItem("playerName"));
 
-          const res = await fetch("/api/set-score.json", {
+          await fetch("/api/submit-score.json", {
             method: "POST",
             body: formData,
           });
 
-          const data = await res.json();
-          console.log("Server response:", data);
           this.showScoreSavedNotification(this);
         } catch (error) {
           console.error("Contract call failed:", error);
@@ -91,6 +89,7 @@ export default class GameOverScene extends Phaser.Scene {
         }
       });
 
+    // TODO: avoid reload the page to try again the game to better the performance
     const tryAgain = this.add
       .text(this.scale.width / 2, 300, "Try again", {
         fontFamily: "Minecraft",

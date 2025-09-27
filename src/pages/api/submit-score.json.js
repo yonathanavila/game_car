@@ -8,7 +8,7 @@ export const POST = async ({ request }) => {
 
     const receipt = await submitScore({
       baseAccountName: player,
-      score,
+      score: Math.round(score),
     });
 
     return new Response(
