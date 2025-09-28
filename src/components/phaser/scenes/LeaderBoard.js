@@ -57,15 +57,6 @@ export default class LeaderboardScene extends Phaser.Scene {
         },
       })
       .setOrigin(0.5, 0);
-    const menuContainer = this.add.container(
-      this.sys.game.config.width / 2,
-      145
-    );
-
-    // ----- Fetch top players from contract -----
-    const response = await fetch("/api/get-leaderboard.json?offset=0&limit=5");
-
-    const data = await response.json();
 
     this.add
       .text(
@@ -81,6 +72,16 @@ export default class LeaderboardScene extends Phaser.Scene {
         }
       )
       .setOrigin(0.5, 0);
+
+    const menuContainer = this.add.container(
+      this.sys.game.config.width / 2,
+      145
+    );
+
+    // ----- Fetch top players from contract -----
+    const response = await fetch("/api/get-leaderboard.json?offset=0&limit=5");
+
+    const data = await response.json();
 
     // Espaciado vertical
     let offsetY = 0;

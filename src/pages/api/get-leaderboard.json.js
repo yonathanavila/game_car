@@ -31,8 +31,6 @@ export const GET = async ({ request }) => {
           expiresIn: 120, // optional (defaults to 120 seconds)
         });
 
-        console.log(`Token: ${token}`);
-
         const options = {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -47,8 +45,6 @@ export const GET = async ({ request }) => {
           throw new Error(`CDP API error ${response.status}: ${text}`);
         }
 
-        console.log(`CDP Data: ${JSON.stringify(data)}`);
-
         return {
           name: data.name,
           score: player.score,
@@ -60,7 +56,6 @@ export const GET = async ({ request }) => {
       status: 200,
     });
   } catch (err) {
-    console.error("Contract write failed:", err);
     return new Response(
       JSON.stringify({ success: false, error: err.message }),
       { status: 500 }
