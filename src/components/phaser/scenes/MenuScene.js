@@ -59,6 +59,8 @@ export default class MenuScene extends Phaser.Scene {
         leaderBoard.setStyle({ fill: "#8aebf1" });
       });
 
+    const username = localStorage.getItem("playerName");
+
     if (username) {
       this.add
         .text(
@@ -72,7 +74,6 @@ export default class MenuScene extends Phaser.Scene {
           }
         )
         .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true })
         .on("pointerdown", () => {
           if (window.connectWalletFarcaster) {
             window.connectWalletFarcaster();
@@ -91,7 +92,6 @@ export default class MenuScene extends Phaser.Scene {
           }
         )
         .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true })
         .on("pointerdown", () => {
           if (window.connectWalletFarcaster) {
             window.connectWalletFarcaster();

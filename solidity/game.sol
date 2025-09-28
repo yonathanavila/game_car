@@ -53,6 +53,12 @@ contract GameLogic is AccessControl {
         require(player != address(0), "Invalid player address");
         require(score > 0, "Score must be greater than zero");
 
+        // Check if the new score is higher than the current score
+        require(
+            score > players[player].score,
+            "Submitted score must be higher than current score"
+        );
+
         // Update or initialize player data
         if (
             players[player].score == 0 &&
@@ -62,7 +68,7 @@ contract GameLogic is AccessControl {
             emit PlayerAdded(player);
         }
 
-        players[player].score += score;
+        players[player].score = score;
         players[player].lastSubmissionTimestamp = block.timestamp;
 
         // Calculate tokens based on formula: tokens = score * tokenMultiplier

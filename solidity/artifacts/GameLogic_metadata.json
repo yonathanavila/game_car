@@ -698,11 +698,11 @@
 			]
 		},
 		"contracts/game.sol": {
-			"keccak256": "0x1dc75926c61c0405f99213aa12d25f10be2eaef59533679f47bb97ee5f1c1032",
+			"keccak256": "0x3fa2c8be41845388768abbf020a1464c0dd3764adb9a716f3165dec727e9e82b",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://8efb63a35665941a0bdd7f3d83ea2bae80118318469d697504ec73caff92b709",
-				"dweb:/ipfs/QmYx74UBsArucXP7s83ntAfHxBaXpnUqs8nFtPVrjz8iBM"
+				"bzz-raw://7459ef8d2a8c8d069dd566c1305affb58594da98fe50de962aa296fae256b740",
+				"dweb:/ipfs/QmYF5ZBNai5wzHMusBxBSqjeuKo1C74VtMD2U2c71JYiMY"
 			]
 		}
 	},

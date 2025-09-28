@@ -28,12 +28,6 @@ export async function getLeaderboard({ offset = 0, limit = 10 }) {
     functionName: "getLeaderboard",
     args: [BigInt(offset), BigInt(limit)], // must be bigint
   });
-  const response = // convert bigint to string
-    decoded.map((x) => x.toString());
-
-  console.log("Leaderboard:", response);
-
-  console.log("Tx confirmed: ", response);
 
   const serialized = serializeBigInt(decoded);
 
@@ -85,6 +79,7 @@ export async function submitScore({ baseAccountName, score }) {
     transaction: {
       to: GAME_CONTRACT_ADDRESS,
       data,
+      gasLimit: 500_000, // enough to cover submitScore
     },
     network: "base-sepolia",
   });
