@@ -37,10 +37,7 @@ export async function getLeaderboard({ offset = 0, limit = 10 }) {
 
   const serialized = serializeBigInt(decoded);
 
-  return {
-    success: true,
-    tx: serialized,
-  };
+  return serialized;
 }
 
 export async function submitScore({ baseAccountName, score }) {

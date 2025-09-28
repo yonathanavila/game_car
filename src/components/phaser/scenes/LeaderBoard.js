@@ -47,53 +47,71 @@ export default class LeaderboardScene extends Phaser.Scene {
     closeButton.displayHeight = 100;
     closeButton.rotation = Phaser.Math.DegToRad(320);
 
-    const title = this.add.text(100, 48, "Leaderboard", {
-      ...this.baseTextStyle,
-      fontSize: "34px",
-      wordWrap: {
-        width: this.scale.width - 100,
-        useAdvancedWrap: true,
-      },
-    });
-
-    const menuContainer = this.add.container(120, 145);
+    const title = this.add
+      .text(this.sys.game.config.width / 2, 48, "Leaderboard", {
+        ...this.baseTextStyle,
+        fontSize: "34px",
+        wordWrap: {
+          width: this.scale.width - 100,
+          useAdvancedWrap: true,
+        },
+      })
+      .setOrigin(0.5, 0);
+    const menuContainer = this.add.container(
+      this.sys.game.config.width / 2,
+      145
+    );
 
     // ----- Fetch top players from contract -----
-    const response = await fetch("/api/get-leaderboard.json?offset=0&limit=10");
+    const response = await fetch("/api/get-leaderboard.json?offset=0&limit=5");
 
     const data = await response.json();
 
-    console.log(data);
+    this.add
+      .text(
+        this.sys.game.config.width / 2,
+        100,
+        `#\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Player\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Score`,
+        {
+          ...this.baseTextStyle,
+          wordWrap: {
+            width: this.scale.width - 100,
+            useAdvancedWrap: true,
+          },
+        }
+      )
+      .setOrigin(0.5, 0);
 
-    // let topPlayers = data?.tx || [];
+    // Espaciado vertical
+    let offsetY = 0;
+    data.tx.forEach((player, index) => {
+      const option = this.add
+        .text(
+          0,
+          offsetY,
+          `${
+            index + 1
+          }\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${
+            player.name
+          }\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${
+            player.score
+          }`,
+          {
+            ...this.baseTextStyle,
+            wordWrap: {
+              width: this.scale.width - 100,
+              useAdvancedWrap: true,
+            },
+          }
+        )
+        .setOrigin(0.5, 0)
+        .setInteractive();
 
-    // // Filter out empty or zero addresses
-    // topPlayers = topPlayers[0].filter(
-    //   (addr) => addr && addr !== "0x0000000000000000000000000000000000000000"
-    // );
+      // Agregar al contenedor
+      menuContainer.add(option);
 
-    // // Take first 5 valid addresses
-    // this.menuItems = topPlayers.slice(0, 5);
-
-    // // Espaciado vertical
-    // let offsetY = 0;
-    // this.menuItems.forEach((address, index) => {
-    //   const option = this.add
-    //     .text(0, offsetY, `${index + 1} ${shortenAddress(address)}`, {
-    //       ...this.baseTextStyle,
-    //       wordWrap: {
-    //         width: this.scale.width - 100,
-    //         useAdvancedWrap: true,
-    //       },
-    //     })
-    //     .setOrigin(0, 0)
-    //     .setInteractive();
-
-    //   // Agregar al contenedor
-    //   menuContainer.add(option);
-
-    //   // Aumentar Y para la siguiente línea
-    //   offsetY += option.height + 7; // margen de 10px entre textos
-    // });
+      // Aumentar Y para la siguiente línea
+      offsetY += option.height + 7; // margen de 10px entre textos
+    });
   }
 }

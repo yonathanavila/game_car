@@ -1,5 +1,3 @@
-import { shortenAddress } from "@/lib/utils"; // your web3 helper
-
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: "MenuScene" });
@@ -23,17 +21,6 @@ export default class MenuScene extends Phaser.Scene {
         fill: "#fff",
       })
       .setOrigin(0.5);
-
-    // username
-    const username = localStorage.getItem("playerName");
-    if (username) {
-      this.add
-        .text(10, 0, `Welcome, ${username}!`, {
-          fontSize: "20px",
-          fill: "#fff",
-        })
-        .setOrigin(0, 0);
-    }
 
     const startButton = this.add
       .text(this.scale.width / 2, this.scale.height / 2, "Start Game", {
@@ -72,12 +59,12 @@ export default class MenuScene extends Phaser.Scene {
         leaderBoard.setStyle({ fill: "#8aebf1" });
       });
 
-    if (window.isFarcaster == true) {
+    if (username) {
       this.add
         .text(
           this.scale.width / 2,
-          this.sys.game.config.height - 100,
-          "Farcaster",
+          this.sys.game.config.height - 150,
+          "Welcome!",
           {
             fontFamily: "Minecraft",
             fontSize: "32px",
@@ -91,21 +78,25 @@ export default class MenuScene extends Phaser.Scene {
             window.connectWalletFarcaster();
           }
         });
-    }
 
-    if (window.connectedAccount) {
       this.add
         .text(
           this.scale.width / 2,
-          this.sys.game.config.height - 200,
-          `Connected ${shortenAddress(window.connectedAccount)}`,
+          this.sys.game.config.height - 100,
+          username,
           {
             fontFamily: "Minecraft",
-            fontSize: "24px",
+            fontSize: "32px",
             fill: "#fff",
           }
         )
-        .setOrigin(0.5);
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", () => {
+          if (window.connectWalletFarcaster) {
+            window.connectWalletFarcaster();
+          }
+        });
     }
   }
 
