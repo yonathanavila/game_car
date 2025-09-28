@@ -47,7 +47,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     closeButton.displayHeight = 100;
     closeButton.rotation = Phaser.Math.DegToRad(320);
 
-    const title = this.add
+    this.add
       .text(this.sys.game.config.width / 2, 48, "Leaderboard", {
         ...this.baseTextStyle,
         fontSize: "34px",
