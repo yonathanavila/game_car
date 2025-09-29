@@ -12,7 +12,6 @@ export default class RepairScene extends Phaser.Scene {
       align: "left",
     };
     this.balance = 0;
-    this.damage = 1000000;
     this.lastRepairKm = 30000;
     this.menuItems = [];
     // this.carKm = this.registry.get("carKm") || 0;
@@ -52,7 +51,13 @@ export default class RepairScene extends Phaser.Scene {
     }
   }
 
+  init() {
+    this.damage = this.registry.get("damage");
+  }
+
   create() {
+    console.log(this.damage);
+
     // 3️⃣ Fetch the balance asynchronously (non-blocking)
     this.loadBalance(); // 3️⃣ Fetch the balance asynchronously (non-blocking)
 
@@ -103,39 +108,6 @@ export default class RepairScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Create interactive "Repair" button
-    const repairButton = this.add
-      .text(this.scale.width / 2, 600, "Repair", {
-        fontSize: "32px",
-        color: "#ffffff",
-        fontStyle: "bold",
-        backgroundColor: "#000000", // optional background
-        padding: { x: 20, y: 10 },
-        align: "center",
-      })
-      .setDepth(2)
-      .setOrigin(0.5) // center the text
-      .setInteractive({ useHandCursor: true }) // makes cursor a pointer
-      .on("pointerover", () => {
-        repairButton.setStyle({ fill: "#ffff00" }); // hover color
-      })
-      .on("pointerout", () => {
-        repairButton.setStyle({ fill: "#ffffff" }); // normal color
-      })
-      .on("pointerdown", () => {
-        // Action when clicked
-        console.log("Repair button clicked!");
-        // Example: decrease balance or repair damage
-        if (this.balance >= 1000) {
-          this.balance -= 1000;
-          if (this.balanceText) {
-            this.balanceText.setText("Balance: $" + this.balance);
-          }
-          this.damage -= 500; // example repair
-        }
-      });
-
-    // 2️⃣ Create balance text and store a reference
     this.balanceText = this.add
       .text(300, this.scale.height - 30, "Balance: Loading...", {
         fontSize: "25px",
@@ -148,7 +120,7 @@ export default class RepairScene extends Phaser.Scene {
       (value) => value.name == "lowerBallJoint"
     );
 
-    if (lowerBallJointInfo.kmDamage[0] >= this.lastRepairKm) {
+    if (lowerBallJointInfo.kmDamage[0] >= this.damage) {
       // lowerBallJoint.on("pointerdown", () => {
       //     this.balance -= this.lowerBallJointInfo.repairCost;
       //     this.damage -= this.lowerBallJointInfo.damageHelth;
@@ -165,7 +137,7 @@ export default class RepairScene extends Phaser.Scene {
       (value) => value.name == "shockAbsorber"
     );
 
-    if (shockAbsorber.kmDamage[0] >= this.lastRepairKm) {
+    if (this.damage >= shockAbsorber.kmDamage[0]) {
       this.menuItems.push({
         text: "Fix shocks absorbers $5000",
         cost: shockAbsorber.cost,
@@ -175,7 +147,7 @@ export default class RepairScene extends Phaser.Scene {
 
     const bushings = this.damageInfo.find((value) => value.name == "bushings");
 
-    if (bushings.kmDamage[0] >= this.lastRepairKm) {
+    if (this.damage >= bushings.kmDamage[0]) {
       this.menuItems.push({
         text: "Fix lower control arms bushings $1200",
         cost: bushings.cost,
@@ -187,7 +159,7 @@ export default class RepairScene extends Phaser.Scene {
       (value) => value.name == "aligmentBalance"
     );
 
-    if (aligmentBalance.kmDamage[0] >= this.lastRepairKm) {
+    if (this.damage >= aligmentBalance.kmDamage[0]) {
       this.menuItems.push({
         text: "Fix aligment & balance $600",
         cost: aligmentBalance.cost,
@@ -199,7 +171,7 @@ export default class RepairScene extends Phaser.Scene {
       (value) => value.name == "brakeCheck"
     );
 
-    if (brakeCheckService.kmDamage[0] >= this.lastRepairKm) {
+    if (this.damage >= brakeCheckService.kmDamage[0]) {
       this.menuItems.push({
         text: "Brake check service $800",
         cost: brakeCheckService.cost,
@@ -209,7 +181,7 @@ export default class RepairScene extends Phaser.Scene {
 
     const tires = this.damageInfo.find((value) => value.name == "tires");
 
-    if (tires.kmDamage[0] >= this.lastRepairKm) {
+    if (this.damage >= tires.kmDamage[0]) {
       this.menuItems.push({
         text: "Buy tires $5200",
         cost: tires.cost,
@@ -221,7 +193,7 @@ export default class RepairScene extends Phaser.Scene {
       (value) => value.name == "airPressure"
     );
 
-    if (checkAirPressure.kmDamage[0] >= this.lastRepairKm) {
+    if (this.damage >= checkAirPressure.kmDamage[0]) {
       this.menuItems.push({
         text: "Check tire air pressure $100",
         cost: tires.cost,
@@ -231,7 +203,7 @@ export default class RepairScene extends Phaser.Scene {
 
     const washCar = this.damageInfo.find((value) => value.name == "washCar");
 
-    if (washCar.kmDamage[0] >= this.lastRepairKm) {
+    if (this.damage >= washCar.kmDamage[0]) {
       this.menuItems.push({
         text: "Wash car $200",
         cost: washCar.cost,

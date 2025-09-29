@@ -1,7 +1,7 @@
-import { damageInfo } from "@/const";
-import assetsData from "@/assets/data/assets.json";
-import { calculateCurrentLife } from "@/services/Global";
 import animationsData from "@/assets/data/animations.json";
+import assetsData from "@/assets/data/assets.json";
+import { damageInfo } from "@/const";
+import { calculateCurrentLife } from "@/services/Global";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -89,6 +89,8 @@ export default class GameScene extends Phaser.Scene {
       .on("pointerdown", () => {
         // 1️⃣ Calculate score here
         const score = this.carKm * this.clients;
+
+        this.registry.set("damage", this.damage);
 
         pauseButton.setFrame(1);
         this.scene.pause();
