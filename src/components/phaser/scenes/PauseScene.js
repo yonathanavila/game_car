@@ -58,9 +58,9 @@ export default class PauseScene extends Phaser.Scene {
         try {
           const formData = new FormData();
           formData.append("score", this.score);
-          formData.append("address", window.connectedAccount);
+          formData.append("player", localStorage.getItem("playerName"));
 
-          const res = await fetch("/api/set-score.json", {
+          const res = await fetch("/api/submit-score.json", {
             method: "POST",
             body: formData,
           });

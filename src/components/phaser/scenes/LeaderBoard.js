@@ -62,7 +62,7 @@ export default class LeaderboardScene extends Phaser.Scene {
       .text(
         this.sys.game.config.width / 2,
         100,
-        `#\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Player\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Score`,
+        `#\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Player\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Score`,
         {
           ...this.baseTextStyle,
           wordWrap: {
@@ -73,10 +73,7 @@ export default class LeaderboardScene extends Phaser.Scene {
       )
       .setOrigin(0.5, 0);
 
-    const menuContainer = this.add.container(
-      this.sys.game.config.width / 2,
-      145
-    );
+    const menuContainer = this.add.container(50, 145);
 
     // ----- Fetch top players from contract -----
     const response = await fetch("/api/get-leaderboard.json?offset=0&limit=5");
@@ -92,9 +89,9 @@ export default class LeaderboardScene extends Phaser.Scene {
           offsetY,
           `${
             index + 1
-          }\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${
+          }\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${formatName(
             player.name
-          }\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${
+          )}\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${
             player.score
           }`,
           {
@@ -105,7 +102,7 @@ export default class LeaderboardScene extends Phaser.Scene {
             },
           }
         )
-        .setOrigin(0.5, 0)
+        .setOrigin(0, 0)
         .setInteractive();
 
       // Agregar al contenedor
@@ -116,3 +113,11 @@ export default class LeaderboardScene extends Phaser.Scene {
     });
   }
 }
+
+const formatName = (name) => {
+  if (name.length > 3) {
+    return name.slice(0, 3) + "..."; // truncate
+  } else {
+    return name.padEnd(7, "\u00A0"); // pad with spaces up to 7 chars
+  }
+};
