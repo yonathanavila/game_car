@@ -12,22 +12,20 @@ export default class UIScene extends Phaser.Scene {
     this.balance = 0;
 
     this.damageText = this.add.text(16, 16, "Damage: 0", {
-      fontFamily: "Minecraft",
       fontSize: "28px",
       fill: "#fff",
     });
     this.clientsText = this.add.text(16, 60, "Clients: 0", {
-      fontFamily: "Minecraft",
       fontSize: "32px",
       fill: "#fff",
     });
     // this.carKmText = this.add.text(16, 104, "Car Km: 0", {
-    //   fontFamily: "Minecraft",
+    //
     //   fontSize: "32px",
     //   fill: "#fff",
     // });
     // this.balanceText = this.add.text(16, 148, "Balance: $0", {
-    //   fontFamily: "Minecraft",
+    //
     //   fontSize: "32px",
     //   fill: "#fff",
     // });

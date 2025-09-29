@@ -16,7 +16,6 @@ export default class MenuScene extends Phaser.Scene {
 
     this.add
       .text(this.scale.width / 2, 90, "Taxi Driver", {
-        fontFamily: "Minecraft",
         fontSize: "48px",
         fill: "#fff",
       })
@@ -24,7 +23,6 @@ export default class MenuScene extends Phaser.Scene {
 
     const startButton = this.add
       .text(this.scale.width / 2, this.scale.height / 2, "Start Game", {
-        fontFamily: "Minecraft",
         fontSize: "32px",
         fill: "#8aebf1",
       })
@@ -43,7 +41,6 @@ export default class MenuScene extends Phaser.Scene {
 
     const leaderBoard = this.add
       .text(this.scale.width / 2, this.scale.height / 2 + 70, "Leaderboard", {
-        fontFamily: "Minecraft",
         fontSize: "32px",
         fill: "#8aebf1",
       })
@@ -68,7 +65,6 @@ export default class MenuScene extends Phaser.Scene {
           this.sys.game.config.height - 150,
           "Welcome!",
           {
-            fontFamily: "Minecraft",
             fontSize: "32px",
             fill: "#fff",
           }
@@ -86,7 +82,6 @@ export default class MenuScene extends Phaser.Scene {
           this.sys.game.config.height - 100,
           username,
           {
-            fontFamily: "Minecraft",
             fontSize: "32px",
             fill: "#fff",
           }
@@ -107,7 +102,6 @@ export default class MenuScene extends Phaser.Scene {
         this.sys.game.config.height - 100,
         `Farcaster info: ${window.farcasterProfile.fid} ${window.farcasterProfile.username}`,
         {
-          fontFamily: "Minecraft",
           fontSize: "32px",
           fill: "#fff",
         }

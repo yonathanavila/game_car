@@ -40,7 +40,6 @@ export default class PauseScene extends Phaser.Scene {
 
     const titleScreen = this.add
       .text(this.scale.width / 2, 70, "Pause", {
-        fontFamily: "Minecraft",
         fontSize: "48px",
         fill: "#fff",
       })
@@ -48,7 +47,6 @@ export default class PauseScene extends Phaser.Scene {
 
     const load = this.add
       .text(this.scale.width / 2, 220, "Save Score", {
-        fontFamily: "Minecraft",
         fontSize: "38px",
         fill: "#fff",
       })
@@ -79,24 +77,23 @@ export default class PauseScene extends Phaser.Scene {
 
     this.mainMenu.add(load);
 
-    // const load = this.add
-    //   .text(this.scale.width / 2, 220, "Load Game", {
-    //     fontFamily: "Minecraft",
-    //     fontSize: "38px",
-    //     fill: "#fff",
-    //   })
-    //   .setInteractive({ useHandCursor: true })
-    //   .setOrigin(0.5)
-    //   .on("pointerdown", () => {
-    //     this.mainMenu.setVisible(false);
-    //     this.subMenu.setVisible(true);
-    //   });
+    const repairScene = this.add
+      .text(this.scale.width / 2, 300, "Auto repair shop", {
+        fontSize: "38px",
+        fill: "#fff",
+      })
+      .setInteractive({ useHandCursor: true })
+      .setOrigin(0.5)
+      .on("pointerdown", () => {
+        this.mainMenu.setVisible(false);
+        this.subMenu.setVisible(true);
+        this.scene.start("RepairScene");
+      });
 
-    // this.mainMenu.add(load);
+    this.mainMenu.add(repairScene);
 
     const mainMenu = this.add
-      .text(this.scale.width / 2, 300, "Main Menu", {
-        fontFamily: "Minecraft",
+      .text(this.scale.width / 2, 400, "Main Menu", {
         fontSize: "38px",
         fill: "#fff",
       })
@@ -113,7 +110,7 @@ export default class PauseScene extends Phaser.Scene {
 
     // const configurationMenu = this.add
     //   .text(this.scale.width / 2, 380, "Configuration", {
-    //     fontFamily: "Minecraft",
+    //
     //     fontSize: "38px",
     //     fill: "#fff",
     //   })
@@ -131,7 +128,6 @@ export default class PauseScene extends Phaser.Scene {
 
     const partyA = this.add
       .text(this.scale.width / 2, 220, "Party A", {
-        fontFamily: "Minecraft",
         fontSize: "38px",
         fill: "#fff",
       })
@@ -146,7 +142,6 @@ export default class PauseScene extends Phaser.Scene {
 
     const partyB = this.add
       .text(this.scale.width / 2, 300, "Party B", {
-        fontFamily: "Minecraft",
         fontSize: "38px",
         fill: "#fff",
       })

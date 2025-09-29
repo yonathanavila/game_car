@@ -5,7 +5,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     super("LeaderboardScene");
     this.baseTextStyle = {
       fontSize: "25px",
-      fontFamily: "Minecraft",
+
       color: "#ffffff",
       align: "left",
     };

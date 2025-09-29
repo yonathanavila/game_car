@@ -34,7 +34,6 @@ export default class ConfigurationScene extends Phaser.Scene {
 
     const titleScreen = this.add
       .text(this.scale.width / 2, 70, "Configuration", {
-        fontFamily: "Minecraft",
         fontSize: "35px",
         fill: "#fff",
       })
@@ -42,7 +41,6 @@ export default class ConfigurationScene extends Phaser.Scene {
 
     const MuteMusic = this.add
       .text(this.scale.width / 2, 210, "Mute music", {
-        fontFamily: "Minecraft",
         fontSize: "35px",
         fill: "#fff",
       })
@@ -50,7 +48,6 @@ export default class ConfigurationScene extends Phaser.Scene {
 
     const MuteSoundEffects = this.add
       .text(this.scale.width / 2, 280, "Mute sound effects", {
-        fontFamily: "Minecraft",
         fontSize: "35px",
         fill: "#fff",
       })
@@ -58,7 +55,6 @@ export default class ConfigurationScene extends Phaser.Scene {
 
     const DeleteAccount = this.add
       .text(this.scale.width / 2, 350, "Delete account", {
-        fontFamily: "Minecraft",
         fontSize: "35px",
         fill: "#fff",
       })

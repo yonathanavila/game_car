@@ -7,11 +7,11 @@ export default class RepairScene extends Phaser.Scene {
 
     this.baseTextStyle = {
       fontSize: "25px",
-      fontFamily: "Minecraft",
+
       color: "#ffffff",
       align: "left",
     };
-    this.balance = 1000000;
+    this.balance = 0;
     this.damage = 1000000;
     this.lastRepairKm = 30000;
     this.menuItems = [];
@@ -21,14 +21,41 @@ export default class RepairScene extends Phaser.Scene {
 
   preload() {
     this.load.image("menu_bg", "/images/garage/chalkboard.webp");
-    this.load.image("tool_1", "/images/tools/MechanicTools_1.webp");
+    this.load.image("tool_1", "/images/tools/MechanicTools_1.web;p");
     this.load.image("tool_2", "/images/tools/MechanicTools_2.webp");
     this.load.image("tool_3", "/images/tools/MechanicTools_3.webp");
     this.load.image("tool_4", "/images/tools/MechanicTools_4.webp");
     this.load.image("close", "/images/close.webp");
   }
 
+  async loadBalance() {
+    try {
+      // set balance
+      const result = await fetch(
+        `/api/wallets/check-tt-balance?username=${localStorage.getItem(
+          "playerName"
+        )}`
+      );
+
+      if (result.ok) {
+        const data = await result.json();
+        console.log(data);
+        this.balance = data.balance;
+
+        // ✅ Update the UI
+        if (this.balanceText) {
+          this.balanceText.setText("Balance: $" + this.balance);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load balance:", err);
+    }
+  }
+
   create() {
+    // 3️⃣ Fetch the balance asynchronously (non-blocking)
+    this.loadBalance(); // 3️⃣ Fetch the balance asynchronously (non-blocking)
+
     const bg = this.add.image(0, 0, "menu_bg").setOrigin(0, 0);
     bg.displayWidth = this.sys.game.config.width;
     bg.displayHeight = this.sys.game.config.height;
@@ -48,16 +75,9 @@ export default class RepairScene extends Phaser.Scene {
     closeButton.displayHeight = 100;
     closeButton.rotation = Phaser.Math.DegToRad(45);
 
-    // tools
-    const tool_1 = this.add
-      .image(70, this.sys.game.config.height - 90, "tool_1")
-      .setOrigin(0, 0);
-    tool_1.displayWidth = 100;
-    tool_1.displayHeight = 100;
-    tool_1.rotation = Phaser.Math.DegToRad(45);
-
     const tool_2 = this.add
-      .image(70, this.sys.game.config.height - 90, "tool_2")
+      .image(30, this.sys.game.config.height - 90, "tool_2")
+      .setDepth(1)
       .setOrigin(0, 0);
     tool_2.displayWidth = 100;
     tool_2.displayHeight = 100;
@@ -77,8 +97,48 @@ export default class RepairScene extends Phaser.Scene {
     // Add title text
     this.add
       .text(this.scale.width / 2, 100, "Garage", {
-        fontFamily: "Minecraft",
         fontSize: "48px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    // Create interactive "Repair" button
+    const repairButton = this.add
+      .text(this.scale.width / 2, 600, "Repair", {
+        fontSize: "32px",
+        color: "#ffffff",
+        fontStyle: "bold",
+        backgroundColor: "#000000", // optional background
+        padding: { x: 20, y: 10 },
+        align: "center",
+      })
+      .setDepth(2)
+      .setOrigin(0.5) // center the text
+      .setInteractive({ useHandCursor: true }) // makes cursor a pointer
+      .on("pointerover", () => {
+        repairButton.setStyle({ fill: "#ffff00" }); // hover color
+      })
+      .on("pointerout", () => {
+        repairButton.setStyle({ fill: "#ffffff" }); // normal color
+      })
+      .on("pointerdown", () => {
+        // Action when clicked
+        console.log("Repair button clicked!");
+        // Example: decrease balance or repair damage
+        if (this.balance >= 1000) {
+          this.balance -= 1000;
+          if (this.balanceText) {
+            this.balanceText.setText("Balance: $" + this.balance);
+          }
+          this.damage -= 500; // example repair
+        }
+      });
+
+    // 2️⃣ Create balance text and store a reference
+    this.balanceText = this.add
+      .text(300, this.scale.height - 30, "Balance: Loading...", {
+        fontSize: "25px",
         color: "#ffffff",
         fontStyle: "bold",
       })
@@ -95,7 +155,7 @@ export default class RepairScene extends Phaser.Scene {
       // });
 
       this.menuItems.push({
-        text: "Fix lower ball joints . . . . . . . . . . . . . . . . . . . . . . . . . . . $1400",
+        text: "Fix lower ball joints $1400",
         cost: lowerBallJointInfo.cost,
         damage: lowerBallJointInfo.damageHealth,
       });
@@ -107,7 +167,7 @@ export default class RepairScene extends Phaser.Scene {
 
     if (shockAbsorber.kmDamage[0] >= this.lastRepairKm) {
       this.menuItems.push({
-        text: "Fix shocks absorbers . . . . . . . . . . . . . . . . . . . . . . . . $5000",
+        text: "Fix shocks absorbers $5000",
         cost: shockAbsorber.cost,
         damage: shockAbsorber.damageHealth,
       });
@@ -117,7 +177,7 @@ export default class RepairScene extends Phaser.Scene {
 
     if (bushings.kmDamage[0] >= this.lastRepairKm) {
       this.menuItems.push({
-        text: "Fix lower control arms bushings . . . . . . . . . . . . $1200",
+        text: "Fix lower control arms bushings $1200",
         cost: bushings.cost,
         damage: bushings.damageHealth,
       });
@@ -129,7 +189,7 @@ export default class RepairScene extends Phaser.Scene {
 
     if (aligmentBalance.kmDamage[0] >= this.lastRepairKm) {
       this.menuItems.push({
-        text: "Fix aligment & balance . . . . . . . . . . . . . . . . . . . . . . . . $600",
+        text: "Fix aligment & balance $600",
         cost: aligmentBalance.cost,
         damage: aligmentBalance.damageHealth,
       });
@@ -141,7 +201,7 @@ export default class RepairScene extends Phaser.Scene {
 
     if (brakeCheckService.kmDamage[0] >= this.lastRepairKm) {
       this.menuItems.push({
-        text: "Brake check service . . . . . . . . . . . . . . . . . . . . . . . . . $800",
+        text: "Brake check service $800",
         cost: brakeCheckService.cost,
         damage: brakeCheckService.damageHealth,
       });
@@ -151,7 +211,7 @@ export default class RepairScene extends Phaser.Scene {
 
     if (tires.kmDamage[0] >= this.lastRepairKm) {
       this.menuItems.push({
-        text: "Buy tires . . . . . . . . . . $5200",
+        text: "Buy tires $5200",
         cost: tires.cost,
         damage: tires.damageHealth,
       });
@@ -163,7 +223,7 @@ export default class RepairScene extends Phaser.Scene {
 
     if (checkAirPressure.kmDamage[0] >= this.lastRepairKm) {
       this.menuItems.push({
-        text: "Check tire air pressure . . . . . . . . . . . . . . . . . . . . . . . $100",
+        text: "Check tire air pressure $100",
         cost: tires.cost,
         damage: tires.damageHealth,
       });
@@ -173,21 +233,11 @@ export default class RepairScene extends Phaser.Scene {
 
     if (washCar.kmDamage[0] >= this.lastRepairKm) {
       this.menuItems.push({
-        text: "Wash car . . . . . . . . . . . $200",
+        text: "Wash car $200",
         cost: washCar.cost,
         damage: washCar.damageHealth,
       });
     }
-
-    // Add title text
-    this.add
-      .text(300, this.scale.height - 30, "Balance: $" + this.balance, {
-        fontFamily: "Minecraft",
-        fontSize: "25px",
-        color: "#ffffff",
-        fontStyle: "bold",
-      })
-      .setOrigin(0.5);
 
     // Contenedor principal en X=55, Y=200
     const menuContainer = this.add.container(55, 165);
@@ -223,7 +273,7 @@ export default class RepairScene extends Phaser.Scene {
 
       if (index === this.menuItems.length - 1) {
         const totalCostText = this.add
-          .text(0, offsetY, "Total Cost . . . . . . . . $" + totalCost, {
+          .text(0, offsetY, "Total Cost $" + totalCost, {
             ...this.baseTextStyle,
             wordWrap: {
               width: this.scale.width - 100,

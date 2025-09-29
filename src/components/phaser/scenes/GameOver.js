@@ -41,7 +41,6 @@ export default class GameOverScene extends Phaser.Scene {
 
     const titleScreen = this.add
       .text(this.scale.width / 2, 70, "Game Over", {
-        fontFamily: "Minecraft",
         fontSize: "48px",
         fill: "#fff",
       })
@@ -53,7 +52,6 @@ export default class GameOverScene extends Phaser.Scene {
         140,
         `"Your score": ${Math.round(this.score)}`,
         {
-          fontFamily: "Minecraft",
           fontSize: "38px",
           fill: "#fff",
         }
@@ -62,7 +60,6 @@ export default class GameOverScene extends Phaser.Scene {
 
     const saveScore = this.add
       .text(this.scale.width / 2, 220, "Save Score", {
-        fontFamily: "Minecraft",
         fontSize: "38px",
         fill: "#fff",
       })
@@ -92,7 +89,6 @@ export default class GameOverScene extends Phaser.Scene {
     // TODO: avoid reload the page to try again the game to better the performance
     const tryAgain = this.add
       .text(this.scale.width / 2, 300, "Try again", {
-        fontFamily: "Minecraft",
         fontSize: "38px",
         fill: "#fff",
       })
