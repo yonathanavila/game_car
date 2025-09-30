@@ -10,7 +10,6 @@ contract GameLogic is AccessControl {
 
     IERC20 public gameToken; // Reference to the ERC20 token contract
     uint256 public tokenMultiplier = 1; // Default multiplier for token rewards
-    uint256 public constant REPAIR_COST = 100 * 10 ** 18; // Repair cost: 100 tokens
 
     // Define roles
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
@@ -135,12 +134,15 @@ contract GameLogic is AccessControl {
     }
 
     // Repair vehicle component
-    function repairVehicle(string calldata component) external {
+    function repairVehicle(
+        string calldata component,
+        uint256 repairCost
+    ) external {
         require(
-            gameToken.allowance(msg.sender, address(this)) >= REPAIR_COST,
+            gameToken.allowance(msg.sender, address(this)) >= repairCost,
             "Insufficient allowance"
         );
-        gameToken.safeTransferFrom(msg.sender, address(this), REPAIR_COST);
+        gameToken.safeTransferFrom(msg.sender, address(this), repairCost);
         emit VehicleRepaired(msg.sender, component);
     }
 
