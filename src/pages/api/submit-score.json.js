@@ -1,5 +1,11 @@
+// TODO: Make this apporuch like a client and make too like a server using normal wallets
+
 import { CdpClient } from "@coinbase/cdp-sdk";
-import { createPublicClient, encodeFunctionData, http } from "viem";
+import { createPublicClient, http } from "viem";
+import {
+  createBundlerClient,
+  createEIP4337Account,
+} from "viem/account-abstraction";
 import { base } from "viem/chains";
 import contractAbi from "../../../solidity/artifacts/GameLogic_metadata.json";
 
@@ -21,70 +27,84 @@ const publicClient = createPublicClient({
 });
 
 export const POST = async ({ request }) => {
-  const formData = await request.formData();
-  const score = parseInt(formData.get("score"));
-  const baseAccountName = formData.get("player");
+  try {
+    const formData = await request.formData();
+    const score = parseInt(formData.get("score"));
+    const baseAccountName = formData.get("player");
 
-  // get or create the admin account
-  const admin = await cdp.evm.getAccount({
-    name: ADMIN_WALLET_NAME,
-  });
+    // get or create the admin account
+    const admin = await cdp.evm.getAccount({
+      name: ADMIN_WALLET_NAME,
+    });
 
-  // get the player account
-  const player = await cdp.evm.getAccount({
-    name: baseAccountName,
-  });
+    // get the player account
+    const player = await cdp.evm.getAccount({
+      name: baseAccountName,
+    });
 
-  console.log("Admin account:", admin);
-  console.log("Player account:", player);
+    // create an account abstraction for the admin wallet
+    const adminAccount = createEIP4337Account({
+      client: publicClient,
+      chain: base,
+      secretKey: admin.privateKey, // admin.privateKey from CDP
+    });
 
-  // // request eth to the faucet
-  // const { transactionHash: faucetTransactionHash } =
-  //   await cdp.evm.requestFaucet({
-  //     address: admin.address,
-  //     network: "base-sepolia",
-  //     token: "eth",
-  //   });
+    const bundlerClient = createBundlerClient({
+      account: adminAccount,
+      client: publicClient,
+      transport: http(),
+      chain: base,
+    });
 
-  // const faucetTxReceipt = await publicClient.waitForTransactionReceipt({
-  //   hash: faucetTransactionHash,
-  // });
+    console.log("Admin account:", admin);
+    console.log("Player account:", player);
 
-  // console.log(
-  //   "Successfully requested ETH from faucet:",
-  //   faucetTxReceipt.transactionHash
-  // );
-  console.log("Submitting score:", {
-    player: player.address,
-    score,
-    admin: admin.address,
-  });
+    // Prepare UserOperation
+    const userOp = {
+      calls: [
+        {
+          abi: contractAbi,
+          functionName: "submitScore",
+          to: GAME_CONTRACT_ADDRESS,
+          args: [player.address, score],
+        },
+      ],
+      paymaster: true, // This tells the bundler to use the Paymaster
+      estimateGas: async (userOperation) => {
+        const estimate = await bundlerClient.estimateUserOperationGas(
+          userOperation
+        );
+        // Optional: increase preVerificationGas to avoid underestimation
+        estimate.preVerificationGas = estimate.preVerificationGas * 2n;
+        return estimate;
+      },
+    };
 
-  // send transaction
-  const data = encodeFunctionData({
-    abi: contractAbi,
-    functionName: "submitScore",
-    args: [player.address, score],
-  });
+    // Send UserOperation
+    const userOpHash = await bundlerClient.sendUserOperation(userOp);
 
-  const transactionResult = await cdp.evm.sendTransaction({
-    address: admin.address,
-    transaction: {
-      to: GAME_CONTRACT_ADDRESS,
-      data,
-    },
-    network: "base",
-  });
+    // Wait for confirmation
+    const receipt = await bundlerClient.waitForUserOperationReceipt({
+      hash: userOpHash,
+    });
 
-  console.log("Transaction sent:", transactionResult.transactionHash);
+    console.log("✅ Transaction successfully sponsored!");
+    console.log(
+      `⛽ View UserOperation: https://base-sepolia.blockscout.com/op/${receipt.userOpHash}`
+    );
+    console.log(
+      `🔍 View transaction for player: https://sepolia.basescan.org/address/${player.address}`
+    );
 
-  const receipt = await publicClient.waitForTransactionReceipt({
-    hash: transactionResult.transactionHash,
-  });
-
-  console.log(`Tx confirmed in block ${receipt.blockNumber} ✅`);
-  return new Response(
-    JSON.stringify({ success: true, tx: receipt.transactionHash }),
-    { status: 200 }
-  );
+    return new Response(
+      JSON.stringify({ success: true, tx: receipt.transactionHash }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error sending transaction:", error);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500 }
+    );
+  }
 };

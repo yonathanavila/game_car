@@ -1,18 +1,28 @@
 import { createPublicClient, http } from "viem";
+import { createBundlerClient } from "viem/account-abstraction";
 import { readContract } from "viem/actions";
 import { base } from "viem/chains";
-import contractAbi from "../../solidity/artifacts/GameToken_metadata.json";
+import gameAbi from "../../solidity/artifacts/GameLogic_metadata.json";
+import tokenAbi from "../../solidity/artifacts/GameToken_metadata.json";
 
 const TOKEN_CONTRACT_ADDRESS = import.meta.env.TOKEN_CONTRACT_ADDRESS;
+const GAME_CONTRACT_ADDRESS = import.meta.env.GAME_CONTRACT_ADDRESS;
 
 const publicClient = createPublicClient({
   chain: base,
   transport: http(),
 });
 
+export const bundlerClient = createBundlerClient({
+  account,
+  client,
+  transport: http(config.rpc_url),
+  chain: base,
+});
+
 export async function getLeaderboard({ offset = 0, limit = 10 }) {
   const decoded = await readContract(publicClient, {
-    abi: contractAbi,
+    abi: gameAbi,
     address: GAME_CONTRACT_ADDRESS,
     functionName: "getLeaderboard",
     args: [BigInt(offset), BigInt(limit)], // must be bigint
@@ -25,7 +35,7 @@ export async function getLeaderboard({ offset = 0, limit = 10 }) {
 
 export async function getTTBalance({ address }) {
   const decoded = await readContract(publicClient, {
-    abi: contractAbi,
+    abi: tokenAbi,
     address: TOKEN_CONTRACT_ADDRESS,
     functionName: "balanceOf",
     args: [address], // must be bigint

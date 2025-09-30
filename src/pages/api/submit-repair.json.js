@@ -1,3 +1,5 @@
+// TODO: Make this apporuch like a client and make too like a server using normal wallets
+
 import { CdpClient } from "@coinbase/cdp-sdk";
 import { createPublicClient, encodeFunctionData, http } from "viem";
 import { base } from "viem/chains";
@@ -9,7 +11,6 @@ const CDP_API_KEY_SECRET = import.meta.env.CDP_API_KEY_SECRET;
 const CDP_WALLET_SECRET = import.meta.env.CDP_WALLET_SECRET;
 const GAME_CONTRACT_ADDRESS = import.meta.env.GAME_CONTRACT_ADDRESS;
 const TOKEN_CONTRACT_ADDRESS = import.meta.env.TOKEN_CONTRACT_ADDRESS;
-
 const ADMIN_WALLET_NAME = import.meta.env.ADMIN_WALLET_NAME;
 
 const cdp = new CdpClient({
@@ -24,31 +25,20 @@ const publicClient = createPublicClient({
 });
 
 export const POST = async ({ request }) => {
-  const formData = await request.formData();
-  const component = parseInt(formData.get("component"));
-  const repairCost = formData.get("repairCost");
+  const body = await request.json();
+  const player = body.player;
+  const component = body.component;
+  const repairCost = parseInt(body.repairCost);
 
   // get or create the admin account
-  const admin = await cdp.evm.getAccount({
+  const playerAccount = await cdp.evm.getAccount({
+    name: player,
+  });
+
+  const adminAccount = await cdp.evm.getAccount({
     name: ADMIN_WALLET_NAME,
   });
 
-  // // request eth to the faucet
-  // const { transactionHash: faucetTransactionHash } =
-  //   await cdp.evm.requestFaucet({
-  //     address: admin.address,
-  //     network: "base-sepolia",
-  //     token: "eth",
-  //   });
-
-  // const faucetTxReceipt = await publicClient.waitForTransactionReceipt({
-  //   hash: faucetTransactionHash,
-  // });
-
-  // console.log(
-  //   "Successfully requested ETH from faucet:",
-  //   faucetTxReceipt.transactionHash
-  // );
   console.log("Submitting repair cost:", {
     component,
     repairCost,
@@ -58,14 +48,14 @@ export const POST = async ({ request }) => {
   const allowance = encodeFunctionData({
     abi: tokenContractAbi,
     functionName: "approve",
-    args: [GAME_CONTRACT_ADDRESS, repairCost],
+    args: [adminAccount.address, repairCost],
   });
 
   const allowanceResult = await cdp.evm.sendTransaction({
-    address: admin.address,
+    address: playerAccount.address,
     transaction: {
       to: TOKEN_CONTRACT_ADDRESS,
-      allowance,
+      data: allowance,
     },
     network: "base",
   });
@@ -75,12 +65,12 @@ export const POST = async ({ request }) => {
   // send transaction
   const data = encodeFunctionData({
     abi: gameContractAbi,
-    functionName: "repairCost",
+    functionName: "repairVehicle",
     args: [component, repairCost],
   });
 
   const transactionResult = await cdp.evm.sendTransaction({
-    address: admin.address,
+    address: playerAccount.address,
     transaction: {
       to: GAME_CONTRACT_ADDRESS,
       data,

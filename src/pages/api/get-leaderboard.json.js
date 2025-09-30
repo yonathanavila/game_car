@@ -1,3 +1,5 @@
+// TODO: Make this apporuch using the smartwallet or the normal wallet of the user
+
 import { getLeaderboard } from "@/services/Contract";
 import { generateJwt } from "@coinbase/cdp-sdk/auth";
 

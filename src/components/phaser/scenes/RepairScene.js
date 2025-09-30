@@ -246,14 +246,16 @@ export default class RepairScene extends Phaser.Scene {
 
             // Call the API
             try {
+              console.log(item);
               const response = await fetch("/api/submit-repair.json", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  component: item.text, // or use item.name if you have it
+                  component: item.name, // or use item.name if you have it
                   repairCost: item.cost,
+                  player: localStorage.getItem("playerName"),
                 }),
               });
 
@@ -311,6 +313,7 @@ export default class RepairScene extends Phaser.Scene {
                   body: JSON.stringify({
                     component: "Fix entire car", // or use item.name if you have it
                     repairCost: totalCost,
+                    player: localStorage.getItem("playerName"),
                   }),
                 });
 
