@@ -230,7 +230,41 @@ export default class RepairScene extends Phaser.Scene {
           },
         })
         .setOrigin(0, 0)
-        .setInteractive();
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", async () => {
+          if (this.balance >= item.cost) {
+            this.balance -= item.cost;
+            this.damage -= item.damage;
+
+            // Update the UI
+            this.balanceText.setText("Balance: $" + this.balance);
+            // Optionally, you could disable the option after repair
+            option.setAlpha(0.5); // visually mark as used
+            option.disableInteractive(); // prevent further clicks
+
+            // Call the API
+            try {
+              const response = await fetch("/api/submit-repair.json", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  component: item.text, // or use item.name if you have it
+                  repairCost: item.cost,
+                }),
+              });
+
+              const data = await response.json();
+              console.log("Repair submitted:", data);
+            } catch (err) {
+              console.error("Failed to submit repair:", err);
+            }
+          } else {
+            // Optional: show a message if not enough money
+            console.log("Not enough balance!");
+          }
+        });
 
       option.on("pointerdown", () => {
         this.balance -= item.cost;
