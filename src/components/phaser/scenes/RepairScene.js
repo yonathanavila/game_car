@@ -217,9 +217,11 @@ export default class RepairScene extends Phaser.Scene {
     // Espaciado vertical
     let offsetY = 0;
     let totalCost = 0;
+    let totalDamage = 0;
 
     this.menuItems.forEach((item, index) => {
       totalCost += item.cost;
+      totalDamage += item.damageHealth;
 
       const option = this.add
         .text(0, offsetY, item.text, {
@@ -287,7 +289,41 @@ export default class RepairScene extends Phaser.Scene {
             },
           })
           .setOrigin(0, 0)
-          .setInteractive();
+          .setInteractive()
+          .on("pointerdown", async () => {
+            if (this.balance >= totalCost) {
+              this.balance -= totalCost;
+              this.damage -= totalDamage;
+
+              // Update the UI
+              this.balanceText.setText("Balance: $" + this.balance);
+              // Optionally, you could disable the option after repair
+              option.setAlpha(0.5); // visually mark as used
+              option.disableInteractive(); // prevent further clicks
+
+              // Call the API
+              try {
+                const response = await fetch("/api/submit-repair.json", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    component: "Fix entire car", // or use item.name if you have it
+                    repairCost: totalCost,
+                  }),
+                });
+
+                const data = await response.json();
+                console.log("Repair submitted:", data);
+              } catch (err) {
+                console.error("Failed to submit repair:", err);
+              }
+            } else {
+              // Optional: show a message if not enough money
+              console.log("Not enough balance!");
+            }
+          });
         // Agregar al contenedor
         menuContainer.add(totalCostText);
 
