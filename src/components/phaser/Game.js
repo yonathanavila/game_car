@@ -8,7 +8,6 @@ import ConfigurationScene from "@/components/phaser/scenes/ConfigurationScene";
 import GameOverScene from "@/components/phaser/scenes/GameOver";
 import GameScene from "@/components/phaser/scenes/GameScene";
 import LeaderboardScene from "@/components/phaser/scenes/LeaderBoard";
-import LoginScene from "@/components/phaser/scenes/LoginScene";
 import MenuScene from "@/components/phaser/scenes/MenuScene";
 import PauseScene from "@/components/phaser/scenes/PauseScene";
 import RepairScene from "@/components/phaser/scenes/RepairScene";
@@ -41,7 +40,6 @@ export default class Game extends Phaser.Game {
       },
       scene: [
         BootScene,
-        LoginScene,
         MenuScene,
         GameScene,
         UIScene,

@@ -72,6 +72,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.pickupImage = null;
     this.bgMusic = this.sound.add("bgAudio", { loop: true, volume: 0.5 });
     this.bgMusic.play();
     this.engineStartSound = this.sound.add("engineStart", {
@@ -504,6 +505,17 @@ export default class GameScene extends Phaser.Scene {
 
     npc.destroy();
 
+    // Show the "pickup" image when client is in the taxi
+    if (!this.pickupImage) {
+      this.pickupImage = this.add.image(
+        this.scale.width - 80, // position (for example, top-right)
+        80,
+        "pickup" // the key of your loaded image
+      );
+      this.pickupImage.setScrollFactor(0); // stays fixed on camera
+      this.pickupImage.setScale(0.6); // optional size adjust
+    }
+
     // spawn taxi stop after a small random delay (or 0)
     const delayedCall = Phaser.Math.Between(1500, 6000);
     this.time.delayedCall(delayedCall, () => this.spawnTaxiStop());
@@ -527,6 +539,12 @@ export default class GameScene extends Phaser.Scene {
     this.registry.set("balance", this.balance);
 
     stop.destroy();
+
+    // remove the pickup indicator
+    if (this.pickupImage) {
+      this.pickupImage.destroy();
+      this.pickupImage = null;
+    }
 
     // spawn next client after random delay
     const delay = Phaser.Math.Between(1500, 6000);

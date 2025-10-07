@@ -75,23 +75,6 @@ export default class MenuScene extends Phaser.Scene {
             window.connectWalletFarcaster();
           }
         });
-
-      this.add
-        .text(
-          this.scale.width / 2,
-          this.sys.game.config.height - 100,
-          username,
-          {
-            fontSize: "32px",
-            fill: "#fff",
-          }
-        )
-        .setOrigin(0.5)
-        .on("pointerdown", () => {
-          if (window.connectWalletFarcaster) {
-            window.connectWalletFarcaster();
-          }
-        });
     }
   }
 

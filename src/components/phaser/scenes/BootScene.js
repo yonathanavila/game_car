@@ -14,6 +14,8 @@ export default class BootScene extends Phaser.Scene {
     this.load.image("npc_3", "images/npc/npc_3.webp");
     this.load.image("npc_4", "images/npc/npc_4.webp");
 
+    this.load.image("pickup", "images/taxi.webp");
+
     this.load.image("street", "images/street/street_us.png");
     this.load.image("taxi_stop", "images/signal/taxi_stop.webp");
     this.load.spritesheet("button_tool", "images/button/button_tool.webp", {
@@ -51,7 +53,7 @@ export default class BootScene extends Phaser.Scene {
 
   create() {
     // Once assets are ready, go to menu
-    this.scene.start("LoginScene");
+    this.scene.start("MenuScene");
     // this.scene.start("GameOverScene");
   }
 }
