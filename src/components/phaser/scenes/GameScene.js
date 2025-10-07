@@ -367,12 +367,6 @@ export default class GameScene extends Phaser.Scene {
       }
     });
 
-    // Despawn taxi stops off screen
-    this.taxiStopGroup.getChildren().forEach((stop) => {
-      if (stop.active && stop.y > this.sys.game.config.height + 50)
-        stop.destroy();
-    });
-
     // Despawn NPCs off screen
     this.npcGroup.getChildren().forEach((npc) => {
       if (npc.active && npc.y > this.sys.game.config.height + 50) npc.destroy();
@@ -409,6 +403,11 @@ export default class GameScene extends Phaser.Scene {
       if (taxiStop.y > this.sys.game.config.height) {
         taxiStop.destroy();
 
+        // 🚫 Remove pickup indicator if player missed the stop
+        if (this.pickupImage) {
+          this.pickupImage.destroy();
+          this.pickupImage = null;
+        }
         // respawn a new Taxi Stop after delay
         const delay = Phaser.Math.Between(3000, 12000);
         this.time.delayedCall(delay, () => this.spawnClient());
