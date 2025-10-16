@@ -1,32 +1,16 @@
-import { useEffect } from "react";
-import { useConnect, useAccount, useChainId } from "wagmi";
+import { useEffect, useState } from "react";
+import { useAccount, useConnect } from "wagmi";
 
 export const ConnectWallet = () => {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
-  const chainId = useChainId();
 
-  const GetOrCreateAccount = async () => {
-    const response = await fetch("/api/wallets/get-wallet.json", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        address,
-      }),
-    });
-    console.log(response);
-  };
-
-  useEffect(() => {
-    if (address) {
-      GetOrCreateAccount();
-    }
-  }, [address]);
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
     // Exponer función global para Phaser
     window.connectWalletMetamask = () => {
-      if (connectors.length > 0) {
+      if (connectors?.length > 0) {
         connect({ connector: connectors[0] });
       } else {
         console.error("No wallet connectors found");

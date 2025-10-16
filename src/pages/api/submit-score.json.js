@@ -1,105 +1,80 @@
 // TODO: Make this apporuch like a client and make too like a server using normal wallets
 
-import { CdpClient } from "@coinbase/cdp-sdk";
 import { createPublicClient, http } from "viem";
 import {
   createBundlerClient,
-  createEIP4337Account,
+  toCoinbaseSmartAccount,
 } from "viem/account-abstraction";
+import { privateKeyToAccount } from "viem/accounts";
 import { base } from "viem/chains";
 import contractAbi from "../../../solidity/artifacts/GameLogic_metadata.json";
 
-const CDP_API_KEY_ID = import.meta.env.CDP_API_KEY_ID;
-const CDP_API_KEY_SECRET = import.meta.env.CDP_API_KEY_SECRET;
-const CDP_WALLET_SECRET = import.meta.env.CDP_WALLET_SECRET;
 const GAME_CONTRACT_ADDRESS = import.meta.env.GAME_CONTRACT_ADDRESS;
-const ADMIN_WALLET_NAME = import.meta.env.ADMIN_WALLET_NAME;
-
-const cdp = new CdpClient({
-  apiKeyId: CDP_API_KEY_ID,
-  apiKeySecret: CDP_API_KEY_SECRET,
-  walletSecret: CDP_WALLET_SECRET,
-});
+const PAYMASTER_RPC = import.meta.env.PAYMASTER_RPC;
+const ADMIN_PVKEY = import.meta.env.ADMIN_PRIVATE_KEY?.trim();
+const RCP_URL = import.meta.env.RCP_URL;
 
 const publicClient = createPublicClient({
   chain: base,
-  transport: http(),
+  transport: http(RCP_URL),
 });
+const owner = privateKeyToAccount(ADMIN_PVKEY);
 
 export const POST = async ({ request }) => {
   try {
     const formData = await request.formData();
     const score = parseInt(formData.get("score"));
-    const baseAccountName = formData.get("player");
+    const player = formData.get("player");
 
-    // get or create the admin account
-    const admin = await cdp.evm.getAccount({
-      name: ADMIN_WALLET_NAME,
-    });
-
-    // get the player account
-    const player = await cdp.evm.getAccount({
-      name: baseAccountName,
-    });
+    console.log("Not enter yet to create coinbase smart account");
 
     // create an account abstraction for the admin wallet
-    const adminAccount = createEIP4337Account({
+    const adminAccount = await toCoinbaseSmartAccount({
       client: publicClient,
-      chain: base,
-      secretKey: admin.privateKey, // admin.privateKey from CDP
+      owner: [owner],
     });
 
+    console.log("Enter to create coinbase smart account");
     const bundlerClient = createBundlerClient({
       account: adminAccount,
       client: publicClient,
-      transport: http(),
+      transport: http(PAYMASTER_RPC),
       chain: base,
     });
+
+    console.log("Enter to create coinbase smart account #2");
 
     console.log("Admin account:", admin);
     console.log("Player account:", player);
 
     // Prepare UserOperation
-    const userOp = {
-      calls: [
-        {
-          abi: contractAbi,
-          functionName: "submitScore",
-          to: GAME_CONTRACT_ADDRESS,
-          args: [player.address, score],
-        },
-      ],
-      paymaster: true, // This tells the bundler to use the Paymaster
-      estimateGas: async (userOperation) => {
-        const estimate = await bundlerClient.estimateUserOperationGas(
-          userOperation
-        );
-        // Optional: increase preVerificationGas to avoid underestimation
-        estimate.preVerificationGas = estimate.preVerificationGas * 2n;
-        return estimate;
+    const calls = [
+      {
+        abi: contractAbi,
+        functionName: "repairVehicle",
+        to: GAME_CONTRACT_ADDRESS,
+        args: [player, score],
       },
-    };
+    ];
 
-    // Send UserOperation
-    const userOpHash = await bundlerClient.sendUserOperation(userOp);
+    try {
+      // Send UserOperation
+      const userOpHash = await bundlerClient.sendUserOperation({
+        account: adminAccount,
+        calls,
+        paymaster: true,
+      });
 
-    // Wait for confirmation
-    const receipt = await bundlerClient.waitForUserOperationReceipt({
-      hash: userOpHash,
-    });
-
-    console.log("✅ Transaction successfully sponsored!");
-    console.log(
-      `⛽ View UserOperation: https://base-sepolia.blockscout.com/op/${receipt.userOpHash}`
-    );
-    console.log(
-      `🔍 View transaction for player: https://sepolia.basescan.org/address/${player.address}`
-    );
-
-    return new Response(
-      JSON.stringify({ success: true, tx: receipt.transactionHash }),
-      { status: 200 }
-    );
+      console.log("✅ Transaction successfully sponsored!");
+      console.log(
+        `⛽ View UserOperation: https://base-sepolia.blockscout.com/op/${receipt.userOpHash}`
+      );
+      console.log(
+        `🔍 View transaction: https://sepolia.basescan.org/address/${adminAccount.address}`
+      );
+    } catch (error) {
+      console.error("Error sending transaction:", error);
+    }
   } catch (error) {
     console.error("Error sending transaction:", error);
     return new Response(

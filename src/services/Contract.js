@@ -1,5 +1,4 @@
 import { createPublicClient, http } from "viem";
-import { createBundlerClient } from "viem/account-abstraction";
 import { readContract } from "viem/actions";
 import { base } from "viem/chains";
 import gameAbi from "../../solidity/artifacts/GameLogic_metadata.json";
@@ -11,13 +10,6 @@ const GAME_CONTRACT_ADDRESS = import.meta.env.GAME_CONTRACT_ADDRESS;
 const publicClient = createPublicClient({
   chain: base,
   transport: http(),
-});
-
-export const bundlerClient = createBundlerClient({
-  account,
-  client,
-  transport: http(config.rpc_url),
-  chain: base,
 });
 
 export async function getLeaderboard({ offset = 0, limit = 10 }) {

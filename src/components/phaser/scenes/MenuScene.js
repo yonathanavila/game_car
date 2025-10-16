@@ -56,26 +56,38 @@ export default class MenuScene extends Phaser.Scene {
         leaderBoard.setStyle({ fill: "#8aebf1" });
       });
 
-    const username = localStorage.getItem("playerName");
+    this.add
+      .text(
+        this.scale.width / 2,
+        this.sys.game.config.height - 150,
+        "Welcome!",
+        {
+          fontSize: "32px",
+          fill: "#fff",
+        }
+      )
+      .setOrigin(0.5)
+      .on("pointerdown", () => {
+        if (window.connectWalletFarcaster) {
+          window.connectWalletFarcaster();
+        }
+      });
 
-    if (username) {
-      this.add
-        .text(
-          this.scale.width / 2,
-          this.sys.game.config.height - 150,
-          "Welcome!",
-          {
-            fontSize: "32px",
-            fill: "#fff",
-          }
-        )
-        .setOrigin(0.5)
-        .on("pointerdown", () => {
-          if (window.connectWalletFarcaster) {
-            window.connectWalletFarcaster();
-          }
-        });
-    }
+    this.add
+      .text(
+        this.scale.width / 2,
+        this.sys.game.config.height - 80,
+        "Metamask",
+        {
+          fontSize: "32px",
+          fill: "#fff",
+        }
+      )
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", () => {
+        window.connectWalletMetamask();
+      });
   }
 
   update() {

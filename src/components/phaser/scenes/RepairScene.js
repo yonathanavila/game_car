@@ -1,5 +1,6 @@
 import { damageInfo } from "@/const";
 import { calculateCurrentLife } from "@/services/Global";
+import { PayTotalAmount } from "@/services/payments";
 
 export default class RepairScene extends Phaser.Scene {
   constructor() {
@@ -20,7 +21,6 @@ export default class RepairScene extends Phaser.Scene {
 
   preload() {
     this.load.image("menu_bg", "/images/garage/chalkboard.webp");
-    this.load.image("tool_1", "/images/tools/MechanicTools_1.web;p");
     this.load.image("tool_2", "/images/tools/MechanicTools_2.webp");
     this.load.image("tool_3", "/images/tools/MechanicTools_3.webp");
     this.load.image("tool_4", "/images/tools/MechanicTools_4.webp");
@@ -31,19 +31,16 @@ export default class RepairScene extends Phaser.Scene {
     try {
       // set balance
       const result = await fetch(
-        `/api/wallets/check-tt-balance?username=${localStorage.getItem(
-          "playerName"
-        )}`
+        `/api/wallets/check-tt-balance?address=${window.connectedAccount}`
       );
 
       if (result.ok) {
         const data = await result.json();
-        console.log(data);
+
         this.balance = data.balance;
 
-        // ✅ Update the UI
         if (this.balanceText) {
-          this.balanceText.setText("Balance: $" + this.balance);
+          this.balanceText.setText("$" + this.balance);
         }
       }
     } catch (error) {
@@ -56,10 +53,7 @@ export default class RepairScene extends Phaser.Scene {
   }
 
   create() {
-    console.log(this.damage);
-
     // 3️⃣ Fetch the balance asynchronously (non-blocking)
-    this.loadBalance(); // 3️⃣ Fetch the balance asynchronously (non-blocking)
 
     const bg = this.add.image(0, 0, "menu_bg").setOrigin(0, 0);
     bg.displayWidth = this.sys.game.config.width;
@@ -109,7 +103,7 @@ export default class RepairScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.balanceText = this.add
-      .text(300, this.scale.height - 30, "Balance: Loading...", {
+      .text(300, this.scale.height - 30, "Money: Loading...", {
         fontSize: "25px",
         color: "#ffffff",
         fontStyle: "bold",
@@ -246,17 +240,9 @@ export default class RepairScene extends Phaser.Scene {
 
             // Call the API
             try {
-              console.log(item);
-              const response = await fetch("/api/submit-repair.json", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  component: item.name, // or use item.name if you have it
-                  repairCost: item.cost,
-                  player: localStorage.getItem("playerName"),
-                }),
+              const response = await PayTotalAmount({
+                component: item.name,
+                repairCost: item.cost,
               });
 
               const data = await response.json();
@@ -291,7 +277,7 @@ export default class RepairScene extends Phaser.Scene {
             },
           })
           .setOrigin(0, 0)
-          .setInteractive()
+          .setInteractive({ useHandCursor: true })
           .on("pointerdown", async () => {
             if (this.balance >= totalCost) {
               this.balance -= totalCost;
@@ -305,16 +291,9 @@ export default class RepairScene extends Phaser.Scene {
 
               // Call the API
               try {
-                const response = await fetch("/api/submit-repair.json", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    component: "Fix entire car", // or use item.name if you have it
-                    repairCost: totalCost,
-                    player: localStorage.getItem("playerName"),
-                  }),
+                const response = await PayTotalAmount({
+                  component: item.name,
+                  repairCost: item.cost,
                 });
 
                 const data = await response.json();
@@ -336,5 +315,7 @@ export default class RepairScene extends Phaser.Scene {
     });
 
     this.currentLife = calculateCurrentLife(this);
+
+    this.loadBalance(); // 3️⃣ Fetch the balance asynchronously (non-blocking)
   }
 }
