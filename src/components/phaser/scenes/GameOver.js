@@ -1,3 +1,5 @@
+import { SaveScore } from "@/services/payments";
+
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameOverScene" });
@@ -67,15 +69,12 @@ export default class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5)
       .on("pointerdown", async () => {
         try {
-          const formData = new FormData();
-          formData.append("score", this.score);
-          formData.append("player", localStorage.getItem("playerName"));
-
-          await fetch("/api/submit-score.json", {
-            method: "POST",
-            body: formData,
+          const response = await SaveScore({
+            score: this.score,
+            player: localStorage.getItem("playerName"),
           });
 
+          console.log(response);
           this.showScoreSavedNotification(this);
         } catch (error) {
           console.error("Contract call failed:", error);

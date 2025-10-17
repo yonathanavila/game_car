@@ -13,6 +13,39 @@ const sdk = createBaseAccountSDK({
 
 const provider = sdk.getProvider();
 
+export async function SaveScore({ score, player }) {
+  const subaccount = await connectAndEnsureSubAccount();
+
+  const calls = [
+    {
+      abi: contractAbi,
+      functionName: "submitScore",
+      to: GAME_CONTRACT_ADDRESS,
+      args: [player, score],
+    },
+  ];
+
+  const response = await sendSponsoredCalls(subaccount, calls);
+
+  console.log("⛓️ Transaction Request:", response);
+
+  if (response?.txHash) {
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash: response.txHash,
+    });
+    console.log("✅ Transaction confirmed:", receipt);
+    return receipt;
+  }
+
+  // Some versions return just an ID — handle that too
+  if (typeof response === "string") {
+    console.log("Transaction submitted, ID:", response);
+    return { txId: response };
+  }
+
+  throw new Error("Unexpected response from sendSponsoredCalls()");
+}
+
 export async function PayTotalAmount({ component, repairCost }) {
   try {
     const subaccount = await connectAndEnsureSubAccount();
