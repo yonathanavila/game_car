@@ -2,9 +2,11 @@ import { ConnectWallet } from "@/components/ConnectWallet";
 import Game from "@/components/phaser/Game";
 
 import { config } from "@/services/Wagmi";
+import { createBaseAccountSDK } from "@base-org/account";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { base } from "viem/chains";
 import { WagmiProvider } from "wagmi";
 
 export default function MiniApp() {
@@ -27,6 +29,29 @@ export default function MiniApp() {
 
     new Game();
     initFarcaster();
+  }, []);
+
+  useEffect(() => {
+    const initSDK = async () => {
+      try {
+        const sdk = createBaseAccountSDK({
+          appName: "Taxi Driver",
+          appLogoUrl: "https://example.com/logo.png",
+          appChainIds: [base.id],
+        });
+
+        const providerInstance = sdk.getProvider();
+
+        // Expose provider on window for Phaser
+        window.baseWalletProvider = providerInstance;
+
+        console.log("Base Wallet SDK initialized and exposed on window");
+      } catch (error) {
+        console.log(error, "Error here");
+      }
+    };
+
+    initSDK();
   }, []);
 
   return (

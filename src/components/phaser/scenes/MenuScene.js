@@ -1,3 +1,5 @@
+import { shortenAddress } from "@/lib/utils";
+
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: "MenuScene" });
@@ -73,21 +75,61 @@ export default class MenuScene extends Phaser.Scene {
         }
       });
 
-    this.add
-      .text(
-        this.scale.width / 2,
-        this.sys.game.config.height - 80,
-        "Metamask",
-        {
-          fontSize: "32px",
-          fill: "#fff",
-        }
-      )
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true })
-      .on("pointerdown", () => {
-        window.connectWalletMetamask();
-      });
+    if (!window?.connectedAccount) {
+      this.add
+        .text(
+          this.scale.width / 2,
+          this.sys.game.config.height - 80,
+          "Connect Wallet",
+          {
+            fontSize: "32px",
+            fill: "#fff",
+          }
+        )
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", async () => {
+          const provider = window.connectWallet();
+          if (!provider) {
+            console.error("Base Wallet not available");
+            return;
+          }
+
+          const accounts = await provider.request({
+            method: "eth_requestAccounts",
+            params: [],
+          });
+
+          console.log("Phaser sees Base Account:", accounts[0]);
+        });
+    } else {
+      this.add
+        .text(
+          this.scale.width / 2,
+          this.sys.game.config.height - 80,
+          shortenAddress(window?.connectedAccount),
+          {
+            fontSize: "32px",
+            fill: "#fff",
+          }
+        )
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", async () => {
+          const provider = window.connectWallet();
+          if (!provider) {
+            console.error("Base Wallet not available");
+            return;
+          }
+
+          const accounts = await provider.request({
+            method: "eth_requestAccounts",
+            params: [],
+          });
+
+          console.log("Phaser sees Base Account:", accounts[0]);
+        });
+    }
   }
 
   update() {
