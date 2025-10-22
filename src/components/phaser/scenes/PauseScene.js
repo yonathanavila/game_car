@@ -1,3 +1,5 @@
+import { SaveScore } from "@/services/payments";
+
 export default class PauseScene extends Phaser.Scene {
   constructor() {
     super("PauseScene");
@@ -54,17 +56,13 @@ export default class PauseScene extends Phaser.Scene {
       .setOrigin(0.5)
       .on("pointerdown", async () => {
         try {
-          const formData = new FormData();
-          formData.append("score", this.score);
-          formData.append("player", localStorage.getItem("playerName"));
+          await connectWallet();
 
-          const res = await fetch("/api/submit-score.json", {
-            method: "POST",
-            body: formData,
+          await SaveScore({
+            score: this.score,
+            player: window.connectedAccount,
           });
 
-          const data = await res.json();
-          console.log("Server response:", data);
           this.showScoreSavedNotification(this);
         } catch (error) {
           console.error("Contract call failed:", error);
