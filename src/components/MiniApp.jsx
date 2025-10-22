@@ -36,7 +36,8 @@ export default function MiniApp() {
       try {
         const sdk = createBaseAccountSDK({
           appName: "Taxi Driver",
-          appLogoUrl: "https://example.com/logo.png",
+          appLogoUrl:
+            "https://game-car-beta.vercel.app/images/splasharts/taxi_in_game.webp",
           appChainIds: [base.id],
         });
 
