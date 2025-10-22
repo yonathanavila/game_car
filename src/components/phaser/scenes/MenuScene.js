@@ -75,61 +75,38 @@ export default class MenuScene extends Phaser.Scene {
         }
       });
 
-    if (!window?.connectedAccount) {
-      this.add
-        .text(
-          this.scale.width / 2,
-          this.sys.game.config.height - 80,
-          "Connect Wallet",
-          {
-            fontSize: "32px",
-            fill: "#fff",
-          }
-        )
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true })
-        .on("pointerdown", async () => {
-          const provider = window.connectWallet();
-          if (!provider) {
-            console.error("Base Wallet not available");
-            return;
-          }
+    this.walletText = this.add
+      .text(
+        this.scale.width / 2,
+        this.sys.game.config.height - 80,
+        window?.connectedAccount
+          ? shortenAddress(window.connectedAccount)
+          : "Connect Wallet",
+        {
+          fontSize: "32px",
+          fill: "#fff",
+        }
+      )
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", async () => {
+        const addr = await window.connectWallet();
 
-          const accounts = await provider.request({
-            method: "eth_requestAccounts",
-            params: [],
-          });
+        if (addr) {
+          window.connectedAccount = addr;
+          this.updateWalletText(addr);
+        }
 
-          console.log("Phaser sees Base Account:", accounts[0]);
-        });
-    } else {
-      this.add
-        .text(
-          this.scale.width / 2,
-          this.sys.game.config.height - 80,
-          shortenAddress(window?.connectedAccount),
-          {
-            fontSize: "32px",
-            fill: "#fff",
-          }
-        )
-        .setOrigin(0.5)
-        .setInteractive({ useHandCursor: true })
-        .on("pointerdown", async () => {
-          const provider = window.connectWallet();
-          if (!provider) {
-            console.error("Base Wallet not available");
-            return;
-          }
+        console.log("Phaser sees Base Account:", addr);
+      });
 
-          const accounts = await provider.request({
-            method: "eth_requestAccounts",
-            params: [],
-          });
+    this.updateWalletText = (addr) => {
+      this.walletText.setText(shortenAddress(addr));
+    };
 
-          console.log("Phaser sees Base Account:", accounts[0]);
-        });
-    }
+    window.refreshPhaserWalletText = (addr) => {
+      this.updateWalletText(addr);
+    };
   }
 
   update() {
