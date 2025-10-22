@@ -71,7 +71,7 @@ export default class GameOverScene extends Phaser.Scene {
         try {
           const response = await SaveScore({
             score: this.score,
-            player: localStorage.getItem("playerName"),
+            player: window.connectedAccount,
           });
 
           console.log(response);
