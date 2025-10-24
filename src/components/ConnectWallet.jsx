@@ -1,28 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAccount, useConnect } from "wagmi";
 
 export const ConnectWallet = () => {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
-  const [account, setAccount] = useState();
 
   const connectSmartWallet = async () => {
     const provider = window?.baseWalletProvider;
 
     try {
-      console.log("Enter");
       const accounts = await provider.request({
         method: "eth_requestAccounts",
         params: [],
       });
       const universalAddress = accounts[0];
       if (universalAddress) {
-        console.log("Connected Base Wallet:", universalAddress);
-        setAccount(universalAddress);
         window.connectedAccount = universalAddress;
         return universalAddress;
       }
-      setAccount(universalAddress);
     } catch (error) {
       console.error("Failed to connect Base Account");
     }
@@ -49,7 +44,6 @@ export const ConnectWallet = () => {
           connectedAddress
         );
 
-        setAccount(connectedAddress);
         window.connectedAccount = connectedAddress;
 
         return connectedAddress;
@@ -85,7 +79,6 @@ export const ConnectWallet = () => {
 
     // If user already connected via wagmi
     if (isConnected && address) {
-      setAccount(address);
       window.connectedAccount = address;
     }
   }, [isConnected, address, connectors]);

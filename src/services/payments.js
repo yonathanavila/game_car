@@ -1,12 +1,15 @@
 import { createBaseAccountSDK } from "@base-org/account";
+import { encodeFunctionData, numberToHex } from "viem";
 import { base } from "viem/chains";
 import contractAbi from "../../solidity/artifacts/GameLogic_metadata.json";
 
-const PAYMASTER_RPC = import.meta.env.PAYMASTER_RPC;
-const GAME_CONTRACT_ADDRESS = import.meta.env.GAME_CONTRACT_ADDRESS;
+const PAYMASTER_RPC = import.meta.env.PUBLIC_PAYMASTER_RPC;
+const GAME_CONTRACT_ADDRESS = import.meta.env.PUBLIC_GAME_CONTRACT_ADDRESS;
 
 const sdk = createBaseAccountSDK({
-  appName: "TaxiDriver",
+  appName: "Taxi Driver",
+  appLogoUrl:
+    "https://game-car-beta.vercel.app/images/splasharts/taxi_in_game.webp",
   appChainIds: [base.id],
   subAccounts: { creation: "on-connect", defaultAccount: "sub" },
 });
@@ -15,19 +18,34 @@ const provider = sdk.getProvider();
 
 export async function SaveScore({ score, player }) {
   const subaccount = await connectAndEnsureSubAccount();
+  const nonce = "1";
+
+  const responseSign = await fetch("/api/sign-transaction.json", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      score,
+      nonce,
+      playerAddress: player,
+    }),
+  });
+
+  const signature = responseSign.signature;
 
   const calls = [
     {
-      abi: contractAbi,
-      functionName: "submitScore",
       to: GAME_CONTRACT_ADDRESS,
-      args: [player, score],
+      data: encodeFunctionData({
+        abi: contractAbi,
+        functionName: "submitScore",
+        args: [score, nonce, signature],
+      }),
     },
   ];
 
-  const response = await sendSponsoredCalls(subaccount, calls);
-
-  console.log("⛓️ Transaction Request:", response);
+  const response = await sendSponsoredCalls(subaccount.address, calls);
 
   if (response?.txHash) {
     const receipt = await publicClient.waitForTransactionReceipt({
@@ -50,6 +68,8 @@ export async function PayTotalAmount({ component, repairCost }) {
   try {
     const subaccount = await connectAndEnsureSubAccount();
 
+    console.log("Sub account is: ", subaccount);
+
     const calls = [
       {
         abi: contractAbi,
@@ -59,7 +79,7 @@ export async function PayTotalAmount({ component, repairCost }) {
       },
     ];
 
-    const response = await sendSponsoredCalls(subaccount, calls);
+    const response = await sendSponsoredCalls(subaccount.address, calls);
 
     console.log("⛓️ Transaction Request:", response);
 
@@ -85,29 +105,36 @@ export async function PayTotalAmount({ component, repairCost }) {
 }
 
 async function connectAndEnsureSubAccount() {
-  // triggers passkey prompt / connect
-  const accounts = await provider.request({
-    method: "eth_requestAccounts",
-    params: [],
+  const universalAddress = await provider.request({
+    method: "wallet_addSubAccount",
+    params: [
+      {
+        account: {
+          type: "create",
+        },
+      },
+    ],
   });
-  const universal = accounts[0];
+
+  console.log("Sub Account created: ", universalAddress.address);
 
   // get existing subaccount for this origin
-  const subResp = await provider.request({
+  const result = await provider.request({
     method: "wallet_getSubAccounts",
-    params: [{ account: universal, domain: window.location.origin }],
+    params: [
+      { account: universalAddress.address, domain: window.location.origin },
+    ],
   });
 
-  if (subResp?.subAccounts?.length > 0) {
-    return subResp.subAccounts[0];
+  const subAccount = result?.subAccounts?.[0];
+
+  if (subAccount) {
+    console.log("Sub Account found:", subAccount.address);
+  } else {
+    console.log("No Sub Account exists for this app");
   }
 
-  const newSub = await provider.request({
-    method: "wallet_addSubAccount",
-    params: [{ account: { type: "create" } }],
-  });
-
-  return newSub;
+  return subAccount;
 }
 
 async function sendSponsoredCalls(subAccountAddress, calls) {
@@ -115,9 +142,9 @@ async function sendSponsoredCalls(subAccountAddress, calls) {
     method: "wallet_sendCalls",
     params: [
       {
-        version: "2.0",
-        atomicRequired: true,
+        version: "1.0",
         from: subAccountAddress,
+        chainId: numberToHex(base.id),
         calls,
         capabilities: {
           paymasterService: {
@@ -128,6 +155,6 @@ async function sendSponsoredCalls(subAccountAddress, calls) {
     ],
   });
 
-  console.log("Transaction ID:", response);
+  console.log("Sponsored calls: ", response);
   return response;
 }
