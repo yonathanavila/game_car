@@ -1,0 +1,19 @@
+// scripts/init-db.js
+import Database from "better-sqlite3";
+const db = new Database("database.db");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS nonces (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    wallet TEXT,
+    nonce TEXT
+  );
+`);
+
+console.log("✅ Tables 'users' and 'nonces' initialized.");
