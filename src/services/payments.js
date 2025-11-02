@@ -16,9 +16,8 @@ const sdk = createBaseAccountSDK({
 
 const provider = sdk.getProvider();
 
-export async function SaveScore({ score, player }) {
+export async function SaveScore({ score, player, nonce }) {
   const subaccount = await connectAndEnsureSubAccount();
-  const nonce = "1";
 
   const responseSign = await fetch("/api/sign-transaction.json", {
     method: "POST",

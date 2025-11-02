@@ -5,15 +5,16 @@ const SERVER_PRIVATE_KEY = import.meta.env.ADMIN_PRIVATE_KEY;
 const signer = new ethers.Wallet(SERVER_PRIVATE_KEY);
 
 export function signScore(playerAddress, score, nonce) {
+  const intScore = Math.floor(score);
   // Hash the data
-  const hash = ethers.utils.solidityKeccak256(
+  const hash = ethers.solidityPackedKeccak256(
     ["address", "uint256", "uint256"],
-    [playerAddress, score, nonce]
+    [playerAddress, intScore, nonce]
   );
 
   // Sign the hash (Ethereum signed message)
-  const signature = signer.signMessage(ethers.utils.arrayify(hash));
-
+  const signature = signer.signMessage(ethers.getBytes(hash));
+  console.log(signature);
   return signature;
 }
 

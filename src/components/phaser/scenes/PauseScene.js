@@ -58,9 +58,41 @@ export default class PauseScene extends Phaser.Scene {
         try {
           await connectWallet();
 
+          const getNonce = await fetch(
+            `/api/db/get-nonce.json?wallet=${window.connectedAccount}`
+          );
+
+          if (!getNonce.ok) {
+            const saveNonce = await fetch(`/api/db/save-nonce.json`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                wallet: window.connectedAccount,
+                nonce: 1,
+              }),
+            });
+
+            if (!saveNonce.ok) {
+              throw new Error("We cannot create the wallet nonce");
+            }
+
+            await SaveScore({
+              score: this.score,
+              player: window.connectedAccount,
+              nonce: 1,
+            });
+
+            return;
+          }
+
+          const data = await getNonce.json();
+
           await SaveScore({
             score: this.score,
             player: window.connectedAccount,
+            nonce: data.nonce,
           });
 
           this.showScoreSavedNotification(this);
