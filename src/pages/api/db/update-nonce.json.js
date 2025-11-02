@@ -3,7 +3,6 @@ import { UpdateNonceById } from "@/services/DB";
 export const POST = async ({ request }) => {
   try {
     const { nonceId, nonce } = await request.json();
-    console.log(nonceId, nonce);
 
     if (!nonceId || nonce === undefined) {
       return new Response(
