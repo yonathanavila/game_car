@@ -13,7 +13,7 @@ export const GET = async ({ url }) => {
 
     const record = GetNonce({ wallet });
 
-    const status = result.success ? 200 : 400;
+    const status = record.success ? 200 : 400;
 
     return new Response(JSON.stringify(record), {
       status,

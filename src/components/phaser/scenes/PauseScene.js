@@ -58,11 +58,13 @@ export default class PauseScene extends Phaser.Scene {
         try {
           await connectWallet();
 
-          const getNonce = await fetch(
+          const resNonce = await fetch(
             `/api/db/get-nonce.json?wallet=${window.connectedAccount}`
           );
 
-          if (!getNonce.ok) {
+          const dataNonce = await resNonce.json();
+
+          if (!dataNonce.data) {
             const saveNonce = await fetch(`/api/db/save-nonce.json`, {
               method: "POST",
               headers: {
@@ -86,13 +88,29 @@ export default class PauseScene extends Phaser.Scene {
 
             return;
           }
+          const data = dataNonce.data;
+          const newNonce = data.nonce + 1;
 
-          const data = await getNonce.json();
+          // save in the database first
+          const saveNonce = await fetch(`/api/db/update-nonce.json`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              nonceId: data.id,
+              nonce: newNonce,
+            }),
+          });
+
+          if (!saveNonce.ok) {
+            throw new Error("We cannot update the nonce");
+          }
 
           await SaveScore({
-            score: this.score,
+            score: parseInt(this.score),
             player: window.connectedAccount,
-            nonce: data.nonce,
+            nonce: newNonce,
           });
 
           this.showScoreSavedNotification(this);

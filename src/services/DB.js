@@ -4,9 +4,13 @@ const db = new Database("database.db");
 
 export const CreateNonce = ({ wallet, nonce }) => {
   try {
+    const createdAt = new Date().toISOString();
+
     // Insert a new record
-    const stmt = db.prepare("INSERT INTO nonces (wallet, nonce) VALUES (?, ?)");
-    const result = stmt.run(wallet, nonce);
+    const stmt = db.prepare(
+      "INSERT INTO nonces (wallet, nonce, createdAt) VALUES (?, ?, ?)"
+    );
+    const result = stmt.run(wallet, nonce, createdAt);
 
     return {
       success: true,
@@ -50,12 +54,16 @@ export const GetNonce = ({ wallet }) => {
  * Updates the nonce value by record ID.
  * @param {number} nonceId - The ID of the nonce record to update.
  * @param {number} newNonce - The new nonce value.
+ *
  * @returns {object} { success, message, data? }
  */
 export const UpdateNonceById = ({ nonceId, newNonce }) => {
   try {
-    const stmt = db.prepare("UPDATE nonces SET nonce = ? WHERE id = ?");
-    const result = stmt.run(newNonce, nonceId);
+    const stmt = db.prepare(
+      "UPDATE nonces SET nonce = ?, updatedAt = ? WHERE id = ?"
+    );
+    const updatedDate = new Date().toISOString();
+    const result = stmt.run(newNonce, updatedDate, nonceId);
 
     if (result.changes === 0) {
       return { success: false, message: "Nonce not found or not updated." };
