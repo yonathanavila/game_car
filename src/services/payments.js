@@ -16,6 +16,7 @@ const sdk = createBaseAccountSDK({
 
 const provider = sdk.getProvider();
 
+// TODO: Review the SaveScore structure becouse continue faild the transaction
 export async function SaveScore({ score, player, nonce }) {
   const subaccount = await connectAndEnsureSubAccount();
 
