@@ -2,19 +2,23 @@ import { ethers } from "ethers";
 
 // Your server-side wallet (must be private!)
 const SERVER_PRIVATE_KEY = import.meta.env.ADMIN_PRIVATE_KEY;
+const CONTRACT_ADDRESS = import.meta.env.PUBLIC_GAME_CONTRACT_ADDRESS;
+
 const signer = new ethers.Wallet(SERVER_PRIVATE_KEY);
 
 export async function signScore(playerAddress, score, nonce) {
   const intScore = Math.floor(score);
-  // Hash the data
-  const hash = ethers.solidityPackedKeccak256(
-    ["address", "uint256", "uint256"],
-    [playerAddress, intScore, nonce]
+
+  console.log(playerAddress, score, nonce, CONTRACT_ADDRESS);
+
+  const messageHash = ethers.solidityPackedKeccak256(
+    ["address", "uint256", "uint256", "address"],
+    [playerAddress, intScore, nonce, CONTRACT_ADDRESS]
   );
 
   // Sign the hash (Ethereum signed message)
-  const signature = await signer.signMessage(ethers.getBytes(hash));
-  console.log(signature);
+  const signature = await signer.signMessage(ethers.getBytes(messageHash));
+
   return signature;
 }
 

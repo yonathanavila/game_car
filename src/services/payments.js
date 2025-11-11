@@ -30,8 +30,9 @@ export async function SaveScore({ score, player, nonce }) {
       playerAddress: player,
     }),
   });
+  const data = await responseSign.json();
 
-  const signature = responseSign.signature;
+  const signature = data.signature;
 
   const calls = [
     {
@@ -39,7 +40,7 @@ export async function SaveScore({ score, player, nonce }) {
       data: encodeFunctionData({
         abi: contractAbi,
         functionName: "submitScore",
-        args: [score, nonce, signature],
+        args: [player, score, nonce, signature],
       }),
     },
   ];

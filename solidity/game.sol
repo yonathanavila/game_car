@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
@@ -65,17 +65,32 @@ contract GameLogic is AccessControl, Pausable {
 
     // Submit score (only callable by admin)
     function submitScore(
+        address player,
         uint256 score,
         uint256 nonce,
-        bytes calldata signature
-    ) external whenNotPaused {
-        require(score > 0, "Score must be greater than zero");
+        bytes memory signature
+    ) public {
         require(!usedNonces[msg.sender][nonce], "Nonce already used");
 
-        bytes32 hash = keccak256(abi.encode(msg.sender, score, nonce))
-            .toEthSignedMessageHash();
-        address recovered = hash.recover(signature);
-        require(recovered == trustedSigner, "Invalid signature");
+        // ----- OPTIMIZED HASH (inline assembly) -----
+        bytes32 messageHash;
+        assembly {
+            // Reserve 0x80 bytes of free memory (4 * 32 = 128 bytes)
+            let ptr := mload(0x40) // current free-memory pointer
+            mstore(ptr, player) // slot 0
+            mstore(add(ptr, 0x20), score) // slot 1
+            mstore(add(ptr, 0x40), nonce) // slot 2
+            mstore(add(ptr, 0x60), address()) // slot 3  (address(this))
+            messageHash := keccak256(ptr, 0x80) // hash 128 bytes
+            mstore(0x40, add(ptr, 0x80)) // update free-memory pointer
+        }
+        // -------------------------------------------
+
+        bytes32 ethSignedHash = messageHash.toEthSignedMessageHash();
+
+        address signer = ethSignedHash.recover(signature);
+
+        require(signer == trustedSigner, "Invalid signature");
 
         // Check if the new score is higher than the current score
         require(

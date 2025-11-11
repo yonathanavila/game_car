@@ -80,7 +80,7 @@ export default class PauseScene extends Phaser.Scene {
               throw new Error("We cannot create the wallet nonce");
             }
 
-            await SaveScore({
+            const signature = await SaveScore({
               score: this.score,
               player: window.connectedAccount,
               nonce: 1,
@@ -107,11 +107,13 @@ export default class PauseScene extends Phaser.Scene {
             throw new Error("We cannot update the nonce");
           }
 
-          await SaveScore({
+          const signature = await SaveScore({
             score: parseInt(this.score),
             player: window.connectedAccount,
             nonce: newNonce,
           });
+
+          console.log(signature);
 
           this.showScoreSavedNotification(this);
         } catch (error) {
