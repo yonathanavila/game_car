@@ -8,9 +8,9 @@ export const GET = async ({ request }) => {
 
     const address = params.get("address");
 
-    console.log(address);
-
     const result = await getTTBalance({ address });
+
+    console.log("Result is: ", result);
 
     return new Response(
       JSON.stringify({ success: true, balance: formatEther(result) }),

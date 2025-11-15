@@ -4,8 +4,8 @@ import { base } from "viem/chains";
 import gameAbi from "../../solidity/artifacts/GameLogic_metadata.json";
 import tokenAbi from "../../solidity/artifacts/GameToken_metadata.json";
 
-const TOKEN_CONTRACT_ADDRESS = import.meta.env.TOKEN_CONTRACT_ADDRESS;
-const GAME_CONTRACT_ADDRESS = import.meta.env.GAME_CONTRACT_ADDRESS;
+const TOKEN_CONTRACT_ADDRESS = import.meta.env.PUBLIC_TOKEN_CONTRACT_ADDRESS;
+const GAME_CONTRACT_ADDRESS = import.meta.env.PUBLIC_GAME_CONTRACT_ADDRESS;
 
 const publicClient = createPublicClient({
   chain: base,
