@@ -56,13 +56,19 @@ export default class PauseScene extends Phaser.Scene {
       .setOrigin(0.5)
       .on("pointerdown", async () => {
         try {
-          await connectWallet();
+          const addr = await window.connectWallet();
+
+          if (!addr) throw new Error("The wallet doesnt exist");
+
+          console.log("Wallet connected:", window.connectedAccount);
 
           const resNonce = await fetch(
             `/api/db/get-nonce.json?wallet=${window.connectedAccount}`
           );
 
           const dataNonce = await resNonce.json();
+
+          console.log(`Data nonce: ${dataNonce}`);
 
           if (!dataNonce.data) {
             const saveNonce = await fetch(`/api/db/save-nonce.json`, {
@@ -90,6 +96,8 @@ export default class PauseScene extends Phaser.Scene {
           }
           const data = dataNonce.data;
           const newNonce = data.nonce + 1;
+
+          console.log(`New nonce: ${newNonce}`);
 
           // save in the database first
           const saveNonce = await fetch(`/api/db/update-nonce.json`, {

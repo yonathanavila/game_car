@@ -144,8 +144,8 @@ async function sendSponsoredCalls(subAccountAddress, calls) {
     params: [
       {
         version: "1.0",
-        from: subAccountAddress,
         chainId: numberToHex(base.id),
+        from: subAccountAddress,
         calls,
         capabilities: {
           paymasterService: {
