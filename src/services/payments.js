@@ -67,9 +67,17 @@ export async function SaveScore({ score, player, nonce }) {
 
 export async function PayTotalAmount({ component, repairCost }) {
   try {
-    const subaccount = await connectAndEnsureSubAccount();
+    if (!window.connectedAccount) {
+      throw new Error("No connected account found.");
+    }
+
+    const subaccount = await connectAndEnsureSubAccount(
+      window.connectedAccount
+    );
 
     console.log("Sub account is: ", subaccount);
+
+    console.log("Component: ", component, " RepairCost: ", repairCost);
 
     const calls = [
       {
@@ -105,7 +113,17 @@ export async function PayTotalAmount({ component, repairCost }) {
   }
 }
 
-async function connectAndEnsureSubAccount() {
+async function connectAndEnsureSubAccount(userWallet) {
+  // get existing subaccount for this origin
+  const result = await provider.request({
+    method: "wallet_getSubAccounts",
+    params: [{ account: userWallet, domain: window.location.origin }],
+  });
+
+  const subAccount = result?.subAccounts?.[0];
+
+  if (subAccount) return subAccount;
+
   const universalAddress = await provider.request({
     method: "wallet_addSubAccount",
     params: [
@@ -117,25 +135,7 @@ async function connectAndEnsureSubAccount() {
     ],
   });
 
-  console.log("Sub Account created: ", universalAddress.address);
-
-  // get existing subaccount for this origin
-  const result = await provider.request({
-    method: "wallet_getSubAccounts",
-    params: [
-      { account: universalAddress.address, domain: window.location.origin },
-    ],
-  });
-
-  const subAccount = result?.subAccounts?.[0];
-
-  if (subAccount) {
-    console.log("Sub Account found:", subAccount.address);
-  } else {
-    console.log("No Sub Account exists for this app");
-  }
-
-  return subAccount;
+  return universalAddress.address;
 }
 
 async function sendSponsoredCalls(subAccountAddress, calls) {

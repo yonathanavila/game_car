@@ -241,7 +241,7 @@ export default class RepairScene extends Phaser.Scene {
             // Call the API
             try {
               const response = await PayTotalAmount({
-                component: item.name,
+                component: item.text,
                 repairCost: item.cost,
               });
 
@@ -292,7 +292,7 @@ export default class RepairScene extends Phaser.Scene {
               // Call the API
               try {
                 const response = await PayTotalAmount({
-                  component: item.name,
+                  component: item.text,
                   repairCost: item.cost,
                 });
 
